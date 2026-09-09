@@ -18,13 +18,26 @@ LogisticaMineraFront/
 │   ├── angular.json  package.json  proxy.conf.json  ngsw-config.json
 │   └── src/
 ├── skills/             seis skills de trabajo, versionadas
+├── docs/               documentación propia de este repositorio (ver abajo)
 ├── .claude/skills  →   enlace simbólico a ../skills, para que Claude las cargue
 ├── .gitignore          dist, .angular, node_modules, .env
+├── CONTRIBUTING.md     paso a paso para trabajar aquí
 └── README.md           este archivo
 ```
 
 **Todos los comandos de npm se ejecutan dentro de `frontend/`.** El proyecto Angular vive ahí, no en
 la raíz: la raíz es el repositorio, y el repositorio contiene más que la aplicación.
+
+## Documentación
+
+| Documento | Qué encontrar ahí |
+|---|---|
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Cómo crear un feature, convención de commits, checklist de PR |
+| [`docs/entorno.md`](docs/entorno.md) | Versiones exactas, por qué Node 24 es un riesgo, cómo probar M07 offline |
+| [`docs/decisiones.md`](docs/decisiones.md) | Decisiones de implementación (D-F01…): por qué signals y no NgRx, por qué el token en `localStorage`, etc. |
+| [`docs/estado-modulos.md`](docs/estado-modulos.md) | Avance real por módulo — se actualiza al cerrar trabajo, no en cada commit |
+
+Nada de esto duplica la documentación de la tesis (historias, requerimientos, decisiones D-01 a D-11). Esa vive solo en el repositorio del backend.
 
 ## Stack
 
@@ -133,6 +146,8 @@ npx http-server dist/mineria-logistica/browser -p 4300   # desde frontend/
 
 Y en DevTools › Network › **Offline**: registrar, volver a línea, y comprobar que el correlativo
 llega del servidor y que la hora de registro conserva la de captura.
+
+Procedimiento completo, con dónde inspeccionar la cola en IndexedDB, en [`docs/entorno.md`](docs/entorno.md#4-cómo-probar-la-captura-sin-conexión-m07).
 
 ## Convención de commits
 

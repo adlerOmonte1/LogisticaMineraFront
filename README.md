@@ -8,6 +8,24 @@ documentación de la tesis —historias de usuario, requerimientos, diagramas y 
 viven en el repositorio del backend. No se duplican aquí: dos copias de una historia divergen y la
 trazabilidad se pierde.
 
+## Organización del repositorio
+
+Espejo del repositorio del backend (`backend/` + `skills/`), para que los dos se lean igual:
+
+```
+LogisticaMineraFront/
+├── frontend/           proyecto Angular — aquí se ejecuta npm
+│   ├── angular.json  package.json  proxy.conf.json  ngsw-config.json
+│   └── src/
+├── skills/             seis skills de trabajo, versionadas
+├── .claude/skills  →   enlace simbólico a ../skills, para que Claude las cargue
+├── .gitignore          dist, .angular, node_modules, .env
+└── README.md           este archivo
+```
+
+**Todos los comandos de npm se ejecutan dentro de `frontend/`.** El proyecto Angular vive ahí, no en
+la raíz: la raíz es el repositorio, y el repositorio contiene más que la aplicación.
+
 ## Stack
 
 | Pieza | Versión | Para qué |
@@ -20,6 +38,7 @@ trazabilidad se pierde.
 ## Puesta en marcha
 
 ```bash
+cd frontend
 npm install
 npm start          # http://localhost:4200 con proxy hacia el backend en :8000
 ```
@@ -109,7 +128,7 @@ intermitente: si algún día falla, la respuesta es quitar peso, no subir el pre
 
 ```bash
 npx ng build --configuration production
-npx http-server dist/mineria-logistica/browser -p 4300
+npx http-server dist/mineria-logistica/browser -p 4300   # desde frontend/
 ```
 
 Y en DevTools › Network › **Offline**: registrar, volver a línea, y comprobar que el correlativo
@@ -127,6 +146,10 @@ repartida entre los dos repositorios.
 
 ## Skills
 
-En `.claude/skills/` hay seis skills de trabajo, versionadas a propósito para que no se pierdan:
+En `skills/` hay seis skills de trabajo, versionadas a propósito para que no se pierdan:
 `contexto-frontend` (siempre primero), `frontend-angular`, `frontend-feature-nuevo`,
 `frontend-http-sesion`, `frontend-formularios` y `frontend-offline-pwa`.
+
+Viven en `skills/` para que la estructura sea espejo de la del backend, y `.claude/skills` es un
+enlace simbólico que apunta ahí: Claude Code las carga desde `.claude/`, y quien abra el repositorio
+las ve en la raíz sin tener que mirar dentro de una carpeta oculta. Un solo contenido, dos entradas.

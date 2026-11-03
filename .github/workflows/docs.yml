@@ -1,0 +1,44 @@
+# Coherencia de la documentación propia del frontend: enlaces internos y conceptos del
+# alcance anterior de la tesis que no deben volver (salidas, existencias, cola offline...).
+name: Documentacion
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "skills/**"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "scripts/validar_docs.py"
+      - ".github/workflows/docs.yml"
+  push:
+    branches: [main, staging]
+    paths:
+      - "docs/**"
+      - "skills/**"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "scripts/validar_docs.py"
+      - ".github/workflows/docs.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coherencia:
+    name: Coherencia de la documentacion
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Enlaces y conceptos del alcance anterior
+        run: python3 scripts/validar_docs.py

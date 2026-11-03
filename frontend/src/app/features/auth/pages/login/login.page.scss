@@ -1,0 +1,79 @@
+.login {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 24px;
+  min-height: 100vh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: var(--bg);
+}
+
+.login__marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login__logo {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--gold);
+  color: var(--sidebar);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.login__nombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.login__lema {
+  margin: 0;
+  color: var(--label-2);
+}
+
+.login__tarjeta {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.login__titulo {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.login__motivo {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--blue-b) 12%, transparent);
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.login__boton {
+  height: var(--altura-toque);
+}
+
+.login__ayuda {
+  justify-self: center;
+}
+
+.login__planta {
+  margin: 0;
+  color: var(--label-3);
+  font-size: 0.85rem;
+}

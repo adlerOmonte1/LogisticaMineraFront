@@ -1,0 +1,55 @@
+<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+  <app-aviso-error [error]="error()" />
+
+  <div class="formulario">
+    <mat-form-field>
+      <mat-label>Nombres</mat-label>
+      <input matInput formControlName="nombres" autocomplete="given-name" />
+      <mat-error>{{ formulario.controls.nombres | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Apellidos</mat-label>
+      <input matInput formControlName="apellidos" autocomplete="family-name" />
+      <mat-error>{{ formulario.controls.apellidos | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Nombre de usuario</mat-label>
+      <input
+        matInput
+        formControlName="username"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+      <mat-error>{{ formulario.controls.username | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="rol">
+        @for (rol of roles; track rol) {
+          <mat-option [value]="rol">{{ etiquetaRol[rol] }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>{{ formulario.controls.rol | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    @if (esAlta()) {
+      <mat-form-field class="formulario__ancho">
+        <mat-label>Contraseña inicial</mat-label>
+        <input matInput type="password" formControlName="password" autocomplete="new-password" />
+        <mat-hint>Al menos ocho caracteres</mat-hint>
+        <mat-error>{{ formulario.controls.password | errorCampo }}</mat-error>
+      </mat-form-field>
+    }
+  </div>
+
+  <div class="acciones-formulario">
+    <button mat-button type="button" (click)="cancelar.emit()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="enviando()">
+      {{ esAlta() ? 'Crear usuario' : 'Guardar cambios' }}
+    </button>
+  </div>
+</form>

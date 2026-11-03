@@ -1,0 +1,40 @@
+<app-marco-listado
+  [cargando]="listado.cargando()"
+  [vacio]="listado.vacio()"
+  [error]="listado.error()"
+  [total]="listado.total()"
+  [pagina]="listado.pagina()"
+  mensajeVacio="No hay usuarios con estos filtros"
+  iconoVacio="group"
+  (cambioPagina)="listado.irAPagina($event)"
+>
+  <ng-container filtros>
+    <mat-form-field>
+      <mat-label>Rol</mat-label>
+      <mat-select [ngModel]="listado.filtro().rol" (ngModelChange)="filtrarPorRol($event)">
+        <mat-option [value]="null">Todos</mat-option>
+        @for (rol of roles; track rol) {
+          <mat-option [value]="rol">{{ etiquetaRol[rol] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-slide-toggle
+      [ngModel]="listado.filtro().incluir_inactivos"
+      (ngModelChange)="mostrarInactivos($event)"
+    >
+      Mostrar inactivos
+    </mat-slide-toggle>
+    <span class="filtros__espacio"></span>
+    <button mat-flat-button color="primary" type="button" (click)="crear()">
+      <mat-icon>person_add</mat-icon>
+      Nuevo usuario
+    </button>
+  </ng-container>
+  <app-tabla-usuarios
+    [usuarios]="listado.filas()"
+    (editar)="editar($event)"
+    (desactivar)="desactivar($event)"
+    (reactivar)="reactivar($event)"
+    (restablecerClave)="restablecerClave($event)"
+  />
+</app-marco-listado>

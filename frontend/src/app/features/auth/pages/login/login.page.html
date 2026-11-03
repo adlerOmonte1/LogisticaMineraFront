@@ -1,0 +1,63 @@
+<div class="login">
+  <header class="login__marca">
+    <span class="login__logo" aria-hidden="true">C</span>
+    <div>
+      <div class="login__nombre">CONSMIN</div>
+      <p class="login__lema">Construcción &amp; Minería · Control de ingreso de mineral</p>
+    </div>
+  </header>
+
+  <form class="login__tarjeta" [formGroup]="formulario" (ngSubmit)="ingresar()" novalidate>
+    <h1 class="login__titulo">Inicia sesión</h1>
+
+    @if (motivoCierre(); as motivo) {
+      <p class="login__motivo" role="status">{{ motivo }}</p>
+    }
+    <app-aviso-error [error]="envio.error()" />
+
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input
+        matInput
+        formControlName="username"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
+        data-prueba="usuario"
+      />
+      <mat-error>{{ formulario.controls.username | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input
+        matInput
+        [type]="claveVisible() ? 'text' : 'password'"
+        formControlName="password"
+        autocomplete="current-password"
+        data-prueba="clave"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        [attr.aria-label]="claveVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        (click)="alternarClave()"
+      >
+        <mat-icon>{{ claveVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error>{{ formulario.controls.password | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" class="login__boton" type="submit" [disabled]="envio.enviando()">
+      Iniciar sesión
+    </button>
+    <button mat-button type="button" class="login__ayuda" (click)="mostrarAyudaClave()">
+      ¿Olvidó su contraseña?
+    </button>
+  </form>
+
+  <p class="login__planta">Planta Pillcomarca, Huánuco</p>
+</div>

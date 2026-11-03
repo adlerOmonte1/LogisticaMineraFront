@@ -1,0 +1,47 @@
+<table mat-table [dataSource]="usuarios()" class="tabla">
+  <ng-container matColumnDef="nombre">
+    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+    <td mat-cell *matCellDef="let usuario">
+      <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef>Usuario</th>
+    <td mat-cell *matCellDef="let usuario" data-etiqueta="Usuario">{{ usuario.username }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="rol">
+    <th mat-header-cell *matHeaderCellDef>Rol</th>
+    <td mat-cell *matCellDef="let usuario" data-etiqueta="Rol">{{ usuario.rol | etiquetaRol }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="estado">
+    <th mat-header-cell *matHeaderCellDef>Estado</th>
+    <td mat-cell *matCellDef="let usuario">
+      <app-insignia-estado
+        [texto]="usuario.is_active ? 'Activo' : 'Inactivo'"
+        [tono]="usuario.is_active ? 'exito' : 'neutro'"
+      />
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Acciones</span></th>
+    <td mat-cell *matCellDef="let usuario" class="celda-acciones">
+      <app-acciones-registro
+        [nombre]="usuario.username"
+        [activo]="usuario.is_active"
+        [extras]="extras"
+        textoDesactivar="Desactivar"
+        (editar)="editar.emit(usuario)"
+        (desactivar)="desactivar.emit(usuario)"
+        (reactivar)="reactivar.emit(usuario)"
+        (accionExtra)="alElegirExtra($event, usuario)"
+      />
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+  <tr mat-row *matRowDef="let usuario; columns: columnas"></tr>
+</table>

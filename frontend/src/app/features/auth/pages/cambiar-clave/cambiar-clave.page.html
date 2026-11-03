@@ -1,0 +1,37 @@
+<app-encabezado-pagina
+  [titulo]="obligatorio() ? 'Cambie su contraseña temporal' : 'Cambiar contraseña'"
+  subtitulo="Use al menos ocho caracteres."
+/>
+
+<form class="tarjeta formulario-clave" [formGroup]="formulario" (ngSubmit)="cambiar()" novalidate>
+  <app-aviso-error [error]="envio.error()" />
+
+  <mat-form-field>
+    <mat-label>Contraseña actual</mat-label>
+    <input matInput type="password" formControlName="password_actual" autocomplete="current-password" />
+    <mat-error>{{ formulario.controls.password_actual | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Nueva contraseña</mat-label>
+    <input matInput type="password" formControlName="password_nueva" autocomplete="new-password" />
+    <mat-error>{{ formulario.controls.password_nueva | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Repita la nueva contraseña</mat-label>
+    <input
+      matInput
+      type="password"
+      formControlName="password_nueva_confirmacion"
+      autocomplete="new-password"
+    />
+    <mat-error>{{ formulario.controls.password_nueva_confirmacion | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <div class="acciones-formulario">
+    <button mat-flat-button color="primary" type="submit" [disabled]="envio.enviando()">
+      Cambiar contraseña
+    </button>
+  </div>
+</form>

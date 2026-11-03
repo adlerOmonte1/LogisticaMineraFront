@@ -1,0 +1,56 @@
+<app-marco-listado
+  [cargando]="listado.cargando()"
+  [vacio]="listado.vacio()"
+  [error]="listado.error()"
+  [total]="listado.total()"
+  [pagina]="listado.pagina()"
+  mensajeVacio="No hay vehículos con estos filtros"
+  iconoVacio="local_shipping"
+  (cambioPagina)="listado.irAPagina($event)"
+>
+  <ng-container filtros>
+    <mat-form-field>
+      <mat-label>Titularidad</mat-label>
+      <mat-select [ngModel]="listado.filtro().titularidad" (ngModelChange)="filtrarPorTitularidad($event)">
+        <mat-option [value]="null">Todas</mat-option>
+        @for (titularidad of titularidades; track titularidad) {
+          <mat-option [value]="titularidad">{{ etiquetaTitularidad[titularidad] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Buscar placa</mat-label>
+      <input
+        #placa
+        matInput
+        autocapitalize="characters"
+        autocomplete="off"
+        (keyup.enter)="buscarPlaca(placa.value)"
+        (search)="buscarPlaca(placa.value)"
+        type="search"
+      />
+      <button mat-icon-button matSuffix type="button" aria-label="Buscar" (click)="buscarPlaca(placa.value)">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-slide-toggle
+      [ngModel]="listado.filtro().incluir_inactivos"
+      (ngModelChange)="mostrarInactivos($event)"
+    >
+      Mostrar dados de baja
+    </mat-slide-toggle>
+    <span class="filtros__espacio"></span>
+    <button mat-flat-button color="primary" type="button" (click)="crear()">
+      <mat-icon>add</mat-icon>
+      Nuevo vehículo
+    </button>
+  </ng-container>
+  <app-tabla-vehiculos
+    [vehiculos]="listado.filas()"
+    [puedeModificarTara]="puedeModificarTara()"
+    (editar)="editar($event)"
+    (desactivar)="desactivar($event)"
+    (reactivar)="reactivar($event)"
+    (modificarTara)="modificarTara($event)"
+  />
+</app-marco-listado>

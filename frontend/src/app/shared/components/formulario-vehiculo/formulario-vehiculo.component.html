@@ -1,0 +1,58 @@
+<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+  <app-aviso-error [error]="error()" />
+
+  <div class="formulario">
+    <mat-form-field>
+      <mat-label>Placa</mat-label>
+      <input
+        matInput
+        formControlName="placa"
+        autocapitalize="characters"
+        autocomplete="off"
+        spellcheck="false"
+        (input)="normalizarPlaca()"
+        data-prueba="placa"
+      />
+      <mat-error>{{ formulario.controls.placa | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Capacidad de carga (t)</mat-label>
+      <input
+        matInput
+        formControlName="capacidad_tn"
+        inputmode="decimal"
+        autocomplete="off"
+        data-prueba="capacidad"
+      />
+      <mat-error>{{ formulario.controls.capacidad_tn | errorCampo }}</mat-error>
+    </mat-form-field>
+
+    <div class="formulario__ancho titularidad">
+      <span id="etiqueta-titularidad" class="texto-secundario">Titularidad</span>
+      <mat-button-toggle-group formControlName="tipo_titularidad" aria-labelledby="etiqueta-titularidad">
+        @for (titularidad of titularidades; track titularidad) {
+          <mat-button-toggle [value]="titularidad">{{ etiquetaTitularidad[titularidad] }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+
+    @if (esExterno()) {
+      <mat-form-field class="formulario__ancho">
+        <mat-label>Transportista</mat-label>
+        <mat-select formControlName="transportista" data-prueba="transportista">
+          <mat-option [value]="null">Sin elegir</mat-option>
+          @for (transportista of opcionesTransportista(); track transportista.id) {
+            <mat-option [value]="transportista.id">{{ transportista.razon_social }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ formulario.controls.transportista | errorCampo }}</mat-error>
+      </mat-form-field>
+    }
+  </div>
+
+  <div class="acciones-formulario">
+    <button mat-button type="button" (click)="cancelar.emit()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="enviando()">{{ textoEnviar() }}</button>
+  </div>
+</form>

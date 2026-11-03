@@ -1,0 +1,30 @@
+<app-marco-listado
+  [cargando]="listado.cargando()"
+  [vacio]="listado.vacio()"
+  [error]="listado.error()"
+  [total]="listado.total()"
+  [pagina]="listado.pagina()"
+  mensajeVacio="No hay transportistas con estos filtros"
+  iconoVacio="local_shipping"
+  (cambioPagina)="listado.irAPagina($event)"
+>
+  <ng-container filtros>
+    <mat-slide-toggle
+      [ngModel]="listado.filtro().incluir_inactivos"
+      (ngModelChange)="mostrarInactivos($event)"
+    >
+      Mostrar dados de baja
+    </mat-slide-toggle>
+    <span class="filtros__espacio"></span>
+    <button mat-flat-button color="primary" type="button" (click)="crear()">
+      <mat-icon>add</mat-icon>
+      Nuevo transportista
+    </button>
+  </ng-container>
+  <app-tabla-transportistas
+    [transportistas]="listado.filas()"
+    (editar)="editar($event)"
+    (desactivar)="desactivar($event)"
+    (reactivar)="reactivar($event)"
+  />
+</app-marco-listado>

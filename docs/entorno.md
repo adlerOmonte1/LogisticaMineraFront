@@ -1,89 +1,127 @@
 # Entorno de desarrollo
 
-**Documento:** operativo, propio de este repositorio
-**No duplica:** `ARQ-02_Arquitectura_Tecnica.md` del repositorio del backend, que fija el stack a nivel de tesis. Esto es lo que hace falta saber para que el entorno de una máquina nueva funcione.
+**Documento:** operativo, propio de este repositorio.
+**No duplica:** `ARQ-02_Arquitectura_Tecnica.md` del backend, que fija el stack del sistema. Esto es
+lo que hace falta para que una máquina nueva trabaje con los dos repositorios.
 
 ---
 
-## 1. Versiones exactas
+## 1. Versiones
 
-| Herramienta | Versión instalada | Versión soportada por Angular 17 | Estado |
-|---|---|---|---|
-| Node.js | 24.13.1 | 18.x / 20.x | ⚠️ No soportado — funciona, pero fuera de la matriz oficial |
-| npm | 11.8.0 | viene con Node | — |
-| Angular CLI (global) | 17.3.17 | — | Fijado para que coincida con el proyecto |
-| Angular CLI (local, `frontend/`) | 17.3.17 | — | El que realmente compila el build |
-| TypeScript | 5.4.2 | 5.2–5.4 | OK |
+| Herramienta | Objetivo | Estado al 2026-11-03 |
+|---|---|---|
+| Node.js | **20 LTS** (Angular 17 soporta 18.x y 20.x) | 24.13.1 instalado — fuera de la matriz; se corrige en FB0 |
+| npm | El que trae Node 20 | 11.8.0 |
+| Angular CLI | 17.3.x local, en `frontend/package.json` | 17.3.17 |
+| TypeScript | 5.4 | 5.4.2 |
+| Navegadores de prueba | Chrome y Safari móviles, Chrome y Edge de escritorio | — |
 
-### Por qué Node 24 es un riesgo, no un error
+### Node 20
 
-`ng version` marca Node 24 como `(Unsupported)`. Hoy compila y sirve sin problema — se verificó con `ng build --configuration production` — pero "funciona hoy" no es lo mismo que "está soportado". Angular 17 se probó y se mantiene contra Node 18 y 20; nadie en el equipo de Angular corre CI contra Node 24. El riesgo no es abstracto: es que un `npm install` futuro traiga una versión de alguna dependencia que sí choque con Node 24, y que eso se descubra en la semana 8 (preproducción, JMeter) en vez de ahora.
-
-**Recomendación:** instalar Node 20 LTS con `nvm` y fijarlo con un `.nvmrc`. No es urgente mientras el proyecto siga en esqueleto, pero conviene resolverlo antes de que el volumen de dependencias crezca (Material ya está, faltan librerías de formularios y quizá de fechas).
+`ng version` marca Node 24 como «Unsupported». Compila hoy, pero Angular 17 no se prueba contra
+Node 24 y un `npm install` futuro puede traer una dependencia que choque, para descubrirse en la
+estabilización. Se fija Node 20 en FB0:
 
 ```bash
-# instalar nvm si no está
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-
-# instalar y fijar Node 20
 nvm install 20
 nvm alias default 20
 echo "20" > frontend/.nvmrc
 ```
 
-## 2. Por qué el CLI no se instala global "porque sí"
+## 2. El CLI, siempre local
 
-Se instaló global (`npm install -g @angular/cli@17.3.17`) por comodidad de terminal — para que `ng version`, `ng generate` funcionen sin escribir `npx`. Pero **la versión que importa es la local**, la de `frontend/package.json`. Si alguna vez divergen (por ejemplo, alguien actualiza el global a Angular 18), usar `npx ng` dentro de `frontend/` siempre respeta la versión del proyecto y evita builds inconsistentes entre máquinas.
+Para todo lo que termina en un commit (`generate`, `build`, `add`, `lint`, `test`) se usa `npx ng`
+dentro de `frontend/`, que respeta la versión del proyecto. Un CLI global solo para curiosear.
 
-Regla práctica: `ng` a secas para comandos exploratorios (`ng version`, `ng doc`); `npx ng` dentro de `frontend/` para todo lo que termine en un commit (`generate`, `build`, `add`).
+## 3. Arranque de los dos repositorios
 
-## 3. Arranque en una máquina nueva
+Los dos se clonan lado a lado (D-F10):
+
+```
+TesisConsmin/
+├── LogisticaMinera/        backend, docs y maqueta
+└── LogisticaMineraFront/   este repositorio
+```
+
+### 3.1 Backend
+
+Desde `LogisticaMinera/`:
 
 ```bash
-git clone <url> LogisticaMineraFront
+docker compose up -d --build
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py cargar_datos_prueba
+```
+
+`cargar_datos_prueba` crea —o devuelve a su estado inicial— una cuenta por rol, el catálogo
+provisional y datos de ejemplo. Las credenciales de las tres cuentas están en
+`postman/entornos/local.postman_environment.json` del backend; no se copian a este repositorio.
+
+La API queda en `http://localhost:8000/api/v1/` y su documentación en
+`http://localhost:8000/api/v1/docs/`.
+
+Para repetir una revisión desde cero:
+
+```bash
+docker compose exec backend python manage.py flush --no-input
+docker compose exec backend python manage.py cargar_datos_prueba
+```
+
+### 3.2 Frontend
+
+```bash
 cd LogisticaMineraFront/frontend
 npm install
-npm start                # http://localhost:4200, proxy hacia backend en :8000
+npm start           # http://localhost:4200, proxy /api → localhost:8000
 ```
 
-El backend debe estar corriendo en `localhost:8000` (ver `entorno.md` / README del repositorio del backend) para que el proxy de `proxy.conf.json` tenga a quién redirigir `/api`.
+Con el proxy el navegador ve un solo origen y CORS no interviene. En preproducción y producción el
+backend debe declarar el origen del frontend en `CORS_ALLOWED_ORIGINS`.
 
-## 4. Cómo probar la captura sin conexión (M07)
+### 3.3 Ajustes del backend útiles para revisar
 
-`ng serve` **no** registra el service worker (`enabled: !isDevMode()` en `app.config.ts`), así que probar offline con `npm start` da falsos negativos: el navegador nunca tiene nada que servir sin red.
+| Para probar | Variable del backend (`.env`) | Valor de prueba |
+|---|---|---|
+| Sesión expirada (HU-M01-01 CA06) | `JWT_ACCESS_MINUTES`, `JWT_REFRESH_DAYS` | `1` y `0` (luego restaurar) |
+| Motor caído (HU-M04-01 CA05) | `RECONOCEDOR_ACTIVO` | un valor inexistente |
+| Lectura determinista | `RECONOCEDOR_ACTIVO` | `determinista` |
+| Placa con otro patrón | `PATRON_PLACA` | ver `.env.example` |
 
-Procedimiento real, siempre sobre un build de producción:
+Tickets de prueba: `LogisticaMinera/postman/archivos/ticket_legible.jpg`, `ticket_ilegible.png` y
+`documento.pdf` (formato no admitido).
+
+## 4. Probar en un teléfono
+
+1. Teléfono y computadora en la misma red.
+2. `npx ng serve --host 0.0.0.0` dentro de `frontend/`.
+3. Abrir `http://<ip-de-la-computadora>:4200` en el teléfono.
+4. La cámara del navegador (`capture="environment"`) exige contexto seguro en algunos navegadores:
+   si no abre la cámara, usar `npx ng serve --host 0.0.0.0 --ssl` y aceptar el certificado, o elegir
+   la foto desde la galería.
+5. Para la conservación del borrador (RNF-M03-05): modo avión a mitad de la revisión, recargar,
+   comprobar que todo vuelve, salir del modo avión y confirmar.
+
+En DevTools: dispositivo de 360 × 740 y, para red móvil, el perfil «Fast 4G».
+
+## 5. Verificación antes de un commit
 
 ```bash
 cd frontend
+npm run format:check
+npx ng lint
+npm run test:ci                 # ChromeHeadless + cobertura mínima, igual que el CI
 npx ng build --configuration production
-npx http-server dist/mineria-logistica/browser -p 4300
 ```
 
-Luego, en Chrome DevTools → pestaña **Network** → casilla **Offline**:
+El build de producción avisa a 500 kB y falla a 1 MB de bundle inicial. Si algún día avisa, la
+respuesta es quitar peso, no subir el presupuesto.
 
-1. Registrar un ingreso. Debe quedar en la cola de IndexedDB (Application → IndexedDB → `logistica` → `cola`) con `uuidLocal` y `horaCapturaLocal`.
-2. Desmarcar Offline (vuelve la red).
-3. Verificar que el registro sale de la cola y que el `correlativo` que queda en pantalla es el que asignó el servidor, no uno generado en el cliente.
-4. Confirmar en el backend que `hora_registro` coincide con `horaCapturaLocal`, no con el momento en que volvió la señal.
+## 6. `environment.*.ts`
 
-La cola en IndexedDB sí se puede inspeccionar con `ng serve` normal — lo que no funciona ahí es el arranque de la aplicación completa sin red.
+Angular no lee `.env` en tiempo de ejecución: lo que el cliente necesita saber va en
+`src/environments/`, seleccionado por `fileReplacements`.
 
-## 5. Comandos de verificación antes de un commit
-
-```bash
-cd frontend
-npx ng build --configuration development     # falla rápido si algo no compila
-npx ng build --configuration production      # el que importa: aplica presupuestos de tamaño
-```
-
-El build de producción avisa a 500 kB y falla a 1 MB de bundle inicial (`angular.json`, sección `budgets`). Ese límite existe porque el sistema debe cargar en un teléfono con conectividad intermitente en planta — no es un capricho de configuración, es la defensa de un RNF.
-
-## 6. Variables de entorno vs. `environment.*.ts`
-
-Angular no lee `.env` en tiempo de ejecución: todo lo que el cliente necesita saber en runtime (URL de la API, nombre del entorno) va en `src/environments/environment*.ts`, que se seleccionan por configuración de build (`fileReplacements` en `angular.json`), no por variables de shell. Un `.env` en este repositorio solo tendría sentido para scripts de CI/CD, nunca para el código de la aplicación.
-
-| Configuración | Archivo que se usa | `apiUrl` |
+| Configuración | Archivo | `apiUrl` |
 |---|---|---|
 | `development` (por defecto en `ng serve`) | `environment.development.ts` | `/api/v1` vía proxy |
 | `preproduction` | `environment.preproduction.ts` | `https://pre.<dominio>/api/v1` |

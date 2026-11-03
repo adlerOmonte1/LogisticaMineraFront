@@ -1,68 +1,90 @@
 ---
 name: frontend-formularios
-description: Implementa formularios reactivos del frontend Angular — el alta de ingreso de M03 y las demás altas y ediciones, con validaciones, campos calculados, mensajes de error del servidor y borrador persistido. Úsala al crear o modificar cualquier formulario, al tratar validación, FormGroup, campos calculados como el peso neto, teclado numérico, o cuando un campo no llegue al backend.
+description: Implementa formularios reactivos del frontend Angular — altas y ediciones de usuarios, catálogo y lotes, corrección, anulación, destare, división y cierre — con validación de experiencia, campos del servidor de solo lectura, mensajes literales del servidor en su campo, inconsistencias V1 a V5 junto al campo con su justificación, motivos obligatorios y teclado numérico. Úsala al crear o modificar cualquier formulario, al tratar validación, FormGroup, errores 400 de la API, detalles.campos, inconsistencias, justificaciones, motivos, inputmode, o cuando un campo no llegue al backend.
 ---
 
 # Formularios reactivos
 
-Carga antes `contexto-frontend`. El formulario de ingreso (M03) es la pantalla de la que dependen I1
-e I2: lo que sigue se escribió pensando en ella, y aplica a las demás.
+Carga antes `contexto-frontend`. Para la captura y la revisión del registro, además,
+`frontend-registro-ticket`.
 
-## Las cuatro reglas que se rompen siempre
+## Las reglas que se rompen siempre
 
-**1. Los campos calculados son `readonly`, nunca `disabled`.** Un control deshabilitado **no viaja en
-el payload** de un formulario reactivo. Es un error que rompe el alta sin dar señal clara: el
-servidor responde que falta un campo obligatorio que en pantalla se ve lleno.
+**1. Lo que asigna el servidor no está en el formulario.** Código, marcas de tiempo, tara, peso neto
+y tipo de vehículo se muestran como texto. Si por diseño un valor calculado debe verse dentro del
+formulario, `readonly`, nunca `disabled` en un `FormGroup` que se envía: un control deshabilitado no
+viaja en `value`.
+
+**2. El cliente no es la fuente de verdad** (D-08). `Validators` solo para lo que mejora la
+experiencia y no contradice al servidor: requerido, longitud mínima de la clave, número positivo,
+fecha no futura. **No** se replica V1–V5 como bloqueo, ni el patrón de placa (configurable en el
+servidor, D-24): a lo sumo se normaliza a mayúsculas.
+
+**3. El mensaje del servidor, literal y en su lugar.** Ningún texto de error del dominio se escribe
+en el cliente: si el formulario necesita mostrar algo antes de enviar, usa un texto propio de la
+interfaz («Campo obligatorio»), nunca el del criterio.
+
+**4. Sin `[(ngModel)]` en formularios reactivos.** Formularios tipados (`FormGroup<{…}>`,
+`nonNullable`).
+
+## Pintar un `ErrorApi` (skill `frontend-http-sesion`)
 
 ```typescript
-this.form.controls.pesoNetoTn.disable();          // MAL: no llega al servidor
-<input formControlName="pesoNetoTn" readonly>     // BIEN
+function aplicarError(form: FormGroup, error: ErrorApi): void {
+  for (const campo of error.camposObligatorios) form.get(campo)?.setErrors({ servidor: 'Obligatorio' });
+  for (const [campo, texto] of Object.entries(error.camposConError)) form.get(campo)?.setErrors({ servidor: texto });
+  // inconsistencias: se pintan con aviso-inconsistencia junto a su campo, no como error del control
+}
 ```
 
-**2. Las validaciones del cliente no son la fuente de verdad** (D-08). Duplica en `Validators` lo que
-mejora la experiencia, pero un registro que entra por la cola de M07 no pasa por este formulario: la
-regla autoritativa está en el modelo del backend. Si una validación existe **solo** aquí, no existe.
+- `mensaje` siempre visible arriba del formulario (o en el diálogo).
+- `detalles.campos` → cada control listado marcado como obligatorio.
+- `detalles.<campo>` (DRF) → texto bajo el control.
+- `detalles.inconsistencias` → `aviso-inconsistencia` junto al control de su `campo`, con su
+  `mensaje`; si `exige_justificacion`, una `caja-justificacion` que escribe en
+  `justificaciones[regla]`.
+- `justificaciones_faltantes` → resalta las cajas vacías que el servidor reclama.
+- El error del servidor se limpia del control cuando el usuario lo modifica.
 
-**3. Los mensajes de error del servidor se muestran literales**, en el campo que indica
-`detalles.campo`. Ese texto coincide con el criterio de aceptación de la historia. No lo reformules,
-no lo traduzcas, no lo metas en un cuadro genérico.
+## Justificaciones y motivos
 
-**4. Nada de `[(ngModel)]` en formularios reactivos.** Mezclar las dos APIs produce estados
-inconsistentes que se manifiestan como campos que «a veces» no se envían.
+| Formulario | Campo | Forma |
+|---|---|---|
+| Registro y corrección | `justificaciones` | `{"V1": "…", "V4": "…"}` por regla |
+| Destare | `justificaciones` | `{"ING-2027-00001": "…"}` por código de ingreso |
+| Corrección, reversión, anulación | `motivo` | Texto obligatorio; el servidor lo exige con su mensaje |
+| Tara del vehículo | `motivo` | Ídem |
+| Asignar otro mineral al lote | `autorizacion` | Obligatoria solo si se eligió un ingreso de otro mineral |
 
-## El formulario de ingreso, requisito por requisito
+El motivo se pide en el mismo formulario, no en un segundo diálogo.
 
-| Requisito | Implementación |
+## Teclado y formato
+
+| Campo | Atributos |
 |---|---|
-| RNF-M03-03: completable en menos de 90 s | Cada campo se paga en ese cronómetro. Antes de añadir uno, pregunta qué historia lo exige |
-| RNF-M03-04: teclado numérico | `inputmode="decimal"` en pesos; `type="number"` no basta en todos los navegadores |
-| RNF-M03-05: 5 pulgadas sin desplazamiento horizontal | Una columna, campos a ancho completo. Verifícalo a 360 px |
-| RNF-M03-06: borrador persistido | Guarda en IndexedDB con cada `valueChanges`; limpia al confirmar |
-| Catálogos sin red | Producto y vehículo desde caché, no desde una petición al abrir |
+| Pesos, tara, capacidad, horas de molino | `inputmode="decimal"`, se envían como cadena con punto |
+| RUC, cantidad de bigbags | `inputmode="numeric"` |
+| Placa | `autocapitalize="characters"`, se normaliza a mayúsculas |
+| Fracciones | Texto libre (`1/3`, `0.5`); la suma se muestra en vivo (RNF-M06-10) |
+| Fechas y horas | `mat-datepicker` y `type="time"`; nunca futuras en apertura de lote, etapas y destare |
 
-El borrador no es comodidad: si el formulario pierde los datos al caerse la conexión, el supervisor
-vuelve al papel y la latencia regresa a los valores del pretest. Eso es el indicador I1 degradándose
-por una decisión de interfaz.
+Campos y botones de al menos 44 px en teléfono; una columna a 360 px.
 
-## Hora de pesaje y hora de registro
+## Solo enviar lo que cambió
 
-`horaPesaje` la escribe el usuario copiándola del ticket de balanza. `horaRegistro` **no está en el
-formulario**: la asigna el servidor (D-01). No la muestres como campo editable ni la envíes; si
-aparece en el payload, el backend la rechaza.
+La corrección (`PATCH ingresos/{id}/`) y las ediciones del catálogo y de usuarios envían **solo**
+los campos modificados (`form.controls[k].dirty`). Sin cambios, se deja que el servidor responda «No
+hay cambios que guardar» o se deshabilita «Guardar» hasta que haya uno.
 
-En captura sin conexión lo que se envía es `horaCapturaLocal` (D-03), y lo pone la cola, no el
-formulario. Ver `frontend-offline-pwa`.
+## Formularios compartidos
 
-## Estructura
-
-El formulario vive en `pages/` porque tiene estado y orquesta; los campos repetidos que extraigas van
-a `ui/` y reciben el `FormControl` por `input()`. Un componente de `ui/` que inyecte el servicio del
-feature está mal ubicado.
+`formulario-vehiculo` y `formulario-tipo-mineral` viven en `shared/components/` porque los usan el
+catálogo y el registro. Reciben el modo (`alta`, `edicion`, `desdeRegistro`) y el `ErrorApi` por
+`input()`, y emiten el cuerpo con `output()`. La página que los aloja hace el `POST`.
 
 ## Verificación
 
-- [ ] Ningún control calculado usa `disabled`.
-- [ ] Los errores del servidor aparecen en su campo, con el texto exacto de la API.
-- [ ] El formulario abre y se completa **sin red**, con los catálogos en caché.
-- [ ] El borrador sobrevive a recargar la página.
-- [ ] A 360 px de ancho no hay desplazamiento horizontal.
+- [ ] Ningún valor asignado por el servidor se envía.
+- [ ] Provocado cada rechazo de la fase, el texto exacto aparece en su lugar.
+- [ ] Las inconsistencias se ven junto a su campo y todas a la vez.
+- [ ] A 360 px no hay desplazamiento horizontal y el teclado correcto aparece en el teléfono.

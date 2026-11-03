@@ -1,116 +1,127 @@
 ---
 name: frontend-feature-nuevo
-description: Crea un feature completo del frontend Angular — carpeta features/modulo con data-access, pages y ui, rutas con carga diferida, modelos e integración en app.routes.ts. Úsala cuando se pida crear, montar o levantar la pantalla de un módulo (M01 a M09), un listado, un alta o un feature nuevo, y antes de escribir el primer componente de un módulo que aún no existe.
+description: Monta un feature completo del frontend Angular — modelos espejo del contrato, servicio en data-access, rutas con carga diferida y guards por rol, entrada de menú, páginas y componentes de ui, pruebas — siguiendo la fase correspondiente del plan. Úsala cuando se pida crear, montar o levantar las pantallas de un módulo (M01 a M09) o de una fase (FB1 a FB7), un listado, un alta o un detalle, y antes de escribir el primer componente de un feature que aún no tiene archivos.
 ---
 
 # Feature nuevo
 
-Carga antes `contexto-frontend`. El orden importa: cada paso se apoya en el anterior.
+Carga antes `contexto-frontend`. Lee la fase en `docs/plan-implementacion.md`, sus pantallas en
+`docs/pantallas.md`, sus endpoints en `docs/contrato-api.md` y sus criterios en
+`docs/verificacion-criterios.md`. El orden de abajo importa: cada paso se apoya en el anterior.
 
 ## 1. Las tres capas
 
 ```
-features/ingresos/
+features/trazabilidad/
   data-access/    servicio del feature. ÚNICA puerta a HttpClient
   pages/          componentes ruteados: orquestan una pantalla, tienen estado
-  ui/             presentacionales: input() y output(), sin servicios, sin estado propio
-  ingresos.routes.ts
+  ui/             presentacionales: input() y output(), sin servicios
+  trazabilidad.routes.ts
 ```
-
-Es la misma separación por motivo de cambio que el backend aplica con `repositories/`, `services/` y
-`views/`. La prueba para ubicar cualquier cosa: **si necesita inyectar algo, no es `ui/`**.
 
 | Backend | Frontend |
 |---|---|
 | `repositories/` + `services/` | `data-access/` |
 | `views/` | `pages/` |
 | `serializers/` | `ui/` |
-| `models/` | `models/` (en la raíz de `app/`) |
+| `models/` | `models/` en la raíz de `app/` |
 
-La ganancia es verificable: un componente de `ui/` se prueba con entradas y salidas, sin
-`HttpTestingController`. Eso sostiene la característica *capacidad de ser probado* de ISO/IEC 25010
-que afirma la tesis, y en sustentación se enseña abriendo una carpeta.
+La prueba para ubicar algo: **si necesita inyectar un servicio, no es `ui/`**. Si lo usan dos
+features, va a `shared/`.
 
 ## 2. Orden de construcción
 
-**1. El modelo, en `src/app/models/`.** Espejo del serializer, no del modelo de la base: lo que viaja
-por la API es la única forma que el cliente conoce.
+**1. Modelos** en `src/app/models/`, espejo de lo que viaja (`docs/contrato-api.md`), no de la base:
 
 ```typescript
-// models/ingreso.model.ts
-export interface Ingreso {
+// models/lote.model.ts
+export type EstadoLote = 'ABIERTO' | 'EN_RECORRIDO' | 'CERRADO';
+export type CodigoRuta = 'ZARANDEO_ENSACADO' | 'MOLIENDA_ENSACADO' | 'ZARANDEO_MOLIENDA_ENSACADO';
+
+export interface SiguientePaso {
+  carga: string;
+  parte: number | null;
+  ingreso: number | null;
+  etapa: CodigoEtapa | null;
+  elegir_ruta: boolean;
+}
+
+export interface LoteFila {
   id: number;
-  correlativo: string;
-  fechaPesaje: string;      // ISO
-  horaPesaje: string;       // HH:mm
-  horaRegistro: string;
-  pesoBrutoTn: number;
-  taraTn: number;
-  pesoNetoTn: number;
-  estado: 'REGISTRADO' | 'ANULADO';
+  codigo: string;
+  nombre: string;
+  estado: EstadoLote;
+  tipo_mineral_nombre: string;
+  ingresos: number;
+  toneladas: string;          // decimal en cadena (D-F17)
 }
 ```
 
-Tipos union para los `enum` del backend, nunca `string`: si el servidor añade un estado, el
-compilador señala cada punto que hay que revisar.
+- Nombres de propiedad **tal como llegan** (`snake_case`): sin capa de traducción que mantener.
+- Tipos union para los enumerados; nunca `string` genérico.
+- Decimales como `string`; fechas como `string` ISO.
+- Las respuestas de acción `{mensaje, …recurso}` se tipan `ConMensaje<Lote>`.
 
-**2. El servicio, en `data-access/`.**
+**2. Servicio** en `data-access/`:
 
 ```typescript
 @Injectable({ providedIn: 'root' })
-export class IngresosService {
+export class LotesService {
   private http = inject(HttpClient);
-  private base = `${environment.apiUrl}/ingresos/`;
+  private base = `${environment.apiUrl}/lotes/`;
 
-  listar(filtros: FiltroIngreso = {}): Observable<Pagina<Ingreso>> { ... }
-  registrar(payload: NuevoIngreso): Observable<Ingreso> { ... }
-  anular(id: number, motivo: string): Observable<Ingreso> { ... }
+  listar(filtros: FiltroLotes, page = 1): Observable<Pagina<LoteFila>> {
+    return this.http.get<Pagina<LoteFila>>(this.base, { params: aParams({ ...filtros, page }) });
+  }
+  registrarEtapa(id: number, cuerpo: RegistroEtapa): Observable<ConMensaje<Lote>> {
+    return this.http.post<ConMensaje<Lote>>(`${this.base}${id}/etapas/`, cuerpo);
+  }
 }
 ```
 
-Sin `eliminar()`: el sistema no borra, anula (D-07). Ningún ViewSet del backend expone `destroy`.
+Sin `eliminar()`. Un método por operación del contrato. Sin lógica de negocio: si el servidor
+devuelve `siguientes`, el servicio no los recalcula.
 
-**3. Las rutas del feature, con carga diferida.**
+**3. Rutas** del feature con carga diferida, y enganche con sus guards:
 
 ```typescript
-// features/ingresos/ingresos.routes.ts
-export const INGRESOS_ROUTES: Routes = [
-  { path: '', loadComponent: () => import('./pages/ingresos-lista.page').then(m => m.IngresosListaPage) },
-  { path: 'nuevo', loadComponent: () => import('./pages/ingreso-form.page').then(m => m.IngresoFormPage) },
-  { path: ':id', loadComponent: () => import('./pages/ingreso-detalle.page').then(m => m.IngresoDetallePage) },
+// features/trazabilidad/trazabilidad.routes.ts
+export const TRAZABILIDAD_ROUTES: Routes = [
+  { path: '', loadComponent: () => import('./pages/lotes.page').then(m => m.LotesPage) },
+  { path: 'nuevo', canActivate: [permisoGuard('COMPONER_LOTE')],
+    loadComponent: () => import('./pages/abrir-lote.page').then(m => m.AbrirLotePage) },
+  { path: 'cierre', canActivate: [permisoGuard('CERRAR_LOTE')],
+    loadComponent: () => import('./pages/cierre-lotes.page').then(m => m.CierreLotesPage) },
+  { path: ':id', loadComponent: () => import('./pages/lote-detalle.page').then(m => m.LoteDetallePage) },
+  { path: ':id/cerrar', canActivate: [permisoGuard('CERRAR_LOTE')],
+    loadComponent: () => import('./pages/cerrar-lote.page').then(m => m.CerrarLotePage) },
 ];
+
+// rutas-con-sesion.routes.ts, dentro del armazón
+{ path: 'lotes', loadChildren: () => import('./features/trazabilidad/trazabilidad.routes').then(m => m.TRAZABILIDAD_ROUTES) },
 ```
 
-**4. El enganche en `app.routes.ts`**, con los guards que exige la historia:
+Las rutas son las de `docs/pantallas.md` §1; las marcadas ◆ las fabrica el servidor y **no se
+renombran** (D-F13). Cada ruta se protege con el **permiso** (`core/autorizacion/permisos.ts`), nunca
+con una lista de roles escrita en la ruta: la matriz es una sola (D-F24).
 
-```typescript
-{
-  path: 'ingresos',
-  canActivate: [sesionGuard, rolGuard(['ADMINISTRADOR', 'SUPERVISOR'])],
-  loadChildren: () => import('./features/ingresos/ingresos.routes').then(m => m.INGRESOS_ROUTES),
-}
-```
+**4. Menú.** Si la fase añade una entrada, se agrega a la definición del menú en `core/layout/` con
+su lista de roles, según `docs/pantallas.md` §2.
 
-**5. Los componentes:** primero el `pages/` que orquesta, después los `ui/` que extraes cuando un
-bloque se repite o cuando la plantilla deja de leerse de un vistazo. No crees componentes de `ui/`
-por adelantado: abstraer por si acaso es tan defectuoso como no abstraer.
+**5. Páginas, después `ui/`.** Primero la página que orquesta; los componentes de `ui/` se extraen
+cuando un bloque se repite o la plantilla deja de leerse de un vistazo. No por adelantado.
 
-## 3. Estado con signals
+**6. Pruebas.** El servicio con `HttpTestingController` (URL, método, cuerpo, parámetros). Los
+componentes de `ui/` con lógica, con entradas y salidas. Las páginas se cubren con el guion de
+revisión de la fase.
 
-```typescript
-export class IngresosListaPage {
-  private servicio = inject(IngresosService);
-  ingresos = signal<Ingreso[]>([]);
-  cargando = signal(false);
-  error = signal<string | null>(null);
-}
-```
+## 3. Antes de dar la fase por lista para su puerta
 
-## 4. Antes de dar por cerrado el feature
-
-- [ ] Cada historia del módulo tiene su pantalla y su ruta.
-- [ ] Los mensajes de error se muestran literales, en el campo que indica `detalles.campo`.
-- [ ] El guard de rol coincide con lo que `permissions.py` rechaza en el servidor.
-- [ ] El feature no importa de ningún otro feature.
-- [ ] `npx ng build --configuration production` pasa los presupuestos de tamaño.
-- [ ] El commit referencia su historia: `M03: lista de ingresos con filtros (HU-M03-05)`.
+- [ ] Cada HU de la fase tiene su pantalla, su ruta y su entrada de menú por rol.
+- [ ] Cada criterio de la fase está marcado en `docs/verificacion-criterios.md`.
+- [ ] Los mensajes del servidor aparecen literales y en su lugar.
+- [ ] Guards y acciones ocultas = `permissions.py`.
+- [ ] El feature no importa de ningún otro.
+- [ ] `npx ng lint`, `npx ng test --watch=false` y `npx ng build --configuration production` en verde.
+- [ ] Commits `M0n: descripcion (HU-M0n-0m)`.
+- [ ] `docs/estado-modulos.md` y `docs/bitacora-fases.md` actualizados.

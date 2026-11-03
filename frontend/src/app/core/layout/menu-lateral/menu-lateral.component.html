@@ -1,0 +1,43 @@
+<nav class="menu" aria-label="Menú principal">
+  <div class="menu__marca">
+    <span class="menu__logo" aria-hidden="true">C</span>
+    <div>
+      <div class="menu__nombre">CONSMIN</div>
+      <div class="menu__planta">Planta Pillcomarca</div>
+    </div>
+  </div>
+
+  @if (accionPrincipal(); as accion) {
+    <a
+      mat-flat-button
+      color="primary"
+      class="menu__accion"
+      [routerLink]="accion.ruta"
+      (click)="navego.emit()"
+    >
+      <mat-icon>{{ accion.icono }}</mat-icon>
+      {{ accion.etiqueta }}
+    </a>
+  }
+
+  @for (grupo of grupos(); track grupo.seccion) {
+    <div class="menu__seccion">{{ grupo.seccion }}</div>
+    <ul class="menu__lista">
+      @for (item of grupo.items; track item.ruta) {
+        <li>
+          <a
+            class="menu__enlace"
+            [routerLink]="item.ruta"
+            routerLinkActive="menu__enlace--activo"
+            [routerLinkActiveOptions]="{ exact: item.exacta ?? false }"
+            ariaCurrentWhenActive="page"
+            (click)="navego.emit()"
+          >
+            <mat-icon aria-hidden="true">{{ item.icono }}</mat-icon>
+            <span>{{ item.etiqueta }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</nav>

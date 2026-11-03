@@ -1,0 +1,46 @@
+<mat-sidenav-container class="armazon">
+  @if (mostrarNavegacion()) {
+    <mat-sidenav
+      class="armazon__lateral"
+      [mode]="esEscritorio() ? 'side' : 'over'"
+      [opened]="esEscritorio()"
+      [fixedInViewport]="!esEscritorio()"
+    >
+      <app-menu-lateral
+        [grupos]="grupos()"
+        [accionPrincipal]="accionPrincipal()"
+        (navego)="cerrarMenuEnMovil()"
+      />
+    </mat-sidenav>
+  }
+
+  <mat-sidenav-content class="armazon__cuerpo">
+    <mat-toolbar class="armazon__cabecera">
+      @if (mostrarNavegacion() && !esEscritorio()) {
+        <button mat-icon-button type="button" aria-label="Abrir el menú" (click)="alternarMenu()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <span class="armazon__titulo">Control de ingreso de mineral</span>
+      <span class="armazon__espaciador"></span>
+      @if (usuario(); as usuario) {
+        <app-menu-usuario
+          [usuario]="usuario"
+          [puedeCambiarClave]="mostrarNavegacion()"
+          (cambiarClave)="irACambioDeClave()"
+          (cerrarSesion)="cerrarSesion()"
+        />
+      }
+    </mat-toolbar>
+
+    <app-franja-conexion [enLinea]="enLinea()" />
+
+    <main class="armazon__contenido">
+      <router-outlet />
+    </main>
+
+    @if (mostrarNavegacion() && !esEscritorio()) {
+      <app-barra-inferior [items]="itemsBarraInferior()" />
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

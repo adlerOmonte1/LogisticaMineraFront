@@ -43,3 +43,6 @@ Thumbs.db
 
 # Sistema
 .DS_Store
+
+.nx/cache
+.nx/workspace-data

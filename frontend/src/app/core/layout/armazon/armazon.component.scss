@@ -1,0 +1,55 @@
+.armazon {
+  height: 100%;
+  background: var(--bg);
+}
+
+.armazon__lateral {
+  width: 264px;
+  border-right: none;
+  background: var(--sidebar);
+}
+
+.armazon__cuerpo {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.armazon__cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+.armazon__titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--label-2);
+}
+
+.armazon__espaciador {
+  flex: 1;
+}
+
+.armazon__contenido {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 599px) {
+  .armazon__titulo {
+    display: none;
+  }
+
+  .armazon__contenido {
+    padding: 16px 12px 24px;
+  }
+}

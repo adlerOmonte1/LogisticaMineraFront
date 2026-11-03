@@ -1,4 +1,276 @@
-/* You can add global styles to this file, and also import other style files */
+// Tema global (D-F18): Angular Material con la identidad de la maqueta
+// (LogisticaMinera/Mockup/index.html). Los tokens de color viven como variables CSS para lo
+// que Material no cubre: insignias de estado, armazón, avisos.
+@use '@angular/material' as mat;
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+$paleta-oro: (
+  50: #fcf5e8,
+  100: #f7e5c4,
+  200: #f1d49d,
+  300: #ebc275,
+  400: #e7b558,
+  500: #e4a844,
+  600: #d39731,
+  700: #c98a1b,
+  800: #a87214,
+  900: #8a5a12,
+  contrast: (
+    50: #1c1a17,
+    100: #1c1a17,
+    200: #1c1a17,
+    300: #1c1a17,
+    400: #1c1a17,
+    500: #1c1a17,
+    600: #1c1a17,
+    700: #1c1a17,
+    800: #ffffff,
+    900: #ffffff,
+  ),
+);
+
+$paleta-tinta: (
+  50: #f2f1ee,
+  100: #e2dfd8,
+  200: #cfc9be,
+  300: #8b867d,
+  400: #5e5a53,
+  500: #3a3732,
+  600: #2a2723,
+  700: #1c1a17,
+  800: #141310,
+  900: #0c0b09,
+  contrast: (
+    50: #1c1a17,
+    100: #1c1a17,
+    200: #1c1a17,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  ),
+);
+
+$tema: mat.define-light-theme(
+  (
+    color: (
+      primary: mat.define-palette($paleta-oro, 500, 300, 700),
+      accent: mat.define-palette($paleta-tinta, 700),
+      warn: mat.define-palette(mat.$red-palette, 700),
+    ),
+    typography:
+      mat.define-typography-config(
+        $font-family: '"Barlow", -apple-system, "Segoe UI", Roboto, sans-serif',
+      ),
+    density: 0,
+  )
+);
+
+@include mat.core();
+
+// Solo los temas de los componentes que se usan: `all-component-themes` añade ~60 kB de CSS
+// al bundle inicial, que se descarga en un teléfono en planta.
+@include mat.core-theme($tema);
+@include mat.button-theme($tema);
+@include mat.icon-button-theme($tema);
+@include mat.fab-theme($tema);
+@include mat.button-toggle-theme($tema);
+@include mat.form-field-theme($tema);
+@include mat.input-theme($tema);
+@include mat.select-theme($tema);
+@include mat.autocomplete-theme($tema);
+@include mat.option-theme($tema);
+@include mat.toolbar-theme($tema);
+@include mat.sidenav-theme($tema);
+@include mat.menu-theme($tema);
+@include mat.divider-theme($tema);
+@include mat.dialog-theme($tema);
+@include mat.snack-bar-theme($tema);
+@include mat.table-theme($tema);
+@include mat.paginator-theme($tema);
+@include mat.progress-bar-theme($tema);
+@include mat.slide-toggle-theme($tema);
+@include mat.tabs-theme($tema);
+@include mat.tooltip-theme($tema);
+@include mat.icon-theme($tema);
+
+:root {
+  --bg: #f2f1ee;
+  --surface: #ffffff;
+  --surface-2: #f7f6f3;
+  --fill: #eceae5;
+  --fill-2: #e2dfd8;
+  --label: #1c1a17;
+  --label-2: #5e5a53;
+  --label-3: #8b867d;
+  --sep: #e6e2da;
+  --border: #e1ddd4;
+  --gold: #e4a844;
+  --accent: #c98a1b;
+  --link: #8a5a12;
+  --green: #2e7d32;
+  --green-b: #3e9b45;
+  --orange: #a15c00;
+  --orange-b: #e58a00;
+  --red: #b3261e;
+  --red-b: #d93a2f;
+  --blue: #1f5fa8;
+  --blue-b: #2f74c0;
+  --gray: #5e5a53;
+  --sidebar: #1c1a17;
+  --side-text: #dad5ca;
+  --side-muted: #8e887c;
+  --side-hover: rgba(255, 255, 255, 0.06);
+  --font: 'Barlow', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --radio: 14px;
+  --altura-toque: 44px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--label);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--link);
+}
+
+// Tarjeta de contenido, como `.card` de la maqueta.
+.tarjeta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  padding: 16px;
+}
+
+.tarjeta--plana {
+  padding: 0;
+  overflow: hidden;
+}
+
+// Barra de filtros sobre una lista.
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+
+  .mat-mdc-form-field {
+    min-width: 180px;
+  }
+}
+
+// Formulario en una columna; dos columnas desde tableta.
+.formulario {
+  display: grid;
+  gap: 4px 16px;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formulario__ancho {
+    grid-column: 1 / -1;
+  }
+}
+
+// Tablas: en teléfono, cada fila se presenta como tarjeta (como `data-l` en la maqueta).
+.tabla {
+  width: 100%;
+
+  .celda-acciones {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  @media (max-width: 767px) {
+    thead {
+      display: none;
+    }
+
+    tr.mat-mdc-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      height: auto;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--sep);
+    }
+
+    td.mat-mdc-cell {
+      border: none;
+      padding: 2px 0;
+      min-height: 0;
+    }
+
+    td.mat-mdc-cell[data-etiqueta]::before {
+      content: attr(data-etiqueta) ': ';
+      color: var(--label-3);
+      font-size: 0.8rem;
+    }
+
+    .celda-acciones {
+      width: auto;
+      text-align: left;
+    }
+  }
+}
+
+.texto-secundario {
+  color: var(--label-2);
+}
+
+.monoespaciado {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Avisos (NotificacionService).
+.mat-mdc-snack-bar-container.aviso-exito {
+  --mdc-snackbar-container-color: var(--green);
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.mat-mdc-snack-bar-container.aviso-error {
+  --mdc-snackbar-container-color: var(--red);
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+// Campos y botones de al menos 44 px de alto en teléfono (RNF-M01-05).
+@media (max-width: 767px) {
+  .mat-mdc-button-base {
+    min-height: var(--altura-toque);
+  }
+}
+
+// Pie de un formulario: acciones alineadas a la derecha.
+.acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.filtros__espacio {
+  flex: 1;
+}
+
+.titularidad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}

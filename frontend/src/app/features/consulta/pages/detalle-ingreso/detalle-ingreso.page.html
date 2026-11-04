@@ -26,8 +26,8 @@
       @case ('ticket') {
         <app-pestana-ticket
           [respaldo]="detalle.respaldo"
-          [urlImagen]="urlTicket()"
-          [falloImagen]="falloTicket()"
+          [urlImagen]="ticket.url()"
+          [falloImagen]="ticket.fallo()"
         />
       }
       @case ('reconocimiento') {
@@ -35,6 +35,12 @@
       }
       @case ('validacion') {
         <app-pestana-validacion [validaciones]="detalle.validaciones" />
+      }
+      @case ('trazabilidad') {
+        <app-pestana-trazabilidad [trazabilidad]="detalle.trazabilidad" />
+      }
+      @case ('historial') {
+        <app-pestana-historial [eventos]="detalle.historial" [codigo]="detalle.codigo" />
       }
     }
   </mat-tab-nav-panel>

@@ -18,25 +18,30 @@ import { DetalleIngreso } from '@models/detalle-ingreso.model';
 import { ErrorApi } from '@models/error-api.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { ConsultaApiService } from '../../data-access/consulta-api.service';
+import { TicketImagen } from '../../data-access/ticket-imagen';
 import { CabeceraIngresoComponent } from '../../ui/cabecera-ingreso/cabecera-ingreso.component';
 import { PestanaDatosComponent } from '../../ui/pestana-datos/pestana-datos.component';
+import { PestanaTrazabilidadComponent } from '../../ui/pestana-trazabilidad/pestana-trazabilidad.component';
+import { PestanaHistorialComponent } from '../../ui/pestana-historial/pestana-historial.component';
 import { PestanaReconocimientoComponent } from '../../ui/pestana-reconocimiento/pestana-reconocimiento.component';
 import { PestanaTicketComponent } from '../../ui/pestana-ticket/pestana-ticket.component';
 import { PestanaValidacionComponent } from '../../ui/pestana-validacion/pestana-validacion.component';
 
-type Pestana = 'datos' | 'ticket' | 'reconocimiento' | 'validacion';
+type Pestana = 'datos' | 'ticket' | 'reconocimiento' | 'validacion' | 'trazabilidad' | 'historial';
 
 const PESTANAS: readonly { ruta: Pestana; etiqueta: string }[] = [
   { ruta: 'datos', etiqueta: 'Datos' },
   { ruta: 'ticket', etiqueta: 'Ticket' },
   { ruta: 'reconocimiento', etiqueta: 'Reconocimiento' },
   { ruta: 'validacion', etiqueta: 'Validación' },
+  { ruta: 'trazabilidad', etiqueta: 'Trazabilidad' },
+  { ruta: 'historial', etiqueta: 'Historial' },
 ];
 
 /**
  * Detalle de un ingreso, con una sola llamada para todas sus pestañas (RNF-M07-02). La
- * pestaña es parte de la URL, así se puede enlazar directo. En FB4 y FB5 se suman Historial y
- * Trazabilidad. `id` y `pestana` llegan de la ruta (`withComponentInputBinding`).
+ * pestaña es parte de la URL, así se puede enlazar directo. `id` y
+ * `pestana` llegan de la ruta (`withComponentInputBinding`).
  */
 @Component({
   selector: 'app-detalle-ingreso',
@@ -52,6 +57,8 @@ const PESTANAS: readonly { ruta: Pestana; etiqueta: string }[] = [
     PestanaTicketComponent,
     PestanaReconocimientoComponent,
     PestanaValidacionComponent,
+    PestanaTrazabilidadComponent,
+    PestanaHistorialComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './detalle-ingreso.page.html',
@@ -66,18 +73,13 @@ export class DetalleIngresoPage {
   protected readonly detalle = signal<DetalleIngreso | null>(null);
   protected readonly cargando = signal(false);
   protected readonly error = signal<ErrorApi | null>(null);
-  protected readonly urlTicket = signal<string | null>(null);
-  protected readonly falloTicket = signal(false);
+  protected readonly ticket = new TicketImagen(this.api, inject(DestroyRef));
 
   protected readonly pestanaActiva = computed<Pestana>(
     () => PESTANAS.find((p) => p.ruta === this.pestana())?.ruta ?? 'datos',
   );
 
-  private urlObjeto: string | null = null;
-  private ticketSolicitadoDe: number | null = null;
-
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.liberarTicket());
     effect(() => {
       const id = Number(this.id());
       untracked(() => this.cargar(id));
@@ -86,13 +88,13 @@ export class DetalleIngresoPage {
     effect(() => {
       const detalle = this.detalle();
       if (this.pestanaActiva() === 'ticket' && detalle?.respaldo.tipo === 'IMAGEN') {
-        untracked(() => this.cargarTicket(detalle.id));
+        untracked(() => this.ticket.cargar(detalle.id));
       }
     });
   }
 
   private cargar(id: number): void {
-    this.liberarTicket();
+    this.ticket.liberar();
     this.cargando.set(true);
     this.error.set(null);
     this.detalle.set(null);
@@ -106,29 +108,5 @@ export class DetalleIngresoPage {
         this.cargando.set(false);
       },
     });
-  }
-
-  private cargarTicket(id: number): void {
-    if (this.ticketSolicitadoDe === id) {
-      return;
-    }
-    this.ticketSolicitadoDe = id;
-    this.falloTicket.set(false);
-    this.api.ticketIngreso(id).subscribe({
-      next: (imagen) => {
-        this.urlObjeto = URL.createObjectURL(imagen);
-        this.urlTicket.set(this.urlObjeto);
-      },
-      error: () => this.falloTicket.set(true),
-    });
-  }
-
-  private liberarTicket(): void {
-    if (this.urlObjeto) {
-      URL.revokeObjectURL(this.urlObjeto);
-      this.urlObjeto = null;
-    }
-    this.urlTicket.set(null);
-    this.ticketSolicitadoDe = null;
   }
 }

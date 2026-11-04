@@ -1,0 +1,33 @@
+.formulario {
+  margin-bottom: 16px;
+}
+
+.seleccion {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.seleccion__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.seleccion__titulo {
+  flex: 1;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+// Ticket junto a los datos desde tableta (HU-M07-01 CA03); apilados en teléfono.
+.seleccion__cuerpo {
+  display: grid;
+  gap: 16px;
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}

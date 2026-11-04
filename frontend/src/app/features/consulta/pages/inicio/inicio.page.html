@@ -1,0 +1,90 @@
+@if (usuario(); as usuario) {
+  <app-encabezado-pagina
+    [titulo]="'Hola, ' + (usuario.nombre_completo || usuario.username)"
+    [subtitulo]="usuario.rol | etiquetaRol"
+  >
+    @if (accionPrincipal(); as accion) {
+      <a mat-flat-button color="primary" [routerLink]="accion.ruta">
+        <mat-icon>{{ accion.icono }}</mat-icon>
+        {{ accion.etiqueta }}
+      </a>
+    }
+  </app-encabezado-pagina>
+}
+
+<form class="tarjeta consulta-rapida" [formGroup]="formulario" (ngSubmit)="consultar()" novalidate>
+  <mat-form-field class="consulta-rapida__campo">
+    <mat-label>Consultar un ingreso por placa</mat-label>
+    <input
+      matInput
+      formControlName="placa"
+      autocomplete="off"
+      autocapitalize="characters"
+      data-prueba="placa-rapida"
+    />
+  </mat-form-field>
+  <button mat-flat-button color="primary" type="submit" data-prueba="consultar">
+    <mat-icon>search</mat-icon>
+    Consultar
+  </button>
+</form>
+
+<app-aviso-error [error]="error()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (dia(); as dia) {
+  <section class="cifras" aria-label="Resumen del día">
+    <app-cifra-inicio
+      etiqueta="Ingresos de hoy"
+      icono="inbox"
+      [valor]="'' + dia.ingresos_hoy.cantidad"
+      [detalle]="detalleIngresosHoy(dia)"
+      [enlace]="dia.ingresos_hoy.enlace"
+    />
+    <app-cifra-inicio
+      etiqueta="Toneladas de hoy"
+      icono="scale"
+      [valor]="dia.toneladas_hoy.toneladas | toneladas"
+      [detalle]="dia.toneladas_hoy.mensaje"
+      [enlace]="dia.toneladas_hoy.enlace"
+    />
+    <app-cifra-inicio
+      etiqueta="Pendientes de destare"
+      icono="hourglass_top"
+      [valor]="'' + dia.pendientes_destare.cantidad"
+      [detalle]="detalleDestares(dia)"
+      [enlace]="dia.pendientes_destare.enlace"
+    />
+    <app-cifra-inicio
+      etiqueta="Lotes en proceso"
+      icono="account_tree"
+      [valor]="'' + dia.lotes_en_proceso.cantidad"
+      [enlace]="dia.lotes_en_proceso.enlace"
+    />
+  </section>
+
+  <section class="tarjeta bloque" aria-labelledby="titulo-ultimos">
+    <h2 id="titulo-ultimos" class="bloque__titulo">Últimos ingresos</h2>
+    @if (dia.ultimos_ingresos.length > 0) {
+      <app-tabla-ingresos [filas]="dia.ultimos_ingresos" />
+    } @else {
+      <p class="texto-secundario" data-prueba="sin-ultimos">Todavía no hay ingresos registrados</p>
+    }
+  </section>
+
+  <section class="tarjeta bloque" aria-labelledby="titulo-semana">
+    <h2 id="titulo-semana" class="bloque__titulo">Toneladas de los últimos 7 días</h2>
+    <app-barras-semana [dias]="dia.ultimos_siete_dias" />
+  </section>
+}
+
+<section class="accesos" aria-label="Accesos de su rol">
+  @for (item of accesos(); track item.ruta) {
+    <a class="tarjeta acceso" [routerLink]="item.ruta">
+      <mat-icon aria-hidden="true">{{ item.icono }}</mat-icon>
+      <span>{{ item.etiqueta }}</span>
+    </a>
+  }
+</section>

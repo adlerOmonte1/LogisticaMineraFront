@@ -1,0 +1,110 @@
+<app-encabezado-pagina
+  titulo="Ingresos"
+  subtitulo="Todos los ingresos de mineral, del más reciente al más antiguo"
+>
+  <button
+    *appSiPuede="'EXPORTAR_LISTADO'"
+    mat-stroked-button
+    type="button"
+    data-prueba="exportar"
+    [disabled]="exportando()"
+    (click)="exportar()"
+  >
+    <mat-icon>download</mat-icon>
+    Exportar
+  </button>
+</app-encabezado-pagina>
+
+<app-marco-listado
+  [cargando]="listado.cargando()"
+  [vacio]="listado.vacio()"
+  [error]="listado.error()"
+  [total]="listado.total()"
+  [pagina]="listado.pagina()"
+  [mensajeVacio]="resultado()?.mensaje ?? 'Sin resultados'"
+  iconoVacio="inbox"
+  (cambioPagina)="listado.irAPagina($event)"
+>
+  <ng-container filtros>
+    <mat-form-field>
+      <mat-label>Desde</mat-label>
+      <input
+        matInput
+        type="date"
+        [ngModel]="listado.filtro().fecha_desde"
+        (ngModelChange)="filtrar({ fecha_desde: $event ?? '' })"
+        data-prueba="desde"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Hasta</mat-label>
+      <input
+        matInput
+        type="date"
+        [ngModel]="listado.filtro().fecha_hasta"
+        (ngModelChange)="filtrar({ fecha_hasta: $event ?? '' })"
+        data-prueba="hasta"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Mineral</mat-label>
+      <mat-select
+        [ngModel]="listado.filtro().tipo_mineral"
+        (ngModelChange)="filtrar({ tipo_mineral: $event })"
+      >
+        <mat-option [value]="null">Todos</mat-option>
+        @for (mineral of minerales(); track mineral.id) {
+          <mat-option [value]="mineral.id">{{ mineral.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Vehículo</mat-label>
+      <mat-select [ngModel]="listado.filtro().titularidad" (ngModelChange)="filtrar({ titularidad: $event })">
+        <mat-option [value]="null">Todos</mat-option>
+        @for (opcion of titularidades; track opcion[0]) {
+          <mat-option [value]="opcion[0]">{{ opcion[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Estado</mat-label>
+      <mat-select [ngModel]="listado.filtro().estado" (ngModelChange)="filtrar({ estado: $event })">
+        <mat-option [value]="null">Todos</mat-option>
+        @for (opcion of estados; track opcion[0]) {
+          <mat-option [value]="opcion[0]">{{ opcion[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Placa o código</mat-label>
+      <input
+        matInput
+        [value]="listado.filtro().q"
+        (change)="filtrarPorTexto($event)"
+        autocomplete="off"
+        data-prueba="texto"
+      />
+    </mat-form-field>
+    <button mat-button type="button" data-prueba="limpiar" (click)="limpiar()">Limpiar filtros</button>
+  </ng-container>
+
+  @if (resultado(); as resultado) {
+    <div class="resumen" data-prueba="resumen">
+      <p class="resumen__rango" data-prueba="rango">
+        Del {{ resultado.filtros.fecha_desde | fechaLima: 'fecha' }} al
+        {{ resultado.filtros.fecha_hasta | fechaLima: 'fecha' }}
+      </p>
+      <p class="resumen__totales" data-prueba="totales">
+        <strong>{{ resultado.totales.ingresos }}</strong>
+        {{ resultado.totales.ingresos === 1 ? 'ingreso' : 'ingresos' }} ·
+        <strong>{{ resultado.totales.toneladas | toneladas }}</strong>
+        <span class="texto-secundario">
+          (sin contar anulados ni en proceso) · {{ resultado.totales.registrados }} registrados ·
+          {{ resultado.totales.en_proceso }} en proceso · {{ resultado.totales.anulados }} anulados
+        </span>
+      </p>
+    </div>
+  }
+  <app-tabla-ingresos [filas]="listado.filas()" />
+</app-marco-listado>

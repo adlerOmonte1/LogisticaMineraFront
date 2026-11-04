@@ -81,12 +81,12 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA04 | M | EXTERNO sin transportista: mensaje; el selector de transportista aparece solo con EXTERNO | ✅ |
 | CA05 | AI | PROPIO guarda sin transportista | ✅ |
 | CA06 | AI | Baja con ingresos: mensaje literal; la fila queda inactiva | ✅ |
-| CA07 | AI | Un vehículo de baja no se asocia: el registro muestra `aviso_placa` de baja (FB3) | ⬜ |
+| CA07 | AI | Un vehículo de baja no se asocia: el registro muestra `aviso_placa` de baja (FB3) | ✅ |
 | CA08 | AI | El nuevo aparece «Pendiente de destare» | ✅ |
 | CA09 | R | «Modificar tara» solo para el Administrador | ✅ |
 | CA10 | M | Sin motivo: mensaje en el diálogo de tara | ⬜ |
 | CA11 | AI | Con motivo, la tara cambia; el historial (FB4) muestra antes, después y motivo | ⬜ |
-| CA12 | AI | Alta desde el registro en panel, sin perder la captura; vuelve con el vehículo asociado (FB3) | ⬜ |
+| CA12 | AI | Alta desde el registro en panel, sin perder la captura; vuelve con el vehículo asociado (FB3) | ✅ |
 | CA13 | AI | Reactivar: mensaje literal; vuelve a ofrecerse en el registro | ✅ |
 | CA14 | R | Supervisor sin editar, dar de baja ni reactivar; sí alta desde el registro | ✅ |
 
@@ -97,11 +97,11 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA01 | AI | Alta con código y nombre; aparece activo | ✅ |
 | CA02 | M | Código repetido: mensaje literal | ⬜ |
 | CA03 | AI | Baja con ingresos: mensaje literal | ✅ |
-| CA04 | AI | Un tipo desactivado no aparece en el selector del registro | ⬜ |
+| CA04 | AI | Un tipo desactivado no aparece en el selector del registro | ✅ |
 | CA05 | M | Nombre repetido: mensaje literal | ⬜ |
 | CA06 | M | Código fuera de 2–6 caracteres: mensaje literal | ⬜ |
-| CA07 | AI | Alta rápida desde el registro sin código: queda elegido en el ingreso | ⬜ |
-| CA08 | M | Alta rápida sin nombre: mensaje en el panel | ⬜ |
+| CA07 | AI | Alta rápida desde el registro sin código: queda elegido en el ingreso | ✅ |
+| CA08 | M | Alta rápida sin nombre: mensaje en el panel | ✅ |
 | CA09 | AI | Reactivado, vuelve a ofrecerse en el registro y en la apertura de lotes | ⬜ |
 | CA10 | R | Supervisor sin acciones de catálogo | ✅ |
 
@@ -124,40 +124,40 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Confirmación con tara: paso 3 con el código y el `mensaje` | ⬜ |
-| CA02 | M | Sin imagen y sin «sin foto» no se puede avanzar; si el borrador es inválido, mensaje literal | ⬜ |
-| CA03 | M | Campos faltantes: `mensaje` arriba y cada campo de `detalles.campos` marcado | ⬜ |
-| CA04 | AI | `aviso_placa` visible y el alta del vehículo en la misma pantalla | ⬜ |
-| CA05 | AI | Sin tara: aviso previo de «En proceso» y `mensaje` con el código y la placa | ⬜ |
-| CA06 | AI | Bloqueante o advertencia sin justificar: rechazo con mensaje y todas las inconsistencias junto a su campo | ⬜ |
-| CA07 | M | Formato o tamaño no admitido: mensaje literal en la zona de captura | ⬜ |
-| CA08 | AI | Peso neto y tara solo de lectura en revisión y detalle | ⬜ |
-| CA09 | AI | Detalle: pesaje, inicio y fin del registro como tres valores distintos, no editables | ⬜ |
-| CA10 | AI | Hora propuesta por el servidor, señalada como propuesta y editable | ⬜ |
+| CA01 | AI | Confirmación con tara: paso 3 con el código y el `mensaje` | ✅ |
+| CA02 | M | Sin imagen y sin «sin foto» no se puede avanzar; si el borrador es inválido, mensaje literal | ✅ |
+| CA03 | M | Campos faltantes: `mensaje` arriba y cada campo de `detalles.campos` marcado | ✅ |
+| CA04 | AI | `aviso_placa` visible y el alta del vehículo en la misma pantalla | ✅ |
+| CA05 | AI | Sin tara: aviso previo de «En proceso» y `mensaje` con el código y la placa | ✅ |
+| CA06 | AI | Bloqueante o advertencia sin justificar: rechazo con mensaje y todas las inconsistencias junto a su campo | ✅ |
+| CA07 | M | Formato o tamaño no admitido: mensaje literal en la zona de captura | ✅ |
+| CA08 | AI | Peso neto y tara solo de lectura en revisión y detalle | ✅ |
+| CA09 | AI | Detalle: pesaje, inicio y fin del registro como tres valores distintos, no editables | ✅ |
+| CA10 | AI | Hora propuesta por el servidor, señalada como propuesta y editable | ✅ |
 | CA11 | S | Observable en FB3: pestaña Reconocimiento con leído y confirmado; Ticket con la imagen | ⬜ |
 | CA12 | S | — | ⬜ |
-| CA13 | M | Vehículo de baja: mensaje literal y confirmación impedida | ⬜ |
-| CA14 | AI | Alta del tipo de mineral en panel (Administrativo, Administrador); queda elegido | ⬜ |
-| CA15 | AI | Supervisor: sin alta; se muestra `aviso_tipo_mineral` | ⬜ |
-| CA16 | AI | «Registrar sin foto» en la pantalla de captura, motivo de lista cerrada | ⬜ |
-| CA17 | AI | Marca «sin respaldo fotográfico» con motivo en toda lista (FB6) y en el detalle | ⬜ |
+| CA13 | M | Vehículo de baja: mensaje literal y confirmación impedida | ✅ |
+| CA14 | AI | Alta del tipo de mineral en panel (Administrativo, Administrador); queda elegido | ✅ |
+| CA15 | AI | Supervisor: sin alta; se muestra `aviso_tipo_mineral` | ✅ |
+| CA16 | AI | «Registrar sin foto» en la pantalla de captura, motivo de lista cerrada | ✅ |
+| CA17 | AI | Marca «sin respaldo fotográfico» con motivo en toda lista (FB6) y en el detalle | ✅ |
 
 ### HU-M03-02 · Corrección
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Corregir con motivo: `mensaje` y neto recalculado en el detalle | ⬜ |
-| CA02 | M | Sin motivo: mensaje literal | ⬜ |
+| CA01 | AI | Corregir con motivo: `mensaje` y neto recalculado en el detalle | ✅ |
+| CA02 | M | Sin motivo: mensaje literal | ✅ |
 | CA03 | M | Valor que incumple una regla: mensaje literal junto al campo | ⬜ |
-| CA04 | AI | El formulario no ofrece código, marcas de tiempo, tara ni neto | ⬜ |
+| CA04 | AI | El formulario no ofrece código, marcas de tiempo, tara ni neto | ✅ |
 | CA05 | M | Ingreso anulado: el detalle no ofrece corregir; forzado, mensaje literal | ⬜ |
-| CA06 | R | Supervisor sin «Corregir» | ⬜ |
+| CA06 | R | Supervisor sin «Corregir» | ✅ |
 | CA07 | S | Visible en FB4: historial con antes, después y motivo | ⬜ |
 | CA08 | AI | Placa de vehículo sin tara: el ingreso vuelve a En proceso en el detalle | ⬜ |
 | CA09 | M | Mineral fuera de la lista del lote: mensaje literal (FB5) | ⬜ |
-| CA10 | M | Sin cambios: mensaje literal | ⬜ |
+| CA10 | M | Sin cambios: mensaje literal | ✅ |
 | CA11 | S | Visible en FB5–FB7: lote, consolidado y trazabilidad con el valor corregido | ⬜ |
-| CA12 | AI | «Revertir corrección» desde el detalle (y desde el historial); `mensaje` literal | ⬜ |
+| CA12 | AI | «Revertir corrección» desde el detalle (y desde el historial); `mensaje` literal | ✅ |
 | CA13 | M | Corrección no última: mensaje literal | ⬜ |
 | CA14 | M | Reversión que incumple una regla: mensaje literal | ⬜ |
 
@@ -165,11 +165,11 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Anular con motivo: `mensaje` y estado Anulado | ⬜ |
-| CA02 | M | Sin motivo: mensaje literal | ⬜ |
+| CA01 | AI | Anular con motivo: `mensaje` y estado Anulado | ✅ |
+| CA02 | M | Sin motivo: mensaje literal | ✅ |
 | CA03 | M | Ya anulado: la acción no se ofrece; forzada, mensaje literal | ⬜ |
-| CA04 | R | Solo el Administrador ve «Anular» | ⬜ |
-| CA05 | AI | Detalle del anulado: datos, imagen, estado, motivo y responsable | ⬜ |
+| CA04 | R | Solo el Administrador ve «Anular» | ✅ |
+| CA05 | AI | Detalle del anulado: datos, imagen, estado, motivo y responsable | ✅ |
 | CA06 | S | Visible en FB6–FB7: los totales no lo incluyen | ⬜ |
 | CA07 | S | Visible en FB4 | ⬜ |
 | CA08 | S | Visible en FB5: el ingreso sale del lote | ⬜ |
@@ -178,16 +178,16 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Destare válido: `mensaje` y lista de ingresos que pasan a Registrado con su neto | ⬜ |
+| CA01 | AI | Destare válido: `mensaje` y lista de ingresos que pasan a Registrado con su neto | ✅ |
 | CA02 | M | Sin tara: mensaje literal | ⬜ |
-| CA03 | M | Tara ≥ bruto: mensaje literal | ⬜ |
-| CA04 | M | Neto fuera de rango: caja de justificación por ingreso; sin ella, mensaje literal | ⬜ |
+| CA03 | M | Tara ≥ bruto: mensaje literal | ✅ |
+| CA04 | M | Neto fuera de rango: caja de justificación por ingreso; sin ella, mensaje literal | ✅ |
 | CA05 | M | Vehículo con tara: mensaje literal | ⬜ |
-| CA06 | AI | Lista con código, placa, fecha del pesaje y peso bruto; se elige el vehículo | ⬜ |
-| CA07 | AI | Varios En proceso del mismo vehículo se resuelven a la vez | ⬜ |
+| CA06 | AI | Lista con código, placa, fecha del pesaje y peso bruto; se elige el vehículo | ✅ |
+| CA07 | AI | Varios En proceso del mismo vehículo se resuelven a la vez | ✅ |
 | CA08 | S | Visible en FB4 | ⬜ |
 | CA09 | M | Fecha futura: mensaje literal | ⬜ |
-| CA10 | M | Sin pendientes: `mensaje` del listado como estado vacío | ⬜ |
+| CA10 | M | Sin pendientes: `mensaje` del listado como estado vacío | ✅ |
 
 ---
 
@@ -197,24 +197,24 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Tres campos precargados con su confianza visible | ⬜ |
-| CA02 | **I** | Campo bajo el umbral resaltado **con icono y texto**, no solo color, con el `aviso` literal | ⬜ |
-| CA03 | AI | Campo sin lectura: vacío y editable | ⬜ |
-| CA04 | M | Imagen ilegible: `reconocimiento.aviso` y continuación manual | ⬜ |
+| CA01 | AI | Tres campos precargados con su confianza visible | ✅ |
+| CA02 | **I** | Campo bajo el umbral resaltado **con icono y texto**, no solo color, con el `aviso` literal | ✅ |
+| CA03 | AI | Campo sin lectura: vacío y editable | ✅ |
+| CA04 | M | Imagen ilegible: `reconocimiento.aviso` y continuación manual | ✅ |
 | CA05 | M | Motor caído: `reconocimiento.aviso` y continuación manual | ⬜ |
 | CA06 | S | Nada se guarda hasta confirmar (el cliente no hace `POST ingresos/` antes) | ⬜ |
 | CA07 | S | Visible en la pestaña Reconocimiento | ⬜ |
-| CA08 | AI | Sin foto: no hay bloque de confianza en la revisión | ⬜ |
+| CA08 | AI | Sin foto: no hay bloque de confianza en la revisión | ✅ |
 
 ### HU-M04-02 · Reconocido frente a confirmado
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Pestaña Reconocimiento: tres filas con reconocido, confirmado y confianza | ⬜ |
-| CA02 | AI | Campo corregido señalado | ⬜ |
-| CA03 | AI | Sin reconocimiento: se indica y se muestra el motivo | ⬜ |
-| CA04 | AI | Supervisor: solo lectura, sin «Corregir» (`puede_corregir_ingreso`) | ⬜ |
-| CA05 | AI | Motor y versión visibles | ⬜ |
+| CA01 | AI | Pestaña Reconocimiento: tres filas con reconocido, confirmado y confianza | ✅ |
+| CA02 | AI | Campo corregido señalado | ✅ |
+| CA03 | AI | Sin reconocimiento: se indica y se muestra el motivo | ✅ |
+| CA04 | AI | Supervisor: solo lectura, sin «Corregir» (`puede_corregir_ingreso`) | ✅ |
+| CA05 | AI | Motor y versión visibles | ✅ |
 | CA06 | S | Sin sesión, el interceptor lleva al login | ⬜ |
 
 ---
@@ -225,18 +225,18 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Bloqueante señalada junto a su campo con el mensaje literal | ⬜ |
-| CA02 | M | V4 sin justificar: mensaje literal y caja de justificación | ⬜ |
-| CA03 | AI | Con justificación, registra; la pestaña Validación la muestra | ⬜ |
+| CA01 | AI | Bloqueante señalada junto a su campo con el mensaje literal | ✅ |
+| CA02 | M | V4 sin justificar: mensaje literal y caja de justificación | ✅ |
+| CA03 | AI | Con justificación, registra; la pestaña Validación la muestra | ✅ |
 | CA04 | AI | Corregido el dato, la alerta desaparece tras la respuesta del servidor | ⬜ |
-| CA05 | AI | Varias inconsistencias a la vez se muestran todas | ⬜ |
-| CA06 | AI | Sin inconsistencias: ninguna alerta y «Confirmar» habilitado | ⬜ |
+| CA05 | AI | Varias inconsistencias a la vez se muestran todas | ✅ |
+| CA06 | AI | Sin inconsistencias: ninguna alerta y «Confirmar» habilitado | ✅ |
 | CA07 | S | — | ⬜ |
 | CA08 | S | Visible en la pestaña Validación | ⬜ |
-| CA09 | AI | Un campo vacío se reclama como obligatorio, no como inconsistencia | ⬜ |
-| CA10 | M | V1 sin justificar: mensaje literal y caja de justificación | ⬜ |
+| CA09 | AI | Un campo vacío se reclama como obligatorio, no como inconsistencia | ✅ |
+| CA10 | M | V1 sin justificar: mensaje literal y caja de justificación | ✅ |
 | CA11 | AI | Sin tara: V2 y V4 no aparecen en la revisión | ⬜ |
-| CA12 | AI | Sin foto: las inconsistencias se muestran igual | ⬜ |
+| CA12 | AI | Sin foto: las inconsistencias se muestran igual | ✅ |
 | CA13 | S | — | ⬜ |
 
 ---

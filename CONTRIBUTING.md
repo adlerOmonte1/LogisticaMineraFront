@@ -17,10 +17,22 @@ el *por qué* de cada regla, en [`docs/decisiones.md`](docs/decisiones.md) y en 
 
 ## 2. Rama y commits
 
-Una rama por fase:
+Una rama por módulo, con el **mismo nombre que su rama del backend** (`feature/Mnn-nombre`), para
+que la cadena `HU → módulo → rama → commit` se lea igual en los dos repositorios:
+
+| Fase | Rama | Rama del backend |
+|---|---|---|
+| FB0 | `chore/FB0-nucleo` | `chore/F0-preparacion-backend` |
+| FB1 | `feature/M01-autenticacion` | `feature/M01-autenticacion` |
+| FB2 | `feature/M02-catalogo` | `feature/M02-catalogo` |
+| FB3 | `feature/M03-registro-ingresos` | `feature/M03-registro-ingresos` |
+| FB4 | `feature/M09-auditoria` | — |
+| FB5 | `feature/M06-trazabilidad` | `feature/M06-trazabilidad` |
+| FB6 | `feature/M07-consulta` | `feature/M07-consulta` |
+| FB7 | `feature/M08-consolidacion` | — |
 
 ```bash
-git checkout -b feature/FB3-registro-ingresos
+git switch -c feature/M03-registro-ingresos
 ```
 
 | Tipo de cambio | Formato |

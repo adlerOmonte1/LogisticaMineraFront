@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Backend — historias y reglas del dominio
+    url: https://github.com/adlerOmonte1/LogisticaMinera/issues
+    about: Las historias, criterios y mensajes viven en el repositorio del backend; no se duplican aquí.

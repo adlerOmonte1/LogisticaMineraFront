@@ -1,0 +1,50 @@
+<section class="tarjeta">
+  @if (reconocimiento(); as bloque) {
+    @if (bloque.disponible) {
+      <p class="motor texto-secundario" data-prueba="motor">
+        Motor <strong>{{ bloque.motor }}</strong> versión <strong>{{ bloque.version_motor }}</strong> ·
+        {{ bloque.fecha_proceso | fechaLima }} · umbral de confianza {{ bloque.umbral_confianza }}
+      </p>
+      <table mat-table [dataSource]="bloque.campos" class="tabla">
+        <ng-container matColumnDef="campo">
+          <th mat-header-cell *matHeaderCellDef>Campo</th>
+          <td mat-cell *matCellDef="let campo">
+            <strong>{{ etiqueta(campo) }}</strong>
+            @if (campo.fue_corregido) {
+              <app-insignia-estado texto="Corregido" tono="info" icono="edit" />
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="reconocido">
+          <th mat-header-cell *matHeaderCellDef>Reconocido</th>
+          <td mat-cell *matCellDef="let campo" data-etiqueta="Reconocido" class="monoespaciado">
+            {{ campo.valor_reconocido ?? '—' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="confirmado">
+          <th mat-header-cell *matHeaderCellDef>Confirmado</th>
+          <td mat-cell *matCellDef="let campo" data-etiqueta="Confirmado" class="monoespaciado">
+            {{ campo.valor_confirmado ?? '—' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="confianza">
+          <th mat-header-cell *matHeaderCellDef>Confianza</th>
+          <td mat-cell *matCellDef="let campo" data-etiqueta="Confianza">
+            <app-indicador-confianza
+              [confianza]="campo.confianza"
+              [dudoso]="campo.dudoso"
+              aviso="Lectura con baja confianza"
+            />
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let campo; columns: columnas"></tr>
+      </table>
+    } @else {
+      <p class="sin-reconocimiento" data-prueba="sin-reconocimiento">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>{{ bloque.mensaje }}</span>
+      </p>
+    }
+  }
+</section>

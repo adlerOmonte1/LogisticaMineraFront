@@ -1,0 +1,85 @@
+@if (detalle(); as d) {
+  <section class="tarjeta">
+    <h2 class="seccion">Ticket de balanza</h2>
+    <dl class="datos">
+      <div>
+        <dt>Placa</dt>
+        <dd class="monoespaciado">{{ d.placa }}</dd>
+      </div>
+      <div>
+        <dt>Tipo de vehículo</dt>
+        <dd>{{ etiquetaTitularidad[d.tipo_vehiculo] }}</dd>
+      </div>
+      <div>
+        <dt>Tipo de mineral</dt>
+        <dd>
+          {{ d.tipo_mineral_nombre }} <span class="texto-secundario">({{ d.tipo_mineral_codigo }})</span>
+        </dd>
+      </div>
+      <div>
+        <dt>Peso bruto</dt>
+        <dd class="monoespaciado">{{ d.peso_bruto_tn | toneladas }}</dd>
+      </div>
+      <div>
+        <dt>Tara aplicada</dt>
+        <dd class="monoespaciado">{{ d.tara_tn ? (d.tara_tn | toneladas) : 'Pendiente del destare' }}</dd>
+      </div>
+      <div>
+        <dt>Peso neto</dt>
+        <dd class="monoespaciado" data-prueba="peso-neto">
+          {{ d.peso_neto_tn ? (d.peso_neto_tn | toneladas) : 'Pendiente del destare' }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="tarjeta">
+    <h2 class="seccion">Marcas de tiempo</h2>
+    <p class="texto-secundario nota">
+      El pesaje lo indica quien registra; el inicio y el fin del registro los asigna el sistema y nadie los
+      edita.
+    </p>
+    <dl class="datos">
+      <div>
+        <dt>Fecha y hora del pesaje</dt>
+        <dd data-prueba="pesaje">{{ d.fecha_hora_pesaje | fechaLima }}</dd>
+      </div>
+      <div>
+        <dt>Inicio del registro</dt>
+        <dd data-prueba="inicio">{{ d.hora_inicio_registro | fechaLima }}</dd>
+      </div>
+      <div>
+        <dt>Fin del registro</dt>
+        <dd data-prueba="fin">{{ d.hora_fin_registro | fechaLima }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="tarjeta">
+    <h2 class="seccion">Registro</h2>
+    <dl class="datos">
+      <div>
+        <dt>Registrado por</dt>
+        <dd>{{ d.registrado_por }}</dd>
+      </div>
+      @if (d.sin_respaldo_fotografico) {
+        <div class="datos__ancho">
+          <dt>Respaldo fotográfico</dt>
+          <dd>
+            <app-marca-sin-respaldo />
+            <span data-prueba="motivo-sin-foto">{{ d.motivo_sin_respaldo_texto }}</span>
+          </dd>
+        </div>
+      }
+      @if (d.estado === 'ANULADO') {
+        <div class="datos__ancho datos__anulacion" data-prueba="anulacion">
+          <dt>Anulado</dt>
+          <dd>
+            <strong>{{ d.motivo_anulacion }}</strong>
+            <span class="texto-secundario"> · por {{ d.anulado_por }}</span>
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
+}

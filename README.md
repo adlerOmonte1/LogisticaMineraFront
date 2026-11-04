@@ -41,6 +41,7 @@ LogisticaMineraFront/
 | [`docs/pantallas.md`](docs/pantallas.md) | Rutas, menú por rol, pantallas y componentes compartidos |
 | [`docs/decisiones.md`](docs/decisiones.md) | Decisiones de implementación D-F01 en adelante |
 | [`docs/entorno.md`](docs/entorno.md) | Versiones, arranque con el backend, verificación antes de un commit |
+| [`docs/flujo-github.md`](docs/flujo-github.md) | Ramas, issues, etiquetas, hitos, protección y ciclo de una fase en GitHub |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Cómo trabajar una fase, commits, checklist de PR |
 
 Fuentes del backend que se leen a menudo (ruta relativa desde la raíz de este repositorio):

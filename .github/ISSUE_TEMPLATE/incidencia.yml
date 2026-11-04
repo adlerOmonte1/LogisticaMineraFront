@@ -1,0 +1,37 @@
+name: Incidencia (defecto)
+description: Algo no funciona como dice la documentación o el contrato de la API
+title: "DEF-Fnnn · Resumen del defecto"
+labels: ["incidencia", "frontend"]
+body:
+  - type: textarea
+    id: observado
+    attributes:
+      label: Qué ocurre
+      description: Pantalla, rol con el que se probó y mensaje exacto si lo hay.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Qué debería ocurrir
+      description: Citar el criterio de aceptación, la regla o el contrato que lo dice.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducirlo
+      description: Incluir ancho de pantalla o dispositivo y el commit del backend contra el que se probó.
+    validations:
+      required: true
+  - type: dropdown
+    id: origen
+    attributes:
+      label: Dónde está el defecto
+      options:
+        - Frontend
+        - Backend (abrir también un issue allí)
+        - Documentación
+        - No se sabe
+    validations:
+      required: true

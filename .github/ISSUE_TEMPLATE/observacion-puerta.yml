@@ -1,0 +1,23 @@
+name: Observación de una puerta de supervisión
+description: Una observación numerada del supervisor al revisar una fase
+title: "FBn · obs. k · Resumen"
+labels: ["observacion", "frontend"]
+body:
+  - type: input
+    id: fase
+    attributes:
+      label: Fase y fila de la bitácora
+      placeholder: "FB3 · 2026-12-02 · Observada"
+    validations:
+      required: true
+  - type: textarea
+    id: observacion
+    attributes:
+      label: Observación
+      description: Qué se vio, con qué cuenta y a qué ancho de pantalla.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        La corrección va en su propio commit `fix(FBn): obs. k — …` y el PR cierra este issue.

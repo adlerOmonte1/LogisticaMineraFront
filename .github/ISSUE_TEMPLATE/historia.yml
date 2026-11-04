@@ -1,0 +1,37 @@
+name: Historia de usuario (interfaz)
+description: Pantalla o flujo del cliente que implementa una historia del backend
+title: "HU-Mxx-yy · Nombre de la historia"
+labels: ["historia", "frontend"]
+body:
+  - type: textarea
+    id: historia
+    attributes:
+      label: Historia
+      description: Copiar el texto «Como…, quiero…, para…» de la HU del backend. No reescribirlo.
+    validations:
+      required: true
+  - type: textarea
+    id: trazabilidad
+    attributes:
+      label: Trazabilidad
+      value: |
+        - Módulo: Mxx
+        - Fase: FBn
+        - Issue de la HU en el backend: adlerOmonte1/LogisticaMinera#
+        - HU en la documentación: docs/modulos/Mxx-*/HU.md
+        - Criterios de aceptación de interfaz: (ver docs/verificacion-criterios.md)
+        - Pantalla en la maqueta / docs/pantallas.md:
+    validations:
+      required: true
+  - type: textarea
+    id: entregables
+    attributes:
+      label: Entregables
+      value: |
+        - [ ] Modelo en `models/` (espejo de `docs/contrato-api.md`)
+        - [ ] Servicio en `data-access/`
+        - [ ] Rutas, guards y entrada de menú por rol
+        - [ ] Páginas y componentes `ui/`
+        - [ ] Pruebas del servicio y de los componentes con lógica
+        - [ ] Criterios marcados en `docs/verificacion-criterios.md`
+        - [ ] Recorrido con las tres cuentas, en escritorio y a 360 px

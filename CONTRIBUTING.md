@@ -32,8 +32,13 @@ que la cadena `HU → módulo → rama → commit` se lea igual en los dos repos
 | FB7 | `feature/M08-consolidacion` | — |
 
 ```bash
-git switch -c feature/M03-registro-ingresos
+git switch staging && git pull
+git switch -c feature/M09-auditoria
 ```
+
+Las ramas salen de `staging` y vuelven a `staging` con un PR; `main` solo recibe PR desde `staging`
+tras la puerta de supervisión. Issues, etiquetas, hitos y protección de ramas:
+[`docs/flujo-github.md`](docs/flujo-github.md).
 
 | Tipo de cambio | Formato |
 |---|---|

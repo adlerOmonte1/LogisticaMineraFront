@@ -1,0 +1,67 @@
+<app-encabezado-pagina titulo="Registrar ingreso" [subtitulo]="subtitulo[store.paso()]" />
+<app-pasos-registro [paso]="store.paso()" />
+
+@if (store.pendiente(); as pendiente) {
+  <section class="pendiente tarjeta" role="status" data-prueba="registro-en-curso">
+    <mat-icon aria-hidden="true">restore</mat-icon>
+    <p>
+      Tiene un registro en curso del {{ pendiente.actualizado | fechaLima }}.
+      @if (pendiente.propuesta) {
+        Puede continuarlo sin volver a fotografiar.
+      } @else {
+        La imagen quedó guardada pero no se llegó a enviar.
+      }
+    </p>
+    <div class="pendiente__acciones">
+      <button mat-button type="button" (click)="store.descartarPendiente()" data-prueba="descartar-pendiente">
+        Descartar
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="store.continuarPendiente()"
+        data-prueba="continuar-pendiente"
+      >
+        Continuar
+      </button>
+    </div>
+  </section>
+}
+
+<app-aviso-error [error]="store.errorCatalogo()" />
+
+@switch (store.paso()) {
+  @case ('captura') {
+    <app-captura-ticket
+      [procesando]="store.procesando()"
+      [error]="store.errorCaptura()"
+      [hayImagenPendiente]="store.imagen() !== null"
+      (imagenElegida)="store.capturar($event)"
+      (sinFoto)="store.capturarSinFoto($event)"
+      (reintentar)="store.reintentarCaptura()"
+    />
+  }
+  @case ('revision') {
+    @if (store.propuesta(); as propuesta) {
+      <app-revision-ingreso
+        [propuesta]="propuesta"
+        [formulario]="formulario"
+        [tiposMineral]="store.tiposMineral()"
+        [consultaVehiculo]="store.consultaVehiculo()"
+        [imagenUrl]="store.imagenUrl()"
+        [error]="store.errorConfirmacion()"
+        [enviando]="store.confirmando()"
+        (confirmar)="confirmar($event)"
+        (repetirCaptura)="store.nuevo()"
+        (registrarVehiculo)="registrarVehiculo($event)"
+        (agregarTipoMineral)="agregarTipoMineral()"
+      />
+    }
+  }
+  @case ('confirmado') {
+    @if (store.registrado(); as ingreso) {
+      <app-confirmacion-ingreso [ingreso]="ingreso" (registrarOtro)="registrarOtro()" />
+    }
+  }
+}

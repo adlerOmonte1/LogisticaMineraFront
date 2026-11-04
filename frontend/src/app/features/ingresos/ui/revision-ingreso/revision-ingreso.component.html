@@ -1,0 +1,169 @@
+<form class="revision" [formGroup]="formulario()" (ngSubmit)="enviar()" novalidate>
+  <section class="revision__ticket" aria-label="Ticket de balanza">
+    @if (propuesta().sin_respaldo_fotografico) {
+      <div class="sin-foto" data-prueba="sin-foto">
+        <mat-icon aria-hidden="true">no_photography</mat-icon>
+        <h2>Registro sin foto</h2>
+        <p>Motivo: {{ motivoSinFoto() }}</p>
+        <p class="texto-secundario">
+          Digite los datos del ticket. El ingreso quedará marcado «sin respaldo fotográfico».
+        </p>
+      </div>
+    } @else {
+      <app-visor-imagen [src]="imagenUrl()" alt="Ticket de balanza"
+        >Imagen no disponible en este dispositivo</app-visor-imagen
+      >
+    }
+    @if (avisoLectura(); as aviso) {
+      <p class="aviso-lectura" role="status" data-prueba="aviso-lectura">
+        <mat-icon aria-hidden="true">info</mat-icon>{{ aviso }}
+      </p>
+    }
+  </section>
+
+  <section class="revision__datos">
+    <app-aviso-error [error]="error()" />
+
+    <div class="campo">
+      <mat-form-field [class.campo-dudoso]="estadoLectura('placa') === 'dudoso'">
+        <mat-label>Placa</mat-label>
+        <input
+          matInput
+          formControlName="placa"
+          autocapitalize="characters"
+          autocomplete="off"
+          spellcheck="false"
+          (input)="normalizarPlaca()"
+          data-prueba="placa"
+        />
+        <mat-error>{{ formulario().controls.placa | errorCampo }}</mat-error>
+      </mat-form-field>
+      <app-nota-lectura [campo]="campoReconocido('placa')" [estado]="estadoLectura('placa')" />
+      <app-lista-inconsistencias
+        [inconsistencias]="inconsistenciasPorCampo().get('placa') ?? []"
+        [justificaciones]="formulario().controls.justificaciones"
+        [porRevalidar]="porRevalidar()"
+        [faltantes]="faltantes()"
+      />
+    </div>
+
+    <app-resumen-vehiculo
+      [placa]="placaActual()"
+      [pesoBruto]="pesoActual()"
+      [consulta]="consultaVehiculo()"
+      [avisoServidor]="avisoPlaca()"
+      (registrarVehiculo)="registrarVehiculo.emit(placaActual())"
+    />
+
+    <div class="fila-campos">
+      <div class="campo">
+        <mat-form-field [class.campo-dudoso]="estadoLectura('fecha') === 'dudoso'">
+          <mat-label>Fecha del pesaje</mat-label>
+          <input matInput type="date" formControlName="fecha" data-prueba="fecha" />
+          <mat-error>{{ formulario().controls.fecha | errorCampo }}</mat-error>
+        </mat-form-field>
+        <app-nota-lectura [campo]="campoReconocido('fecha')" [estado]="estadoLectura('fecha')" />
+        <app-lista-inconsistencias
+          [inconsistencias]="inconsistenciasPorCampo().get('fecha') ?? []"
+          [justificaciones]="formulario().controls.justificaciones"
+          [porRevalidar]="porRevalidar()"
+          [faltantes]="faltantes()"
+        />
+      </div>
+
+      <div class="campo">
+        <mat-form-field>
+          <mat-label>Hora del pesaje</mat-label>
+          <input matInput type="time" formControlName="hora" data-prueba="hora" />
+          <mat-error>{{ formulario().controls.hora | errorCampo }}</mat-error>
+        </mat-form-field>
+        @if (horaEsPropuesta()) {
+          <span class="propuesta" data-prueba="hora-propuesta">
+            <mat-icon aria-hidden="true">schedule</mat-icon>Hora propuesta: ajústela a la del pesaje
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="campo">
+      <mat-form-field [class.campo-dudoso]="estadoLectura('peso_bruto_tn') === 'dudoso'">
+        <mat-label>Peso bruto (t)</mat-label>
+        <input
+          matInput
+          formControlName="peso_bruto_tn"
+          inputmode="decimal"
+          autocomplete="off"
+          data-prueba="peso"
+        />
+        <mat-error>{{ formulario().controls.peso_bruto_tn | errorCampo }}</mat-error>
+      </mat-form-field>
+      <app-nota-lectura
+        [campo]="campoReconocido('peso_bruto_tn')"
+        [estado]="estadoLectura('peso_bruto_tn')"
+      />
+      <app-lista-inconsistencias
+        [inconsistencias]="inconsistenciasPorCampo().get('peso_bruto_tn') ?? []"
+        [justificaciones]="formulario().controls.justificaciones"
+        [porRevalidar]="porRevalidar()"
+        [faltantes]="faltantes()"
+      />
+    </div>
+
+    <div class="campo">
+      <mat-form-field>
+        <mat-label>Tipo de mineral</mat-label>
+        <mat-select formControlName="tipo_mineral" data-prueba="tipo-mineral">
+          @for (tipo of tiposMineral(); track tipo.id) {
+            <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ formulario().controls.tipo_mineral | errorCampo }}</mat-error>
+      </mat-form-field>
+      @if (propuesta().puede_agregar_tipo_mineral) {
+        <button
+          mat-button
+          type="button"
+          (click)="agregarTipoMineral.emit()"
+          data-prueba="agregar-tipo-mineral"
+        >
+          <mat-icon>add</mat-icon>
+          Agregar tipo de mineral
+        </button>
+      } @else {
+        @if (propuesta().aviso_tipo_mineral; as aviso) {
+          <span class="texto-secundario" data-prueba="aviso-tipo-mineral">{{ aviso }}</span>
+        }
+      }
+    </div>
+
+    <app-lista-inconsistencias
+      [inconsistencias]="sinCampo()"
+      [justificaciones]="formulario().controls.justificaciones"
+      [porRevalidar]="porRevalidar()"
+      [faltantes]="faltantes()"
+    />
+
+    <div class="acciones-formulario revision__acciones">
+      <button
+        mat-button
+        type="button"
+        [disabled]="enviando()"
+        (click)="repetirCaptura.emit()"
+        data-prueba="repetir"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Volver a capturar
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="revision__confirmar"
+        [disabled]="enviando()"
+        data-prueba="confirmar"
+      >
+        Confirmar ingreso
+      </button>
+    </div>
+  </section>
+</form>

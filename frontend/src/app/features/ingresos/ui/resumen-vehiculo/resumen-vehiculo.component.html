@@ -1,0 +1,84 @@
+<section class="vehiculo" aria-live="polite" [attr.data-estado]="estado()">
+  @switch (estado()) {
+    @case ('vacio') {
+      <p class="vehiculo__nota">
+        <mat-icon aria-hidden="true">local_shipping</mat-icon>Escriba la placa para ver los datos del
+        vehículo.
+      </p>
+    }
+    @case ('consultando') {
+      <p class="vehiculo__nota">
+        <mat-icon aria-hidden="true">hourglass_empty</mat-icon>Buscando el vehículo en el catálogo…
+      </p>
+    }
+    @case ('fallo') {
+      <p class="vehiculo__nota vehiculo__nota--aviso">
+        <mat-icon aria-hidden="true">wifi_off</mat-icon>No se pudo consultar el catálogo. Revise la conexión.
+      </p>
+    }
+    @case ('nuevo') {
+      <p class="vehiculo__nota vehiculo__nota--aviso" data-prueba="placa-nueva">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <span>{{ avisoServidor() ?? 'Esta placa no está en el catálogo.' }}</span>
+      </p>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="registrarVehiculo.emit()"
+        data-prueba="registrar-vehiculo"
+      >
+        <mat-icon>add</mat-icon>
+        Registrar vehículo
+      </button>
+    }
+    @case ('baja') {
+      <p class="vehiculo__nota vehiculo__nota--error">
+        <mat-icon aria-hidden="true">block</mat-icon>
+        <span
+          >Este vehículo está dado de baja: no puede asociarse a un ingreso. Reactívelo en el catálogo o
+          revise la placa.</span
+        >
+      </p>
+    }
+    @default {
+      @if (vehiculo(); as vehiculo) {
+        <dl class="vehiculo__datos">
+          <div>
+            <dt>Tipo de vehículo</dt>
+            <dd>{{ etiquetaTitularidad[vehiculo.titularidad] }}</dd>
+          </div>
+          <div>
+            <dt>Capacidad</dt>
+            <dd class="monoespaciado">{{ vehiculo.capacidad_tn | toneladas }}</dd>
+          </div>
+          <div>
+            <dt>Tara</dt>
+            <dd class="monoespaciado">
+              {{ vehiculo.tara_tn ? (vehiculo.tara_tn | toneladas) : 'Pendiente de destare' }}
+            </dd>
+          </div>
+          <div>
+            <dt>Peso neto (referencia)</dt>
+            <dd class="monoespaciado" data-prueba="neto-referencia">
+              {{ netoReferencia() ? (netoReferencia() | toneladas) : '—' }}
+            </dd>
+          </div>
+        </dl>
+        @if (estado() === 'sin-tara') {
+          <p class="vehiculo__nota vehiculo__nota--aviso" data-prueba="sin-tara">
+            <mat-icon aria-hidden="true">schedule</mat-icon>
+            <span
+              >Este vehículo aún no tiene tara: el ingreso quedará En proceso hasta registrar su
+              destare.</span
+            >
+          </p>
+        } @else {
+          <p class="vehiculo__nota texto-secundario">
+            El peso neto lo calcula el sistema al registrar; aquí es solo una referencia.
+          </p>
+        }
+      }
+    }
+  }
+</section>

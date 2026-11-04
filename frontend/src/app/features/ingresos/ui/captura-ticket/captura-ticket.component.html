@@ -1,0 +1,121 @@
+<app-aviso-error [error]="error()" />
+@if (error() && hayImagenPendiente()) {
+  <p class="reintento">
+    La imagen quedó guardada en este dispositivo.
+    <button mat-stroked-button type="button" [disabled]="procesando()" (click)="reintentar.emit()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar el envío
+    </button>
+  </p>
+}
+
+@if (!modoSinFoto()) {
+  <section
+    class="zona"
+    [class.zona--arrastrando]="arrastrando()"
+    [attr.aria-busy]="procesando()"
+    (dragover)="alArrastrarSobre($event)"
+    (dragleave)="arrastrando.set(false)"
+    (drop)="alSoltar($event)"
+  >
+    @if (procesando()) {
+      <div class="zona__estado" role="status">
+        <mat-spinner diameter="40" />
+        <h2>Leyendo el ticket…</h2>
+        <p class="texto-secundario">Esto toma unos segundos. No cierre la pantalla.</p>
+      </div>
+    } @else {
+      <mat-icon class="zona__icono" aria-hidden="true">photo_camera</mat-icon>
+      <h2>Fotografíe o seleccione el ticket de balanza</h2>
+      <p class="texto-secundario">JPG o PNG. En computadora también puede arrastrar la imagen a esta zona.</p>
+      <div class="zona__acciones">
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          class="zona__boton"
+          (click)="camara.click()"
+          data-prueba="fotografiar"
+        >
+          <mat-icon>add_a_photo</mat-icon>
+          Fotografiar ticket
+        </button>
+        <button
+          mat-stroked-button
+          type="button"
+          class="zona__boton"
+          (click)="galeria.click()"
+          data-prueba="elegir"
+        >
+          <mat-icon>image</mat-icon>
+          Elegir imagen
+        </button>
+      </div>
+    }
+    <!-- La cámara trasera se abre directo, sin pantalla intermedia (RNF-M03-07). -->
+    <input
+      #camara
+      hidden
+      type="file"
+      accept="image/*"
+      capture="environment"
+      (change)="alElegirArchivo($event)"
+      data-prueba="entrada-camara"
+    />
+    <input
+      #galeria
+      hidden
+      type="file"
+      accept="image/*"
+      (change)="alElegirArchivo($event)"
+      data-prueba="entrada-galeria"
+    />
+  </section>
+
+  <p class="sin-foto">
+    <button
+      mat-button
+      type="button"
+      [disabled]="procesando()"
+      (click)="modoSinFoto.set(true)"
+      data-prueba="sin-foto"
+    >
+      <mat-icon>no_photography</mat-icon>
+      No tengo el ticket: registrar sin foto
+    </button>
+  </p>
+} @else {
+  <section class="tarjeta sin-foto-formulario">
+    <h2>Registrar sin foto</h2>
+    <p class="texto-secundario">
+      Indique por qué no hay imagen. El ingreso quedará marcado como «sin respaldo fotográfico» y deberá
+      digitar los datos.
+    </p>
+    <mat-form-field>
+      <mat-label>Motivo</mat-label>
+      <mat-select [formControl]="motivo" data-prueba="motivo">
+        @for (opcion of motivos; track opcion.codigo) {
+          <mat-option [value]="opcion.codigo">{{ opcion.etiqueta }}</mat-option>
+        }
+      </mat-select>
+      @if (motivo.touched && motivo.invalid) {
+        <mat-error>Elija un motivo</mat-error>
+      }
+    </mat-form-field>
+    <div class="acciones-formulario">
+      <button mat-button type="button" [disabled]="procesando()" (click)="modoSinFoto.set(false)">
+        Volver a la foto
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="procesando()"
+        (click)="continuarSinFoto()"
+        data-prueba="continuar-sin-foto"
+      >
+        Continuar sin foto
+      </button>
+    </div>
+  </section>
+}

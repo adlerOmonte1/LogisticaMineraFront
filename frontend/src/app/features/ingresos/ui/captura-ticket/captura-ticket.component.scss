@@ -1,0 +1,73 @@
+.zona {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 2px dashed var(--stroke, #cfc9be);
+  border-radius: 18px;
+  background: var(--surface);
+  text-align: center;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.zona--arrastrando {
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 10%, var(--surface));
+}
+
+.zona__icono {
+  width: 48px;
+  height: 48px;
+  font-size: 48px;
+  color: var(--accent);
+}
+
+.zona__estado {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.zona__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.zona__boton {
+  min-width: 200px;
+  height: var(--altura-toque);
+}
+
+.sin-foto {
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+.sin-foto-formulario {
+  display: grid;
+  gap: 4px;
+  max-width: 560px;
+  margin: 0 auto;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.reintento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}

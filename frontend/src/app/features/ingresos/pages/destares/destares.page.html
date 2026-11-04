@@ -1,0 +1,39 @@
+<app-encabezado-pagina titulo="Destares" subtitulo="Vehículos con ingresos en proceso que esperan su tara" />
+
+<app-aviso-error [error]="errorCarga()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (resultado(); as resultado) {
+  <app-resultado-destare [resultado]="resultado" (continuar)="cargar()" />
+} @else {
+  @if (pendientes(); as pendientes) {
+    @if (pendientes.count === 0) {
+      <section class="tarjeta">
+        <app-estado-vacio
+          icono="done_all"
+          [mensaje]="pendientes.mensaje ?? 'No hay vehículos pendientes de destare'"
+        />
+      </section>
+    } @else {
+      <div class="destares">
+        <app-pendientes-destare
+          [vehiculos]="pendientes.vehiculos"
+          [ingresos]="pendientes.results"
+          [elegido]="elegido()"
+          (elegir)="elegir($event)"
+        />
+        @if (vehiculoElegido(); as vehiculo) {
+          <app-formulario-destare
+            [vehiculo]="vehiculo"
+            [error]="envio.error()"
+            [enviando]="envio.enviando()"
+            (registrarDestare)="registrar(vehiculo.id, $event)"
+            (cancelar)="elegido.set(null)"
+          />
+        }
+      </div>
+    }
+  }
+}

@@ -1,0 +1,43 @@
+.inconsistencias {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.inconsistencia {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--orange-b) 12%, transparent);
+  color: var(--orange);
+}
+
+.inconsistencia--bloqueante {
+  background: color-mix(in srgb, var(--red-b) 10%, transparent);
+  color: var(--red);
+}
+
+.inconsistencia__cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.inconsistencia__mensaje {
+  margin: 0;
+  font-weight: 500;
+}
+
+.inconsistencia__nota {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--label-2);
+}
+
+.inconsistencia__justificacion {
+  width: 100%;
+  margin-top: 8px;
+  color: var(--label);
+}

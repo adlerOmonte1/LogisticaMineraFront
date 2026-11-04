@@ -2,9 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { API_URL } from '@core/http/api-url.token';
+import { API_URL } from '../http/api-url.token';
 import { Transportista } from '@models/transportista.model';
-import { paginaDe } from '../../../testing/fabricas';
+import { paginaDe } from '../../testing/fabricas';
 import { TiposMineralApiService } from './tipos-mineral-api.service';
 import { TransportistasApiService } from './transportistas-api.service';
 import { VehiculosApiService } from './vehiculos-api.service';

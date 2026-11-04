@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
 
 import { crearRespuestaLogin } from '../../testing/fabricas';
 import { SesionService } from '../sesion/sesion.service';
@@ -7,9 +8,9 @@ import { SiPuedeDirective } from './si-puede.directive';
 
 @Component({
   standalone: true,
-  imports: [SiPuedeDirective],
+  imports: [SiPuedeDirective, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<button *appSiPuede="'MODIFICAR_TARA'">Modificar tara</button>`,
+  template: `<button *appSiPuede="'MODIFICAR_TARA'"><mat-icon>scale</mat-icon>Modificar tara</button>`,
 })
 class AnfitrionComponent {}
 
@@ -26,6 +27,9 @@ describe('SiPuedeDirective', () => {
     sesion.iniciar(crearRespuestaLogin('ADMINISTRADOR'));
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('button')).not.toBeNull();
+
+    // El contenido nace en un effect: sus componentes hijos deben inicializarse igual.
+    expect(fixture.nativeElement.querySelector('mat-icon').classList).toContain('material-icons');
 
     sesion.finalizar();
     fixture.detectChanges();

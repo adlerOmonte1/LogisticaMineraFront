@@ -5,7 +5,9 @@ import { ErrorApi } from '@models/error-api.model';
 /** Clave con la que se guarda en un control el error que mandó el servidor. */
 export const ERROR_SERVIDOR = 'servidor';
 
-/** Texto de la interfaz para un campo que el servidor reclama sin mensaje propio. */
+const CODIGO_CAMPOS_OBLIGATORIOS = 'CAMPOS_OBLIGATORIOS';
+
+/** Texto de la interfaz para un campo que el servidor reclama como ausente. */
 const TEXTO_OBLIGATORIO = 'Campo obligatorio';
 
 /**
@@ -14,8 +16,11 @@ const TEXTO_OBLIGATORIO = 'Campo obligatorio';
  * El `mensaje` general no va aquí: lo muestra `app-aviso-error` sobre el formulario.
  */
 export function aplicarErrorEnFormulario(formulario: FormGroup, error: ErrorApi): void {
+  // `detalles.campos` lista campos ausentes (CAMPOS_OBLIGATORIOS), pero otros rechazos también
+  // lo usan para señalar el campo culpable (PLACA_NO_REGISTRADA): ahí va el mensaje literal.
+  const textoDeCampos = error.codigo === CODIGO_CAMPOS_OBLIGATORIOS ? TEXTO_OBLIGATORIO : error.mensaje;
   for (const campo of error.camposObligatorios) {
-    marcar(formulario.get(campo), TEXTO_OBLIGATORIO);
+    marcar(formulario.get(campo), textoDeCampos);
   }
   for (const [campo, texto] of Object.entries(error.camposConError)) {
     marcar(formulario.get(campo), texto);

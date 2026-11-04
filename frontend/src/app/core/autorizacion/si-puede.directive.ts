@@ -23,7 +23,9 @@ export class SiPuedeDirective {
     effect(() => {
       const puede = this.autorizacion.puede(this.appSiPuede());
       if (puede && !this.visible) {
-        this.contenedor.createEmbeddedView(this.plantilla);
+        // La vista nace dentro de un `effect`, fuera de una pasada de detección de cambios: sin
+        // `detectChanges()` sus componentes hijos (mat-icon…) no ejecutarían su inicialización.
+        this.contenedor.createEmbeddedView(this.plantilla).detectChanges();
       } else if (!puede && this.visible) {
         this.contenedor.clear();
       }

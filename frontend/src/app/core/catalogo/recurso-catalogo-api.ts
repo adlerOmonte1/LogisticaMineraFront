@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, catchError, shareReplay, tap, throwError } from 'rxjs';
 
-import { API_URL } from '@core/http/api-url.token';
-import { recorrerPaginas } from '@core/http/paginacion';
-import { crearParametros } from '@core/http/parametros-http';
+import { API_URL } from '../http/api-url.token';
+import { recorrerPaginas } from '../http/paginacion';
+import { crearParametros } from '../http/parametros-http';
 import { ConMensaje, Pagina } from '@models/pagina.model';
 
 /** Filtro común de los tres catálogos: por defecto el backend lista solo los vigentes. */

@@ -20,11 +20,11 @@ import { MarcoListadoComponent } from '@shared/components/marco-listado/marco-li
 import { crearListadoPaginado } from '@shared/listados/listado-paginado';
 import { cambiosRespectoDe } from '@shared/utils/cambios';
 import { normalizarPlaca } from '@shared/utils/placa';
-import { FiltroCatalogo } from '../../data-access/recurso-catalogo-api';
-import { TransportistasApiService } from '../../data-access/transportistas-api.service';
-import { VehiculosApiService } from '../../data-access/vehiculos-api.service';
+import { FiltroCatalogo } from '@core/catalogo/recurso-catalogo-api';
+import { TransportistasApiService } from '@core/catalogo/transportistas-api.service';
+import { VehiculosApiService } from '@core/catalogo/vehiculos-api.service';
 import { DatosDialogoTara, DialogoTaraComponent } from '../../ui/dialogo-tara.component';
-import { DatosDialogoVehiculo, DialogoVehiculoComponent } from '../../ui/dialogos-catalogo.component';
+import { DatosDialogoVehiculo, DialogoVehiculoComponent } from '@shared/dialogos/dialogo-vehiculo.component';
 import { TablaVehiculosComponent } from '../../ui/tabla-vehiculos.component';
 import { PaginaCatalogoBase, TextosCatalogo } from '../pagina-catalogo.base';
 

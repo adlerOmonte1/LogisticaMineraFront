@@ -27,6 +27,10 @@ interfaz («Campo obligatorio»), nunca el del criterio.
 **4. Sin `[(ngModel)]` en formularios reactivos.** Formularios tipados (`FormGroup<{…}>`,
 `nonNullable`).
 
+**5. Todo `<form (ngSubmit)>` lleva `[formGroup]`**, aunque tenga un solo control: sin él no se
+emite `ngSubmit` (`ReactiveFormsModule` no trae `NgForm`) y el clic en «Guardar» recarga la página
+(D-F38).
+
 ## Pintar un `ErrorApi` (skill `frontend-http-sesion`)
 
 ```typescript

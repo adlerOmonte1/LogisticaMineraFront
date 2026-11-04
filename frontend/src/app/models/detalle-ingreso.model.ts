@@ -1,5 +1,7 @@
+import { Evento } from './evento.model';
 import { Ingreso } from './ingreso.model';
 import { Reconocimiento } from './reconocimiento.model';
+import { TrazabilidadIngreso } from './trazabilidad.model';
 import { ResultadoValidacion } from './validacion.model';
 
 export type TipoRespaldo = 'IMAGEN' | 'SIN_RESPALDO_FOTOGRAFICO' | 'NO_DISPONIBLE';
@@ -20,12 +22,13 @@ export type BloqueValidaciones = BloqueDetalle<{ resultados: ResultadoValidacion
 
 /**
  * Detalle completo de un ingreso (`GET consulta/ingresos/{id}/`). Es la única llamada que
- * necesitan las pestañas (RNF-M07-02). La trazabilidad y el historial se tipan en FB5 y FB4.
+ * necesitan las pestañas (RNF-M07-02). La trazabilidad es la del ingreso (M06).
  */
 export interface DetalleIngreso extends Omit<Ingreso, 'reconocimiento'> {
   reconocimiento: BloqueReconocimiento;
   respaldo: RespaldoTicket;
   validaciones: BloqueValidaciones;
-  trazabilidad: unknown;
-  historial: unknown[];
+  trazabilidad: TrazabilidadIngreso;
+  /** Eventos del ingreso y de su lote, del primero al más reciente (HU-M09-02 CA01, CA03). */
+  historial: Evento[];
 }

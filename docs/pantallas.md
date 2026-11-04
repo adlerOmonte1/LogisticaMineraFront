@@ -21,7 +21,7 @@ no se renombran (D-F13).
 |---|---|---|---|---|
 | `/login` | `auth` | `LoginPage` | Pública | FB1 |
 | `/cuenta/clave` | `auth` | `CambiarClavePage` | Todos (forzada si `debe_cambiar_clave`) | FB1 |
-| `/inicio` | `consulta` | `InicioPage` | Todos | FB1 (mínima) → FB6 |
+| `/inicio` | `consulta` | `InicioPage` | Todos | FB1 (mínima) → FB6 ✓ |
 | `/ingresos/registrar` | `ingresos` | `RegistrarIngresoPage` | Todos | FB3 |
 | `/ingresos/destares` ◆ | `ingresos` | `DestaresPage` | Todos | FB3 |
 | `/ingresos/:id/corregir` | `ingresos` | `CorregirIngresoPage` | Administrativo, Administrador | FB3 |
@@ -172,9 +172,12 @@ presenta como hoja lateral sobre el detalle. Al terminar vuelven al detalle (§5
 |---|---|---|---|---|
 | Auditoría del sistema | Filtros de usuario, acción y texto; tabla del más reciente al más antiguo; detalle del evento con antes/después y enlace al ingreso o al lote | HU-M09-03 | `auditoria/` | `pAdmin('auditoria')` |
 
-La pestaña **Historial** del detalle es de `consulta` (el dato llega en el detalle); su componente
-de presentación de eventos vive en `shared/components/linea-eventos/` porque también lo usa esta
-pantalla.
+La pestaña **Historial** del detalle es de `consulta` (el dato llega en el detalle, D-F32); su
+componente de presentación de eventos vive en `shared/components/linea-eventos/`, y el antes y
+después por campo, en `shared/components/cambios-evento/`, porque también lo usa el diálogo de esta
+pantalla. Los filtros se aplican al pulsar «Buscar» (D-F34) y `?texto=<código>` abre la pantalla ya
+filtrada: es el enlace de la pestaña Historial. Ruta y pestañas: `rutas-administracion.routes.ts`
+(D-F33).
 
 ## 5. Flujos entre features sin importarse
 
@@ -197,8 +200,9 @@ pantalla.
 | `campo-confianza` | Revisión del registro y pestaña Reconocimiento |
 | `aviso-inconsistencia` + `caja-justificacion` | Revisión, corrección, destare |
 | `formulario-vehiculo`, `formulario-tipo-mineral` | Catálogo y registro |
-| `recorrido-etapas` | Detalle del lote y pestaña Trazabilidad |
-| `linea-eventos` | Pestaña Historial y auditoría |
+| `recorrido-etapas` | Pestaña Trazabilidad del ingreso (el detalle del lote usa su propio `recorrido-lote`, D-F37) |
+| `linea-eventos` | Pestaña Historial |
+| `cambios-evento` (antes y después por campo) | `linea-eventos` y el diálogo de detalle de la auditoría |
 | `confirmacion` (diálogo con motivo opcional u obligatorio) | Bajas, anulación, reversión, cierre |
 | `selector-periodo` | Calendario y consolidación |
 

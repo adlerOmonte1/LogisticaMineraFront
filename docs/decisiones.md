@@ -424,3 +424,193 @@ valor decimal se normaliza con `normalizarDecimal` justo antes de enviarse** (pe
 corrección, tara, capacidad). El defecto apareció al probar contra el backend: el servidor
 rechazaba `"40,00"` con «Datos inválidos». Los pesos y las toneladas se muestran siempre con punto
 (`ToneladasPipe`), como el servidor los devuelve.
+
+## D-F32. El historial del ingreso usa los eventos del detalle; el enlace a la auditoría, el permiso
+
+**Fecha:** 2026-11-03 · **Fase:** FB4 · Aplica D-F24
+
+La pestaña **Historial** pinta `historial` de `GET consulta/ingresos/{id}/` —los mismos eventos, en el
+mismo orden, que devuelve `GET ingresos/{id}/historial/`— y ofrece el enlace a la auditoría con
+`*appSiPuede="'CONSULTAR_AUDITORIA'"`, no con el `puede_ver_auditoria` de ese otro endpoint. El
+cliente **no consume** `ingresos/{id}/historial/`.
+
+- *Alternativa descartada:* pedir `historial/` al abrir la pestaña para leer la bandera. Cuesta una
+  petición más por cada apertura y rompe RNF-M07-02 (el detalle es una sola llamada) a cambio de un
+  dato que la matriz de permisos ya tiene (D-F24): `PuedeConsultarAuditoria` y
+  `puede_ver_auditoria` son hoy el mismo conjunto, solo el Administrador.
+- *Qué mira el criterio:* HU-M09-02 CA05 se cumple porque el enlace no se dibuja; el servidor
+  rechaza la auditoría al resto con 403 de todos modos.
+- *Cuándo se revisaría:* si el backend separa la bandera del permiso de la auditoría, o si el
+  detalle deja de traer `historial`.
+
+## D-F33. Las pestañas de Administración se arman fuera de los features
+
+**Fecha:** 2026-11-03 · **Fase:** FB4 · Aplica D-F22
+
+`/administracion` agrupa Usuarios y Permisos (M01, `features/auth/`) y Auditoría (M09,
+`features/auditoria/`) bajo una misma barra de pestañas. Como un feature no importa de otro,
+`auth.routes.ts` exporta `rutasAdministracion(pestanasDeOtrosFeatures)` y
+`rutas-administracion.routes.ts` (junto a `rutas-con-sesion.routes.ts`, fuera de todo feature) la
+llama con `AUDITORIA_ROUTES`. La lista de pestañas visible sigue en `AdministracionPage`.
+
+- *Alternativas descartadas:* importar `auditoria` desde `auth` (rompe D-F22 y el lint lo marca);
+  sacar la Auditoría de las pestañas con ruta propia (se aleja de la maqueta, que la pone junto a
+  Usuarios y Permisos).
+- *Cuándo se revisaría:* si otro feature aporta una pestaña a una pantalla que no le pertenece, la
+  composición se repite con el mismo patrón.
+
+## D-F34. La auditoría filtra al pulsar «Buscar», no al teclear
+
+**Fecha:** 2026-11-03 · **Fase:** FB4
+
+Los filtros de usuario, acción y texto se envían juntos al pulsar **Buscar** (o Intro). El filtro
+`texto` busca en la referencia y dentro del JSON de valores y motivo de cada evento: es la consulta
+más costosa del backend, y una por tecla sobre una tabla que solo crece no lo justifica. La
+auditoría la usa un solo rol, con propósito (revisar un caso), no la exploración rápida.
+
+- Entrar desde el historial de un ingreso abre `/administracion/auditoria?texto=<código>` y filtra
+  de inmediato; el campo muestra el texto recibido.
+- El detalle de un evento (antes, después, motivo, IP) se abre en un diálogo. El evento de un
+  ingreso enlaza al ingreso; el de un lote, a los ingresos que afecta (`ingresos_relacionados`).
+  **El enlace al lote se agrega en FB5**, cuando exista `/lotes/:id`.
+- `Pagina<T>` gana un `mensaje` opcional: la auditoría lo llena con el texto del servidor cuando
+  no hay resultados (HU-M09-03 CA04), y se muestra literal como estado vacío.
+
+---
+
+# Decisiones de la construcción de FB5 (2026-11-03)
+
+> Numeradas desde D-F35: D-F32 a D-F34 son de FB4 (rama `feature/M09-auditoria`).
+
+## D-F35. El cierre de lotes pide el resumen de cada fila de la página
+
+**Fecha:** 2026-11-03 · **Fase:** FB5
+
+`GET lotes/` no trae los pendientes de cada lote, y «Cierre de lotes» debe decir cuáles están
+listos (HU-M06-05). El cliente no los deduce (riesgo de FB5 en el plan): de cada lote de la
+página —25 como máximo— pide `GET lotes/{id}/resumen/` en paralelo y muestra «Listo para cerrar»,
+«n pendientes» o «No disponible» si un resumen falla; un fallo no tumba la lista.
+
+- *Alternativa descartada:* calcular «listo» en el cliente desde el detalle. Duplicaría reglas del
+  servidor (D-08).
+- *Cuándo se revisaría:* si hay más de unas decenas de lotes en recorrido a la vez. Entonces se
+  pide al backend un conteo de pendientes en la fila de la lista; es un cambio sin lógica de
+  negocio nueva.
+
+## D-F36. Un paso se registra con `etapas/`; el secado de un tardío, con su propio endpoint
+
+**Fecha:** 2026-11-03 · **Fase:** FB5
+
+El «Siguiente paso» se construye solo con `siguientes` (RNF-M06-07). Cada entrada lleva `parte`,
+`ingreso`, `etapa` y `elegir_ruta`, y con ellas basta para decidir la llamada:
+
+| Entrada de `siguientes` | Llamada |
+|---|---|
+| `elegir_ruta: true` | `POST lotes/{id}/etapas/` con `ruta`, sin `etapa` |
+| `etapa` y sin `ingreso` | `POST lotes/{id}/etapas/` con `etapa` y `parte` |
+| `etapa: SECADO` con `ingreso` (tardío) | `POST lotes/{id}/ingresos/{ingreso}/secado/`, con `fracciones` si el lote está dividido |
+| `etapa` con `ingreso` y `parte` | `POST lotes/{id}/etapas/` con `ingreso` y `parte` |
+
+El diálogo de la etapa pregunta solo lo que esa etapa necesita (ruta, horas de molienda,
+bigbags, reparto) y propone la fecha en «ahora»: registrar son dos toques, tres si hay que elegir
+ruta (RNF-M06-06). El reparto de un tardío se propone con las fracciones de las partes y es
+editable; la suma de fracciones se muestra mientras se escribe y **no bloquea** el envío
+(RNF-M06-10): quien rechaza lo que no cierra la unidad es el servidor (HU-M06-04 CA04). Las
+fracciones se leen con `parsearFraccion` (`1/3`, `0.5`, `0,25`) solo para mostrar la suma.
+
+## D-F37. La pestaña Trazabilidad usa el dato del detalle; `recorrido-etapas` es solo suyo
+
+**Fecha:** 2026-11-03 · **Fase:** FB5 · Aplica D-F32 (FB4)
+
+`GET consulta/ingresos/{id}/` ya trae `trazabilidad` con la misma forma que
+`GET ingresos/{id}/trazabilidad/`; la pestaña usa ese dato y el cliente **no consume** el segundo
+endpoint (RNF-M07-02: el detalle es una sola llamada). `pantallas.md` §6 preveía
+`recorrido-etapas` también para el detalle del lote, pero lo que el lote trae —`recorrido`— son
+pasos ya registrados (etapa, carga, usuario), no las líneas de una ruta con etapas pendientes. El
+detalle del lote tiene su propio `recorrido-lote` en `features/trazabilidad/ui/`, y
+`shared/components/recorrido-etapas/` lo usa únicamente la pestaña (en `shared/` porque la
+pestaña es de `consulta` y un feature no importa de otro).
+
+## D-F38. Todo `<form (ngSubmit)>` lleva `[formGroup]`
+
+**Fecha:** 2026-11-03 · **Fase:** FB5
+
+Defecto encontrado al probar los diálogos de lotes: `ReactiveFormsModule` no incluye `NgForm`, así
+que un `<form (ngSubmit)="…">` sin `[formGroup]` **no emite `ngSubmit`**; el clic en «Guardar»
+hacía un envío nativo del navegador y recargaba la página (en Karma, desconectaba el navegador).
+Regla: un formulario con `(ngSubmit)` siempre se asocia a un `FormGroup` (`[formGroup]`), aunque
+tenga un solo control. Está anotada en la skill `frontend-formularios`.
+
+---
+
+# Decisiones de la construcción de FB6 (2026-11-03)
+
+## D-F39. La búsqueda y los avisos de la cabecera viven en `core/consulta/`
+
+**Fecha:** 2026-11-03 · **Fase:** FB6 · Aplica D-F22 y D-F26
+
+La búsqueda rápida y la campana son parte del armazón, y `core/` no depende de ningún feature. Su
+acceso a la API (`ConsultaCabeceraApiService`) y el estado de los avisos (`AvisosService`) están
+en `core/consulta/`; sus componentes, en `core/layout/`. Lo demás de M07 (consulta, listado,
+calendario, inicio) es del feature `consulta`.
+
+Los avisos los calcula el servidor al consultarse y ya vienen filtrados por rol (HU-M07-04 CA08):
+el cliente no decide qué mostrar. Se recargan al abrir la sesión, al abrir el panel, al volver a
+la pestaña del navegador y **tras cada navegación**: un registro o un destare propio termina
+navegando, así que el aviso desaparece sin que el armazón conozca esos flujos (RNF-M07-16). Al
+destruirse el armazón (cerrar sesión) se limpian.
+
+- *Alternativa descartada:* que cada pantalla que cambia algo avise a la campana. Acopla la
+  cabecera con cada feature.
+- *Cuándo se revisaría:* si la lectura tras cada navegación pesa en planta; se pasaría a recargar
+  solo tras `POST` propios con un interceptor.
+
+## D-F40. Búsqueda y listado: dos pantallas, un endpoint, y `placa` viaja siempre
+
+**Fecha:** 2026-11-03 · **Fase:** FB6 · Aplica D-27 del backend
+
+El servidor distingue la búsqueda del listado por la **presencia** de la clave `placa` o `fecha`.
+La pantalla de consulta envía `placa` siempre, aunque vaya vacía, y así «sin criterios» vuelve
+con el mensaje del servidor (HU-M07-01 CA06) en lugar de convertirse en un listado. El listado
+nunca envía `placa` ni `fecha` (sus filtros vacíos se omiten), así que sin fechas recibe el mes
+en curso y la pantalla muestra el rango que el servidor aplicó (HU-M07-02 CA08). Una prueba fija
+ambos comportamientos.
+
+## D-F41. El ticket se abre junto a los datos, en la misma pantalla de consulta
+
+**Fecha:** 2026-11-03 · **Fase:** FB6
+
+La tarea T03 mide cuánto tarda recuperar un respaldo: elegir un resultado no navega, abre debajo
+de la lista el ticket ampliable, los datos y el lote con su recorrido, reutilizando las piezas
+del detalle (`pestana-ticket`, `pestana-datos`, `pestana-trazabilidad`). La imagen se pide con
+`TicketImagen`, el cargador compartido con el detalle del ingreso (Blob autenticado, D-F14): se
+libera al cambiar de ingreso y no se descarga dos veces. El detalle completo sigue a un enlace.
+
+## D-F42. Calendario e inicio: presentación sin cálculo propio
+
+**Fecha:** 2026-11-03 · **Fase:** FB6 · Aplica D-F04, RNF-M07-11
+
+- El calendario empieza la semana en **lunes** y calcula las celdas previas con UTC para que el
+  desfase del teléfono no mueva el día. Los días con En proceso o con anulados llevan icono **y**
+  palabra. En teléfono la celda no muestra las toneladas (no caben en 360 px); quedan el número, los
+  ingresos y las marcas, y las toneladas del día están en su lista y en el resumen del mes.
+- Las barras de siete días son CSS (sin librería de gráficos): la altura es proporcional al mayor
+  de la semana, un día con toneladas siempre se ve (mínimo 4 %) y la cifra va escrita bajo cada
+  barra, de modo que la altura nunca es el único dato.
+- Las cifras del inicio no se calculan en el cliente: el `enlace` de cada una lo manda el
+  servidor, y `null` significa que el rol no tiene esa pantalla (HU-M07-04 CA11).
+
+## D-F43. Un valor ausente no se envía como `null`; y «ahora» no se envía si no se tocó
+
+**Fecha:** 2026-11-03 · **Fase:** FB4–FB6 · Corrige un defecto hallado en el recorrido contra el backend
+
+Dos defectos del cliente que solo aparecieron al usar el backend real:
+
+- **`null` explícito.** «Cerrar lote» sin destino y «Agregar mineral» sin elegir enviaban
+  `{destino: null}` y `{tipo_mineral: null}`; el serializador los rechaza como tipo inválido y la
+  respuesta era el genérico «Datos inválidos» en lugar del mensaje del criterio (HU-M06-05 CA03,
+  HU-M06-01 CA17). Ahora el campo ausente **no viaja** y el servidor contesta con su mensaje.
+- **Fecha «ahora».** El diálogo de una etapa propone la hora actual redondeada al minuto; enviada
+  tal cual, quedaba antes del paso anterior si se registraba en el mismo minuto (23:03:00 frente a
+  23:03:41) y el servidor la rechazaba. Ahora la fecha **solo viaja si el usuario la cambió**; si no,
+  la asigna el servidor, como en el resto del sistema (D-01). Corrige lo dicho en D-F36.

@@ -678,7 +678,7 @@ describe('rutas de consulta', () => {
     expect(Object.keys(rutas)).toContain('ingresos/:id');
   });
 
-  it('Trazabilidad y Consolidación siguen pendientes: Consulta, Ingresos y Calendario ya no lo son', () => {
-    expect(RUTAS_PENDIENTES.map((r) => r.path)).toEqual(['lotes', 'lotes/cierre', 'consolidacion']);
+  it('solo Consolidación sigue pendiente: Consulta, Ingresos y Calendario ya no lo son', () => {
+    expect(RUTAS_PENDIENTES.map((r) => r.path)).toEqual(['consolidacion']);
   });
 });

@@ -9,8 +9,6 @@ import type { DatosPantallaPendiente } from './paginas/pantalla-pendiente.page';
  * feature al construir la fase; mientras tanto, el menú de cada rol está completo.
  */
 const PENDIENTES: readonly { ruta: string; titulo: string; fase: string; permiso: Permiso }[] = [
-  { ruta: 'lotes', titulo: 'Trazabilidad', fase: 'FB5', permiso: 'CONSULTAR' },
-  { ruta: 'lotes/cierre', titulo: 'Cierre de lotes', fase: 'FB5', permiso: 'CERRAR_LOTE' },
   { ruta: 'consolidacion', titulo: 'Consolidación', fase: 'FB7', permiso: 'CONSOLIDAR' },
 ];
 

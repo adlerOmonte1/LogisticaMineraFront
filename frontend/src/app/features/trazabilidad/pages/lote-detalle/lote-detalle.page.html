@@ -1,0 +1,114 @@
+<app-aviso-error [error]="error()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (lote(); as lote) {
+  <app-encabezado-pagina [titulo]="lote.nombre" [subtitulo]="lote.codigo">
+    @if (puedeComponer()) {
+      <button mat-stroked-button type="button" data-prueba="agregar-mineral" (click)="agregarMineral()">
+        <mat-icon>add</mat-icon>
+        Agregar otro mineral
+      </button>
+      <button mat-stroked-button type="button" data-prueba="asignar" (click)="asignar()">
+        <mat-icon>playlist_add</mat-icon>
+        Asignar ingresos
+      </button>
+    }
+    @if (puedeIniciar()) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        data-prueba="iniciar"
+        (click)="iniciarRecorrido()"
+      >
+        <mat-icon>play_arrow</mat-icon>
+        Iniciar recorrido
+      </button>
+    }
+    @if (puedeDividir()) {
+      <button mat-stroked-button type="button" data-prueba="dividir" (click)="dividir()">
+        <mat-icon>call_split</mat-icon>
+        Dividir
+      </button>
+    }
+    @if (puedeCerrar()) {
+      <a mat-flat-button color="primary" [routerLink]="['/lotes', lote.id, 'cerrar']" data-prueba="cerrar">
+        <mat-icon>task_alt</mat-icon>
+        Cerrar lote
+      </a>
+    }
+  </app-encabezado-pagina>
+
+  <div class="pagina">
+    <section class="tarjeta" aria-label="Estado del lote">
+      <dl class="datos">
+        <dt>Estado</dt>
+        <dd>
+          @if (estado(); as estado) {
+            <app-insignia-estado [texto]="estado.texto" [tono]="estado.tono" />
+          }
+        </dd>
+        <dt>Apertura</dt>
+        <dd data-prueba="apertura">{{ lote.fecha_apertura | fechaLima: 'fecha' }}</dd>
+        <dt>Inicio del recorrido</dt>
+        <dd data-prueba="inicio">{{ lote.fecha_inicio_recorrido | fechaLima }}</dd>
+        @if (nombreRuta(lote); as ruta) {
+          <dt>Ruta</dt>
+          <dd data-prueba="ruta">{{ ruta }}</dd>
+        }
+        @if (lote.estado === 'CERRADO') {
+          <dt>Destino</dt>
+          <dd data-prueba="destino">{{ lote.destino_texto }}</dd>
+          <dt>Cierre</dt>
+          <dd data-prueba="cierre">{{ lote.fecha_cierre | fechaLima }} · {{ lote.usuario_cierre }}</dd>
+          @if (lote.observacion_cierre) {
+            <dt>Observación</dt>
+            <dd>{{ lote.observacion_cierre }}</dd>
+          }
+        }
+      </dl>
+    </section>
+
+    @if (lote.estado === 'EN_RECORRIDO' && lote.pendientes.length > 0) {
+      <section class="tarjeta pendientes" aria-label="Pendientes para el cierre" data-prueba="pendientes">
+        <h2 class="titulo">Falta para poder cerrar</h2>
+        <ul>
+          @for (pendiente of lote.pendientes; track pendiente) {
+            <li>{{ pendiente }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    <app-siguiente-paso
+      [siguientes]="lote.siguientes"
+      [etapas]="catalogo()?.etapas ?? []"
+      (registrar)="registrar($event)"
+    />
+    @if (rendimiento(); as texto) {
+      <p class="rendimiento" role="status" data-prueba="rendimiento">{{ texto }}</p>
+    }
+
+    <app-composicion-lote
+      [composicion]="lote.composicion"
+      [total]="lote.total"
+      [editable]="puedeComponer()"
+      (retirar)="retirar($event)"
+      (quitarMineral)="quitarMineral($event)"
+    />
+
+    @if (lote.partes.length > 0) {
+      <app-partes-lote [partes]="lote.partes" />
+    }
+
+    <app-recorrido-lote
+      [recorrido]="lote.recorrido"
+      [bigbags]="lote.bigbags"
+      [partes]="lote.partes"
+      [puedeAsociar]="puedeAsociarBigbags()"
+      (asociarBigbags)="asociarBigbags()"
+    />
+  </div>
+}

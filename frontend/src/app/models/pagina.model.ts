@@ -7,6 +7,8 @@ export interface Pagina<T> {
   next: string | null;
   previous: string | null;
   results: T[];
+  /** Los listados que lo traen lo llenan solo cuando no hay resultados (p. ej. la auditoría). */
+  mensaje?: string | null;
 }
 
 /** Tamaño de página fijo del backend: no admite cambiarlo por parámetro. */

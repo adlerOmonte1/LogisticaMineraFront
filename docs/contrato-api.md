@@ -328,6 +328,12 @@ recorrido, bigbags, siguientes, pendientes}`. Lo que la interfaz necesita para n
 Las fracciones se escriben como texto (`"1/3"`, `"0.5"`). La interfaz suma y muestra cuánto falta
 para la unidad antes de confirmar (RNF-M06-10); el servidor tiene la última palabra.
 
+**Cómo lo lee el cliente.** `etapas/` y `rutas/` se piden una vez por sesión. El «Siguiente paso»
+usa `POST …/etapas/`, salvo el secado de un tardío (`ingreso` con etapa `SECADO`), que usa
+`POST …/ingresos/{id}/secado/` (D-F36). «Cierre de lotes» pide `…/resumen/` de cada lote de la
+página porque la lista no trae los pendientes (D-F35). La pestaña Trazabilidad del ingreso lee
+`trazabilidad` del detalle de M07 y no llama a `ingresos/{id}/trazabilidad/` (D-F37).
+
 ### 5.3 Trazabilidad de un ingreso
 
 `GET ingresos/{id}/trazabilidad/` →
@@ -381,6 +387,12 @@ historial:      [Evento]  (forma de §8)
 peticiones propias, salvo la imagen. Un bloque ausente se **indica** con su `mensaje`, no se omite
 (HU-M07-02 CA06).
 
+**Cómo lo lee el cliente.** La pantalla de consulta envía siempre la clave `placa` (D-F40); el
+listado no envía `placa` ni `fecha`. La búsqueda de la cabecera y los avisos se piden desde
+`core/consulta/` y los avisos se recargan tras cada navegación (D-F39). `ingresos/exportar/` se
+descarga como Blob con el nombre de `Content-Disposition`, y su error —«No hay ingresos para
+exportar»— llega dentro del Blob y se traduce como cualquier otro (D-F14).
+
 ---
 
 ## 7. M08 — Consolidación (Administrativo y Administrador)
@@ -412,6 +424,14 @@ Acciones: `CREAR`, `MODIFICAR`, `ANULAR`, `RECONOCER`, `CORREGIR_DATO`, `EXPORTA
 
 `puede_ver_auditoria: false` ⇒ el historial no ofrece el enlace a la auditoría completa (HU-M09-02
 CA05).
+
+**Cómo lo lee el cliente (D-F32).** El detalle `GET consulta/ingresos/{id}/` ya trae `historial`
+con los mismos eventos y el mismo orden que `ingresos/{id}/historial/`; la pestaña Historial usa
+ese dato y decide el enlace con el permiso `CONSULTAR_AUDITORIA`, de modo que no llama al segundo
+endpoint. `texto` de la auditoría busca en la referencia (código del ingreso, placa, RUC, código
+del mineral, usuario) y en los valores y el motivo de cada evento. `mensaje` es `null` si hay
+resultados. `usuario` acepta el nombre de usuario o su identificador; `accion`, uno de los nueve
+valores de arriba.
 
 ---
 

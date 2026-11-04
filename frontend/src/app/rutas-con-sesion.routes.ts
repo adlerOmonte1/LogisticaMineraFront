@@ -42,6 +42,12 @@ export const RUTAS_CON_SESION: Routes = [
             loadChildren: () => import('./features/consulta/consulta.routes').then((m) => m.CONSULTA_ROUTES),
           },
           {
+            path: 'lotes',
+            canActivate: [permisoGuard('CONSULTAR')],
+            loadChildren: () =>
+              import('./features/trazabilidad/trazabilidad.routes').then((m) => m.TRAZABILIDAD_ROUTES),
+          },
+          {
             path: 'catalogos',
             canActivate: [permisoGuard('GESTIONAR_CATALOGO')],
             loadChildren: () => import('./features/catalogo/catalogo.routes').then((m) => m.CATALOGO_ROUTES),
@@ -49,7 +55,7 @@ export const RUTAS_CON_SESION: Routes = [
           {
             path: 'administracion',
             canActivate: [permisoGuard('GESTIONAR_USUARIOS')],
-            loadChildren: () => import('./features/auth/auth.routes').then((m) => m.ADMINISTRACION_ROUTES),
+            loadChildren: () => import('./rutas-administracion.routes').then((m) => m.RUTAS_ADMINISTRACION),
           },
           {
             path: 'acceso-denegado',

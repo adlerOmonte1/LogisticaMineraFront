@@ -1,0 +1,37 @@
+<app-encabezado-pagina
+  titulo="Abrir lote"
+  subtitulo="Un lote agrupa ingresos de un mineral para recorrer juntos las etapas"
+/>
+
+<form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="abrir()" novalidate>
+  <app-aviso-error class="formulario__ancho" [error]="envio.error()" />
+
+  <mat-form-field class="formulario__ancho">
+    <mat-label>Nombre del lote</mat-label>
+    <input matInput formControlName="nombre" autocomplete="off" data-prueba="nombre" />
+    <mat-error>{{ formulario.controls.nombre | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Tipo de mineral</mat-label>
+    <mat-select formControlName="tipo_mineral" data-prueba="tipo-mineral">
+      @for (mineral of minerales(); track mineral.id) {
+        <mat-option [value]="mineral.id">{{ mineral.nombre }}</mat-option>
+      }
+    </mat-select>
+    <mat-error>{{ formulario.controls.tipo_mineral | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Fecha de apertura</mat-label>
+    <input matInput type="date" formControlName="fecha_apertura" [max]="hoy" data-prueba="fecha-apertura" />
+    <mat-error>{{ formulario.controls.fecha_apertura | errorCampo }}</mat-error>
+  </mat-form-field>
+
+  <div class="acciones-formulario formulario__ancho">
+    <a mat-button routerLink="/lotes">Cancelar</a>
+    <button mat-flat-button color="primary" type="submit" [disabled]="envio.enviando()" data-prueba="abrir">
+      Abrir lote
+    </button>
+  </div>
+</form>

@@ -1,0 +1,38 @@
+<app-marco-listado
+  [cargando]="listado.cargando()"
+  [vacio]="listado.vacio()"
+  [error]="listado.error()"
+  [total]="listado.total()"
+  [pagina]="listado.pagina()"
+  [mensajeVacio]="mensajeVacio()"
+  iconoVacio="manage_search"
+  (cambioPagina)="listado.irAPagina($event)"
+>
+  <form filtros class="filtros-auditoria" [formGroup]="formulario" (ngSubmit)="aplicar()">
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <input matInput formControlName="usuario" autocomplete="off" autocapitalize="none" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Acción</mat-label>
+      <mat-select formControlName="accion">
+        <mat-option [value]="null">Todas</mat-option>
+        @for (accion of acciones; track accion) {
+          <mat-option [value]="accion">{{ etiquetaAccion[accion] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Referencia o texto</mat-label>
+      <input matInput formControlName="texto" autocomplete="off" />
+      <mat-hint>Código del ingreso, placa, RUC, mineral o motivo</mat-hint>
+    </mat-form-field>
+    <button mat-flat-button color="primary" type="submit" data-prueba="buscar">
+      <mat-icon>search</mat-icon>
+      Buscar
+    </button>
+    <button mat-button type="button" data-prueba="limpiar" (click)="limpiar()">Limpiar</button>
+  </form>
+
+  <app-tabla-eventos [eventos]="listado.filas()" (ver)="verDetalle($event)" />
+</app-marco-listado>

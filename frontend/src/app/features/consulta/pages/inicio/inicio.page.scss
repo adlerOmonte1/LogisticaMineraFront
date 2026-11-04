@@ -1,0 +1,53 @@
+.consulta-rapida {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.consulta-rapida__campo {
+  flex: 1;
+  min-width: 200px;
+}
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bloque {
+  margin-bottom: 16px;
+}
+
+.bloque__titulo {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.accesos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.acceso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  color: var(--label);
+  text-decoration: none;
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--accent);
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--gold);
+  }
+}

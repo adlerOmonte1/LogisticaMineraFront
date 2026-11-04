@@ -1,0 +1,86 @@
+<table mat-table [dataSource]="filas()" class="tabla">
+  <ng-container matColumnDef="pesaje">
+    <th mat-header-cell *matHeaderCellDef>Pesaje</th>
+    <td mat-cell *matCellDef="let fila" class="monoespaciado" data-prueba="pesaje">
+      {{ fila.fecha_hora_pesaje | fechaLima }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="codigo">
+    <th mat-header-cell *matHeaderCellDef>Código</th>
+    <td mat-cell *matCellDef="let fila" data-prueba="codigo">
+      <a [routerLink]="['/consulta/ingresos', fila.id]" class="monoespaciado">{{ fila.codigo }}</a>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="placa">
+    <th mat-header-cell *matHeaderCellDef>Placa</th>
+    <td mat-cell *matCellDef="let fila" data-etiqueta="Placa">
+      <strong class="placa" data-prueba="placa">{{ fila.placa }}</strong>
+      <span class="texto-secundario"> · {{ textoTitularidad(fila) }}</span>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="mineral">
+    <th mat-header-cell *matHeaderCellDef>Mineral</th>
+    <td mat-cell *matCellDef="let fila" data-etiqueta="Mineral">{{ fila.tipo_mineral }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="bruto">
+    <th mat-header-cell *matHeaderCellDef>Bruto</th>
+    <td mat-cell *matCellDef="let fila" class="monoespaciado" data-etiqueta="Bruto" data-prueba="bruto">
+      {{ fila.peso_bruto_tn | toneladas }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="neto">
+    <th mat-header-cell *matHeaderCellDef>Neto</th>
+    <td mat-cell *matCellDef="let fila" class="monoespaciado" data-etiqueta="Neto" data-prueba="neto">
+      @if (fila.pendiente_destare) {
+        <span class="texto-secundario">Pendiente del destare</span>
+      } @else {
+        {{ fila.peso_neto_tn | toneladas }}
+      }
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="estado">
+    <th mat-header-cell *matHeaderCellDef>Estado</th>
+    <td mat-cell *matCellDef="let fila" data-prueba="estado">
+      <app-insignia-ingreso [estado]="fila.estado" />
+      @if (fila.sin_respaldo_fotografico) {
+        <app-marca-sin-respaldo [motivo]="fila.motivo_sin_respaldo" />
+      }
+      @if (fila.motivo_anulacion) {
+        <span class="texto-secundario" data-prueba="motivo-anulacion"
+          >Motivo: {{ fila.motivo_anulacion }}</span
+        >
+      }
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="ticket">
+    <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Ver ticket</span></th>
+    <td mat-cell *matCellDef="let fila" class="celda-acciones">
+      <button
+        mat-stroked-button
+        type="button"
+        data-prueba="ver-ticket"
+        [attr.aria-label]="'Ver el ingreso ' + fila.codigo"
+        [attr.aria-pressed]="seleccionada() === fila.id"
+        (click)="elegir.emit(fila)"
+      >
+        <mat-icon>image</mat-icon>
+        Ver
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columnas()"></tr>
+  <tr
+    mat-row
+    *matRowDef="let fila; columns: columnas()"
+    [class.fila--elegida]="seleccionada() === fila.id"
+    data-prueba="fila-ingreso"
+  ></tr>
+</table>

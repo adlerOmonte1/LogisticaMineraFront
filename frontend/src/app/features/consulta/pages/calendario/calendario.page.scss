@@ -1,0 +1,118 @@
+.navegacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navegacion__mes {
+  margin: 0;
+  font-size: 1.2rem;
+
+  // Solo la primera letra en mayúscula: «Noviembre de 2026».
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.resumen {
+  margin: 8px 0 16px;
+}
+
+.cuadricula {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.cuadricula__semana {
+  padding: 4px 0;
+  color: var(--label-3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 64px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--label);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.dia--vacio {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.dia--con-llegadas {
+  background: var(--surface-2);
+}
+
+.dia--elegido {
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+}
+
+.dia__numero {
+  font-weight: 700;
+}
+
+.dia__dato {
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.dia__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.1;
+
+  mat-icon {
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+  }
+}
+
+.dia__marca--proceso {
+  color: var(--orange);
+}
+
+.dia__marca--anulado {
+  color: var(--red);
+}
+
+.del-dia {
+  margin-top: 20px;
+}
+
+.del-dia__titulo {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+// En teléfono las toneladas no caben en la celda: quedan el número, los ingresos y las marcas; las
+// toneladas del día se leen al elegirlo (la lista del día) y en el resumen del mes.
+@media (max-width: 599px) {
+  .dia__dato--toneladas {
+    display: none;
+  }
+
+  .dia {
+    min-height: 52px;
+  }
+}

@@ -1,0 +1,99 @@
+<app-encabezado-pagina titulo="Calendario" subtitulo="Llegadas de mineral por día">
+  <button mat-stroked-button type="button" data-prueba="hoy" (click)="irAlMesActual()">Mes actual</button>
+</app-encabezado-pagina>
+
+<app-aviso-error [error]="error()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<section class="tarjeta" aria-label="Mes">
+  <div class="navegacion">
+    <button
+      mat-icon-button
+      type="button"
+      data-prueba="mes-anterior"
+      aria-label="Mes anterior"
+      (click)="mesAnterior()"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h2 class="navegacion__mes" data-prueba="mes" aria-live="polite">{{ titulo() }}</h2>
+    <button
+      mat-icon-button
+      type="button"
+      data-prueba="mes-siguiente"
+      aria-label="Mes siguiente"
+      (click)="mesSiguiente()"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  @if (datos(); as calendario) {
+    <p class="resumen" data-prueba="resumen-mes">
+      <strong>{{ calendario.resumen.ingresos }}</strong>
+      {{ calendario.resumen.ingresos === 1 ? 'ingreso' : 'ingresos' }} ·
+      <strong>{{ calendario.resumen.toneladas | toneladas }}</strong> ·
+      {{ calendario.resumen.dias_con_llegadas }} días con llegadas
+      @if (calendario.resumen.en_proceso > 0) {
+        · {{ calendario.resumen.en_proceso }} en proceso
+      }
+    </p>
+
+    <div class="cuadricula" role="grid" aria-label="Días del mes">
+      @for (nombre of diasSemana; track nombre) {
+        <span class="cuadricula__semana" role="columnheader">{{ nombre }}</span>
+      }
+      @for (_ of previas(); track $index) {
+        <span class="dia dia--vacio" role="gridcell" aria-hidden="true"></span>
+      }
+      @for (dia of calendario.dias; track dia.fecha) {
+        <button
+          type="button"
+          class="dia"
+          role="gridcell"
+          data-prueba="dia"
+          [class.dia--con-llegadas]="dia.ingresos > 0"
+          [class.dia--elegido]="diaElegido() === numeroDeDia(dia.fecha)"
+          [attr.aria-label]="descripcion(dia)"
+          [attr.aria-pressed]="diaElegido() === numeroDeDia(dia.fecha)"
+          (click)="elegirDia(dia)"
+        >
+          <span class="dia__numero" data-prueba="dia-numero">{{ numeroDeDia(dia.fecha) }}</span>
+          @if (dia.ingresos > 0) {
+            <span class="dia__dato" data-prueba="dia-ingresos">
+              {{ dia.ingresos }} {{ dia.ingresos === 1 ? 'ingreso' : 'ingresos' }}
+            </span>
+            <span class="dia__dato dia__dato--toneladas" data-prueba="dia-toneladas">{{
+              dia.toneladas | toneladas
+            }}</span>
+          }
+          @if (dia.con_en_proceso) {
+            <span class="dia__marca dia__marca--proceso" data-prueba="dia-en-proceso">
+              <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+              En proceso
+            </span>
+          }
+          @if (dia.con_anulados) {
+            <span class="dia__marca dia__marca--anulado" data-prueba="dia-anulados">
+              <mat-icon aria-hidden="true">block</mat-icon>
+              Anulados
+            </span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (calendario.dia; as dia) {
+      <section class="del-dia" aria-label="Ingresos del día" data-prueba="del-dia">
+        <h3 class="del-dia__titulo">Día {{ numeroDeDia(dia.fecha) }}</h3>
+        @if (dia.ingresos.length === 0) {
+          <app-estado-vacio icono="event_busy" [mensaje]="dia.mensaje ?? 'Sin llegadas'" />
+        } @else {
+          <app-tabla-ingresos [filas]="dia.ingresos" [compacta]="true" />
+        }
+      </section>
+    }
+  }
+</section>

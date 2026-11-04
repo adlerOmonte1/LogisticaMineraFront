@@ -274,3 +274,11 @@ a {
   gap: 8px 16px;
   margin-bottom: 16px;
 }
+
+// Campo cuya lectura tiene baja confianza: borde de aviso (además del icono y el texto).
+.campo-dudoso {
+  --mdc-outlined-text-field-outline-color: var(--orange-b);
+  --mdc-outlined-text-field-hover-outline-color: var(--orange);
+  --mdc-outlined-text-field-outline-width: 2px;
+  --mdc-outlined-text-field-label-text-color: var(--orange);
+}

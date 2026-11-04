@@ -1,0 +1,39 @@
+<section class="tarjeta">
+  @if (validaciones(); as bloque) {
+    @if (bloque.disponible) {
+      <table mat-table [dataSource]="bloque.resultados" class="tabla">
+        <ng-container matColumnDef="regla">
+          <th mat-header-cell *matHeaderCellDef>Regla</th>
+          <td mat-cell *matCellDef="let resultado">
+            <strong>{{ resultado.regla }}</strong> · {{ nombre(resultado) }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="resultado">
+          <th mat-header-cell *matHeaderCellDef>Resultado</th>
+          <td mat-cell *matCellDef="let resultado">
+            <app-insignia-estado [texto]="presentar(resultado).texto" [tono]="presentar(resultado).tono" />
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="momento">
+          <th mat-header-cell *matHeaderCellDef>Momento</th>
+          <td mat-cell *matCellDef="let resultado" data-etiqueta="Momento">
+            {{ momento(resultado) }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="justificacion">
+          <th mat-header-cell *matHeaderCellDef>Justificación</th>
+          <td mat-cell *matCellDef="let resultado" data-etiqueta="Justificación">
+            {{ resultado.justificacion || '—' }}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let resultado; columns: columnas"></tr>
+      </table>
+    } @else {
+      <p class="sin-validaciones" data-prueba="sin-validaciones">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>{{ bloque.mensaje }}</span>
+      </p>
+    }
+  }
+</section>

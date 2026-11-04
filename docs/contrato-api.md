@@ -244,7 +244,7 @@ id, codigo, estado (EN_PROCESO | REGISTRADO | ANULADO), placa, vehiculo, tipo_ve
 tipo_mineral, tipo_mineral_codigo, tipo_mineral_nombre,
 fecha_hora_pesaje, hora_inicio_registro, hora_fin_registro,      ← tres marcas distintas, solo lectura
 peso_bruto_tn, tara_tn, peso_neto_tn,                            ← tara y neto nunca editables
-sin_respaldo_fotografico, motivo_sin_respaldo, motivo_sin_respaldo_texto, imagen_url,
+sin_respaldo_fotografico, motivo_sin_respaldo (cadena vacía si hay foto), motivo_sin_respaldo_texto, imagen_url,
 registrado_por, motivo_anulacion, anulado_por,
 reconocimiento: {id, hubo_reconocimiento, motivo},
 correccion_revertible: <id del evento> | null

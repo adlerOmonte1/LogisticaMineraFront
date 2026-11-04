@@ -1,0 +1,42 @@
+.vehiculos,
+.ingresos {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vehiculo--elegido {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+.vehiculo__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+
+  div {
+    display: grid;
+  }
+}
+
+.vehiculo__placa {
+  font-size: 1.15rem;
+}
+
+.ingresos {
+  gap: 4px;
+}
+
+.ingreso {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 6px 0;
+  border-top: 1px solid var(--sep);
+}

@@ -103,9 +103,10 @@ rol que devuelve el inicio de sesión; ocultar una opción no reemplaza el contr
 ```
 src/app/
 ├── core/          se instancia una sola vez
-│   ├── interceptors/   auth (JWT y refresh) · error (cuerpo uniforme {codigo, mensaje, detalles})
-│   ├── guards/         sesion · rol · clave temporal
-│   ├── services/       sesion · borrador-registro · notificacion · descarga
+│   ├── sesion/         sesión, renovación por actividad, interceptor JWT (D-F20)
+│   ├── errores/        interceptor y traductor del cuerpo uniforme {codigo, mensaje, detalles}
+│   ├── autorizacion/   matriz permiso → roles, `*appSiPuede` · guards/ · http/ · notificacion/ · dialogos/
+│   ├── catalogo/       datos de referencia (vehículos, tipos de mineral, transportistas) usados por varios features
 │   └── layout/         armazón: menú por rol, cabecera con búsqueda y avisos
 ├── shared/        reutilizable y sin estado: components/ · pipes/ · utils/
 ├── models/        espejo de lo que viaja por la API (docs/contrato-api.md)

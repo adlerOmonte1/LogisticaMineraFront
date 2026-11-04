@@ -5,7 +5,7 @@
 qué orden. Esto es el **avance real**, que diverge del plan por definición.
 **Cómo se lee la revisión de cada fase:** [`bitacora-fases.md`](bitacora-fases.md).
 
-Última actualización: **2026-11-03** — FB0, FB1 y FB2 construidas y en puerta técnica; pendientes de supervisión.
+Última actualización: **2026-11-03** — FB0 a FB3 construidas y en puerta técnica; pendientes de supervisión.
 
 ---
 
@@ -26,7 +26,7 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | FB0 | Realineación y núcleo | 🟩 | Técnica pasada | Falta 0.14 (esquema OpenAPI del backend, D-F09): es un cambio en el otro repositorio |
 | FB1 | M01 Autenticación y roles | 🟩 | Técnica pasada | Login, cambio de clave, menú por rol, usuarios y permisos |
 | FB2 | M02 Catálogo | 🟩 | Técnica pasada | Vehículos (con tara), tipos de mineral y transportistas |
-| FB3 | M03 + M04 + M05 Registro | ⬜ | — | Fase crítica. Requiere el commit de F3–F7 del backend (R1) |
+| FB3 | M03 + M04 + M05 Registro | 🟩 | Técnica pasada | Registro en 3 pasos, sin foto, destare, detalle (4 pestañas), corrección, reversión y anulación. Pendiente: T01 y T02 cronometradas en teléfono real |
 | FB4 | M09 Auditoría | ⬜ | — | — |
 | FB5 | M06 Trazabilidad | ⬜ | — | — |
 | FB6 | M07 Consulta | ⬜ | — | — |
@@ -40,11 +40,11 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 |---|---|---|---|---|
 | M01 Autenticación y roles | `features/auth/` | 🟩 | Login, cambiar clave, usuarios | ✅ F1 |
 | M02 Catálogo maestro | `features/catalogo/` | 🟩 | Vehículos, tipos de mineral, transportistas | ✅ F2 |
-| M03 Registro de ingresos | `features/ingresos/` | ⬜ | Registrar (3 pasos), destares, corregir, revertir, anular | ✅ F3 |
-| M04 Reconocimiento | dentro de `ingresos/` y `consulta/` | ⬜ | Revisión del registro, pestaña Reconocimiento | ✅ F3 |
-| M05 Validación | dentro de `ingresos/` y `consulta/` | ⬜ | Revisión del registro, pestaña Validación | ✅ F3 |
+| M03 Registro de ingresos | `features/ingresos/` | 🟩 | Registrar (3 pasos), destares, corregir, revertir, anular | ✅ F3 |
+| M04 Reconocimiento | dentro de `ingresos/` y `consulta/` | 🟩 | Revisión del registro, pestaña Reconocimiento | ✅ F3 |
+| M05 Validación | dentro de `ingresos/` y `consulta/` | 🟩 | Revisión del registro, pestaña Validación | ✅ F3 |
 | M06 Trazabilidad | `features/trazabilidad/` | ⬜ | Lotes, detalle, abrir, asignar, dividir, cierre, pestaña Trazabilidad | ✅ F5 |
-| M07 Consulta | `features/consulta/` | 🟨 Inicio mínimo | Inicio, avisos, consulta, listado, detalle, calendario | ✅ F6 |
+| M07 Consulta | `features/consulta/` | 🟨 Inicio mínimo y detalle del ingreso | Inicio, avisos, consulta, listado, detalle, calendario | ✅ F6 |
 | M08 Consolidación | `features/consolidacion/` | ⬜ | Consolidación | ✅ F7 |
 | M09 Auditoría | `features/auditoria/` | ⬜ | Auditoría, pestaña Historial | ✅ F4 |
 
@@ -58,9 +58,11 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | `sesionGuard`, `invitadoGuard`, `permisoGuard`, `claveTemporalGuard` | ✅ | FB0 |
 | Armazón: barra lateral por rol, cabecera, barra inferior, franja de conexión | ✅ | FB0 |
 | Tema con los tokens de la maqueta | ✅ | FB0 |
-| `borrador-registro.service.ts` (IndexedDB) | ⬜ | FB3 |
+| `borrador-local.service.ts` (IndexedDB, en `features/ingresos`, D-F28) | ✅ | FB3 |
+| `core/catalogo/` (datos de referencia con caché, D-F26) | ✅ | FB2–FB3 |
 | `marco-listado`, `acciones-registro`, `insignia-estado`, `pestanas-ruta`, `formulario-vehiculo`, `formulario-tipo-mineral` | ✅ | FB0–FB2 |
-| `visor-imagen-protegida` y demás de `pantallas.md` §6 | ⬜ | Según la fase que los necesite |
+| `visor-imagen`, `indicador-confianza`, `marca-sin-respaldo`, `insignia-ingreso` | ✅ | FB3 |
+| `tabla-paginada`, `recorrido-etapas`, `linea-eventos`, `selector-periodo` | ⬜ | Según la fase que los necesite |
 
 ## Infraestructura del proyecto
 
@@ -74,8 +76,8 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | Node 20 LTS fijado | ✅ | `.nvmrc` y `engines`; el CI usa Node 20. La máquina local sigue en Node 24 |
 | ESLint y Prettier | ✅ | Límites entre capas con `import/no-restricted-paths` (D-F22) |
 | Pipeline de GitHub Actions | ✅ | `frontend.yml` (formato, lint, pruebas con cobertura, build y presupuesto) y `docs.yml` |
-| Pruebas unitarias | ✅ | 130 pruebas; cobertura 89,6 % de sentencias (mínimo 80 %) |
-| Bundle inicial | ✅ | 367 kB (presupuesto 500 kB, D-F21) |
+| Pruebas unitarias | ✅ | 290 pruebas; cobertura 93,6 % de sentencias (mínimo 80 %) |
+| Bundle inicial | ✅ | 368 kB (presupuesto 500 kB, D-F21); el registro es un chunk diferido |
 | Esquema OpenAPI del backend completo | ⬜ | D-F09, paso 0.14 |
 
 ## Bloqueos actuales
@@ -85,5 +87,6 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 
 ## Próximo paso
 
-Puertas de supervisión de FB0, FB1 y FB2 con sus guiones (`plan-implementacion.md` §6). Aprobadas,
-FB3: registro de ingresos.
+Puertas de supervisión de FB0 a FB3 con sus guiones (`plan-implementacion.md` §6); en FB3 hay que
+cronometrar T01 y T02 en un teléfono real. Aprobadas, FB4 (historial y auditoría) o FB5
+(trazabilidad), que son independientes entre sí.

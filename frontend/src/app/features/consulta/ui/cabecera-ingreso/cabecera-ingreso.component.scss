@@ -1,0 +1,28 @@
+.cabecera {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.cabecera__titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+
+.cabecera__subtitulo {
+  margin: 0;
+}
+
+.cabecera__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}

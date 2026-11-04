@@ -8,12 +8,12 @@ import { Transportista } from '@models/transportista.model';
 import { MarcoListadoComponent } from '@shared/components/marco-listado/marco-listado.component';
 import { crearListadoPaginado } from '@shared/listados/listado-paginado';
 import { cambiosRespectoDe } from '@shared/utils/cambios';
-import { FiltroCatalogo } from '../../data-access/recurso-catalogo-api';
-import { TransportistasApiService } from '../../data-access/transportistas-api.service';
+import { FiltroCatalogo } from '@core/catalogo/recurso-catalogo-api';
+import { TransportistasApiService } from '@core/catalogo/transportistas-api.service';
 import {
   DatosDialogoTransportista,
   DialogoTransportistaComponent,
-} from '../../ui/dialogos-catalogo.component';
+} from '../../ui/dialogo-transportista.component';
 import { TablaTransportistasComponent } from '../../ui/tabla-transportistas.component';
 import { PaginaCatalogoBase, TextosCatalogo } from '../pagina-catalogo.base';
 

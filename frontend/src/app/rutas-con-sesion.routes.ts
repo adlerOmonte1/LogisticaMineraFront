@@ -33,6 +33,15 @@ export const RUTAS_CON_SESION: Routes = [
               import('./features/consulta/pages/inicio/inicio.page').then((m) => m.InicioPage),
           },
           {
+            path: 'ingresos',
+            loadChildren: () => import('./features/ingresos/ingresos.routes').then((m) => m.INGRESOS_ROUTES),
+          },
+          {
+            path: 'consulta',
+            canActivate: [permisoGuard('CONSULTAR')],
+            loadChildren: () => import('./features/consulta/consulta.routes').then((m) => m.CONSULTA_ROUTES),
+          },
+          {
             path: 'catalogos',
             canActivate: [permisoGuard('GESTIONAR_CATALOGO')],
             loadChildren: () => import('./features/catalogo/catalogo.routes').then((m) => m.CATALOGO_ROUTES),

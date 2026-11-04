@@ -1,0 +1,41 @@
+<app-aviso-error [error]="error()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (detalle(); as detalle) {
+  <app-cabecera-ingreso [detalle]="detalle" />
+
+  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Secciones del ingreso">
+    @for (item of pestanas; track item.ruta) {
+      <a
+        mat-tab-link
+        [routerLink]="['/consulta/ingresos', detalle.id, item.ruta]"
+        [active]="pestanaActiva() === item.ruta"
+        [attr.data-prueba]="'pestana-' + item.ruta"
+      >
+        {{ item.etiqueta }}
+      </a>
+    }
+  </nav>
+  <mat-tab-nav-panel #panel class="panel">
+    @switch (pestanaActiva()) {
+      @case ('datos') {
+        <app-pestana-datos [detalle]="detalle" />
+      }
+      @case ('ticket') {
+        <app-pestana-ticket
+          [respaldo]="detalle.respaldo"
+          [urlImagen]="urlTicket()"
+          [falloImagen]="falloTicket()"
+        />
+      }
+      @case ('reconocimiento') {
+        <app-pestana-reconocimiento [reconocimiento]="detalle.reconocimiento" />
+      }
+      @case ('validacion') {
+        <app-pestana-validacion [validaciones]="detalle.validaciones" />
+      }
+    }
+  </mat-tab-nav-panel>
+}

@@ -84,7 +84,7 @@ POST ingresos/
 
 ## El borrador (D-F15)
 
-`core/services/borrador-registro.service.ts` sobre IndexedDB con `idb`:
+`features/ingresos/data-access/borrador-local.service.ts` sobre IndexedDB con `idb` (D-F15, D-F26):
 
 ```typescript
 interface BorradorLocal {

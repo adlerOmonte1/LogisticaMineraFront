@@ -7,9 +7,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FiltroTiposMineral, TipoMineral } from '@models/tipo-mineral.model';
 import { MarcoListadoComponent } from '@shared/components/marco-listado/marco-listado.component';
 import { crearListadoPaginado } from '@shared/listados/listado-paginado';
-import { FiltroCatalogo } from '../../data-access/recurso-catalogo-api';
-import { TiposMineralApiService } from '../../data-access/tipos-mineral-api.service';
-import { DatosDialogoTipoMineral, DialogoTipoMineralComponent } from '../../ui/dialogos-catalogo.component';
+import { FiltroCatalogo } from '@core/catalogo/recurso-catalogo-api';
+import { TiposMineralApiService } from '@core/catalogo/tipos-mineral-api.service';
+import {
+  DatosDialogoTipoMineral,
+  DialogoTipoMineralComponent,
+} from '@shared/dialogos/dialogo-tipo-mineral.component';
 import { TablaTiposMineralComponent } from '../../ui/tabla-tipos-mineral.component';
 import { PaginaCatalogoBase, TextosCatalogo } from '../pagina-catalogo.base';
 

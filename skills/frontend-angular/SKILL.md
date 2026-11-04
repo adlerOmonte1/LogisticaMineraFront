@@ -21,7 +21,7 @@ Angular 17.3 con **componentes standalone y signals** (sin NgModules) · Angular
 ```
 src/app/
   core/       interceptors/ (auth, error) · guards/ (sesion, rol, clave temporal)
-              services/ (sesion, borrador-registro, notificacion, descarga) · layout/ (armazón)
+              sesion/ · autorizacion/ · catalogo/ (datos de referencia, D-F26) · http/ · errores/ · layout/ (armazón)
   shared/     components/ · pipes/ · utils/        sin estado, sin servicios
   models/     espejo de docs/contrato-api.md
   features/

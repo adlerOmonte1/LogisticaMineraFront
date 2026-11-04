@@ -14,6 +14,8 @@ export interface Inconsistencia {
 export interface JustificacionFaltante {
   regla: string;
   mensaje: string;
+  /** Solo en el destare: la justificación se pide por código de ingreso (D-25). */
+  ingreso?: string;
 }
 
 export class ErrorApi extends Error {
@@ -55,4 +57,5 @@ export const CODIGO_ERROR = {
   noAutenticado: 'NO_AUTENTICADO',
   sinConexion: 'SIN_CONEXION',
   errorDelServidor: 'ERROR_DEL_SERVIDOR',
+  inesperado: 'ERROR_INESPERADO',
 } as const;

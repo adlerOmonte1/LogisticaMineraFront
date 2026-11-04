@@ -1,0 +1,39 @@
+:host {
+  display: grid;
+  gap: 12px;
+}
+
+.seccion {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.nota {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+
+  dt {
+    font-size: 0.75rem;
+    color: var(--label-3);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.datos__ancho {
+  grid-column: 1 / -1;
+}
+
+.datos__anulacion dd {
+  color: var(--red);
+}

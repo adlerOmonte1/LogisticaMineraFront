@@ -6,7 +6,7 @@ import { DialogosService } from '@core/dialogos/dialogos.service';
 import { NotificacionService } from '@core/notificacion/notificacion.service';
 import { ConMensaje } from '@models/pagina.model';
 import { ListadoPaginado } from '@shared/listados/listado-paginado';
-import { EstadoCatalogoApi, FiltroCatalogo, RegistroCatalogo } from '../data-access/recurso-catalogo-api';
+import { EstadoCatalogoApi, FiltroCatalogo, RegistroCatalogo } from '@core/catalogo/recurso-catalogo-api';
 
 /** Textos de la interfaz propios de cada catálogo. */
 export interface TextosCatalogo {

@@ -1,0 +1,24 @@
+.pendiente {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 10%, var(--surface));
+
+  mat-icon {
+    color: var(--accent);
+  }
+
+  p {
+    flex: 1;
+    min-width: 220px;
+    margin: 0;
+  }
+}
+
+.pendiente__acciones {
+  display: flex;
+  gap: 8px;
+}

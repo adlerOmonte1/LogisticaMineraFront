@@ -1,0 +1,96 @@
+<form class="tarjeta" [formGroup]="formulario" (ngSubmit)="corregir()" novalidate>
+  <app-aviso-error [error]="error()" />
+
+  <div class="formulario">
+    <div>
+      <mat-form-field>
+        <mat-label>Placa</mat-label>
+        <input
+          matInput
+          formControlName="placa"
+          autocapitalize="characters"
+          autocomplete="off"
+          data-prueba="placa"
+        />
+        <mat-error>{{ formulario.controls.placa | errorCampo }}</mat-error>
+      </mat-form-field>
+      <app-lista-inconsistencias
+        [inconsistencias]="porCampo().get('placa') ?? []"
+        [justificaciones]="formulario.controls.justificaciones"
+        [faltantes]="faltantes()"
+      />
+    </div>
+
+    <div>
+      <mat-form-field>
+        <mat-label>Tipo de mineral</mat-label>
+        <mat-select formControlName="tipo_mineral" data-prueba="tipo-mineral">
+          @for (tipo of opcionesMineral(); track tipo.id) {
+            <mat-option [value]="tipo.id">{{ tipo.nombre }}{{ tipo.activo ? '' : ' (de baja)' }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ formulario.controls.tipo_mineral | errorCampo }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field>
+        <mat-label>Fecha del pesaje</mat-label>
+        <input matInput type="date" formControlName="fecha" data-prueba="fecha" />
+        <mat-error>{{ formulario.controls.fecha | errorCampo }}</mat-error>
+      </mat-form-field>
+      <app-lista-inconsistencias
+        [inconsistencias]="porCampo().get('fecha') ?? []"
+        [justificaciones]="formulario.controls.justificaciones"
+        [faltantes]="faltantes()"
+      />
+    </div>
+
+    <div>
+      <mat-form-field>
+        <mat-label>Hora del pesaje</mat-label>
+        <input matInput type="time" formControlName="hora" data-prueba="hora" />
+        <mat-error>{{ formulario.controls.hora | errorCampo }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="formulario__ancho">
+      <mat-form-field>
+        <mat-label>Peso bruto (t)</mat-label>
+        <input
+          matInput
+          formControlName="peso_bruto_tn"
+          inputmode="decimal"
+          autocomplete="off"
+          data-prueba="peso"
+        />
+        <mat-hint>El peso neto se recalcula con la tara aplicada a este ingreso</mat-hint>
+        <mat-error>{{ formulario.controls.peso_bruto_tn | errorCampo }}</mat-error>
+      </mat-form-field>
+      <app-lista-inconsistencias
+        [inconsistencias]="porCampo().get('peso_bruto_tn') ?? []"
+        [justificaciones]="formulario.controls.justificaciones"
+        [faltantes]="faltantes()"
+      />
+    </div>
+
+    <mat-form-field class="formulario__ancho">
+      <mat-label>Motivo de la corrección</mat-label>
+      <textarea matInput rows="3" formControlName="motivo" data-prueba="motivo"></textarea>
+      <mat-error>{{ formulario.controls.motivo | errorCampo }}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="acciones-formulario">
+    <button mat-button type="button" [disabled]="enviando()" (click)="cancelar.emit()">Cancelar</button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="enviando()"
+      data-prueba="guardar-correccion"
+    >
+      Guardar corrección
+    </button>
+  </div>
+</form>

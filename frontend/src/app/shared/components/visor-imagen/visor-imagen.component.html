@@ -1,0 +1,54 @@
+<div class="visor">
+  @switch (estado()) {
+    @case ('cargando') {
+      <div class="visor__estado" role="status">
+        <mat-spinner diameter="32" /><span>Cargando imagen…</span>
+      </div>
+    }
+    @case ('error') {
+      <div class="visor__estado" role="status">
+        <mat-icon>broken_image</mat-icon><span>No se pudo cargar la imagen</span>
+      </div>
+    }
+    @default {
+      @if (src(); as url) {
+        <button
+          type="button"
+          class="visor__miniatura"
+          (click)="ampliar()"
+          [attr.aria-label]="'Ampliar: ' + alt()"
+        >
+          <img [src]="url" [alt]="alt()" />
+          <span class="visor__ampliar"><mat-icon aria-hidden="true">zoom_in</mat-icon>Ampliar</span>
+        </button>
+      } @else {
+        <div class="visor__estado"><ng-content /></div>
+      }
+    }
+  }
+</div>
+
+<dialog #dialogo class="ampliacion" [attr.aria-label]="alt()">
+  @if (src(); as url) {
+    <div class="ampliacion__marco" [class.ampliacion__marco--real]="tamanoReal()">
+      <button
+        type="button"
+        class="ampliacion__imagen"
+        (click)="alternarTamano()"
+        [attr.aria-label]="tamanoReal() ? 'Ajustar a la pantalla' : 'Ver en tamaño real'"
+      >
+        <img [src]="url" [alt]="alt()" />
+      </button>
+    </div>
+    <div class="ampliacion__barra">
+      <button type="button" class="ampliacion__boton" (click)="alternarTamano()">
+        <mat-icon aria-hidden="true">{{ tamanoReal() ? 'zoom_out' : 'zoom_in' }}</mat-icon>
+        {{ tamanoReal() ? 'Ajustar a la pantalla' : 'Tamaño real' }}
+      </button>
+      <button type="button" class="ampliacion__boton" (click)="cerrar()">
+        <mat-icon aria-hidden="true">close</mat-icon>
+        Cerrar
+      </button>
+    </div>
+  }
+</dialog>

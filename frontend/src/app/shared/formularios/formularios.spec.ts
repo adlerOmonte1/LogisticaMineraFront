@@ -11,15 +11,27 @@ describe('aplicarErrorEnFormulario', () => {
     const formulario = new FormGroup({ placa: new FormControl(''), capacidad_tn: new FormControl('') });
     aplicarErrorEnFormulario(
       formulario,
-      new ErrorApi(400, 'X', 'Datos inválidos', { capacidad_tn: 'Número no válido' }, [
-        'placa',
-        'campo_inexistente',
-      ]),
+      new ErrorApi(
+        400,
+        'CAMPOS_OBLIGATORIOS',
+        'Debe completar los campos obligatorios',
+        { capacidad_tn: 'Número no válido' },
+        ['placa', 'campo_inexistente'],
+      ),
     );
 
     expect(formulario.controls.placa.errors?.[ERROR_SERVIDOR]).toBe('Campo obligatorio');
     expect(formulario.controls.capacidad_tn.errors?.[ERROR_SERVIDOR]).toBe('Número no válido');
     expect(formulario.controls.placa.touched).toBeTrue();
+  });
+});
+
+describe('aplicarErrorEnFormulario con un campo culpable', () => {
+  it('muestra el mensaje literal del servidor, no «Campo obligatorio» (HU-M03-01 CA04)', () => {
+    const formulario = new FormGroup({ placa: new FormControl('QQQ-999') });
+    const mensaje = 'La placa QQQ-999 no está registrada. Complete los datos del vehículo para continuar';
+    aplicarErrorEnFormulario(formulario, new ErrorApi(400, 'PLACA_NO_REGISTRADA', mensaje, {}, ['placa']));
+    expect(formulario.controls.placa.errors?.[ERROR_SERVIDOR]).toBe(mensaje);
   });
 });
 

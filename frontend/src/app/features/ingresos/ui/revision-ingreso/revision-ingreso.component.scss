@@ -1,0 +1,114 @@
+.revision {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+
+  @media (min-width: 900px) {
+    grid-template-columns: minmax(280px, 5fr) 7fr;
+  }
+}
+
+.revision__ticket {
+  display: grid;
+  gap: 12px;
+
+  @media (min-width: 900px) {
+    position: sticky;
+    top: 80px;
+  }
+
+  // En teléfono la imagen ocupa poco: el formulario es lo que se trabaja (RNF-M03-07).
+  app-visor-imagen {
+    --altura-maxima: 420px;
+
+    @media (max-width: 899px) {
+      --altura-maxima: 200px;
+    }
+  }
+}
+
+.revision__datos {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.campo {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.fila-campos {
+  display: grid;
+  gap: 0 16px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.propuesta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--blue);
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
+
+.sin-foto {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 24px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radio);
+  background: var(--surface);
+  text-align: center;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    color: var(--blue);
+  }
+}
+
+.aviso-lectura {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--blue-b) 12%, transparent);
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.revision__acciones {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 0;
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.revision__confirmar {
+  min-width: 180px;
+  height: var(--altura-toque);
+}

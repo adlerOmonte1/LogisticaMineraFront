@@ -348,3 +348,79 @@ sin `HttpTestingController`.
 
 Las pantallas de catálogo comparten `PaginaCatalogoBase` (baja, reactivación, inactivos, diálogos)
 y todas las listas el marco `app-marco-listado` y el estado `ListadoPaginado`.
+
+---
+
+# Decisiones de la construcción de FB3 (2026-11-03)
+
+## D-F26. Los datos de referencia viven en `core/catalogo/`; los diálogos de alta, en `shared/`
+
+**Fecha:** 2026-11-03 · **Fase:** FB3
+**Alternativa descartada:** que el registro importe los servicios de `features/catalogo/`.
+
+El registro de un ingreso necesita listar tipos de mineral y dar de alta un vehículo o un tipo de
+mineral; los lotes (FB5) y los filtros de consulta (FB6) necesitarán lo mismo. La regla «un feature
+no importa de otro» (D-F22) lo impide, y duplicar las llamadas en cada feature repetiría las URL y
+la caché. Los tres servicios del catálogo y su clase base `RecursoCatalogoApi` son singletons con
+una caché en memoria (D-F16): pasan a `core/catalogo/`. El feature `catalogo` conserva sus páginas
+y componentes de presentación, y sus diálogos de vehículo y tipo de mineral suben a
+`shared/dialogos/` porque el registro los reutiliza.
+
+## D-F27. El registro tiene un almacén de estado por visita, sin librería
+
+**Fecha:** 2026-11-03 · **Fase:** FB3
+
+`RegistroIngresoStore` (provisto a nivel de la página, así cada visita empieza limpia) concentra el
+estado del flujo captura → revisión → confirmación y todas sus transiciones, con signals. La página
+solo une el formulario con el almacén y abre los diálogos; los componentes de `ui/` solo pintan.
+Es la separación que permite probar el flujo completo —reintento sin red, recuperación del
+borrador, rechazos, consulta del vehículo con espera— sin tocar el DOM (30 pruebas del almacén).
+Descartado: NgRx (D-F01); poner el estado en la página, que la haría imposible de probar aparte.
+
+## D-F28. Dónde se guarda el borrador, y qué contiene
+
+**Fecha:** 2026-11-03 · **Fase:** FB3 · Precisa D-F15
+
+El servicio vive en `features/ingresos/data-access/` (es acceso a un almacén de datos, y solo el
+registro lo usa), no en `core/`. Guarda la imagen reducida **hasta confirmar**, y no solo hasta
+recibir el token como decía D-F15: la revisión necesita mostrarla al recuperar el borrador. Lleva el
+`usuarioId`; al abrir la pantalla, el borrador de otro usuario se descarta. Un fallo de
+IndexedDB (modo privado, cuota) nunca interrumpe el registro.
+
+## D-F29. Un `effect` no debe ser el único responsable de que algo se dibuje
+
+**Fecha:** 2026-11-03 · **Fase:** FB3
+
+Dos defectos reales de la misma raíz aparecieron al construir la revisión y el destare:
+
+- Las cajas de justificación se creaban en un `effect` sobre un `FormRecord`; un componente `OnPush`
+  no se entera de que se agregó un control. **Solución:** `ListaInconsistenciasComponent` escucha el
+  `valueChanges` del registro (`toSignal`), que se emite al agregar un control.
+- `*appSiPuede` creaba su vista dentro de un `effect`, fuera de una pasada de detección de
+  cambios: el texto estático se veía, pero `mat-icon` no ejecutaba su inicialización y los iconos
+  salían como texto. **Solución:** `createEmbeddedView(...).detectChanges()`, con su prueba de
+  regresión (falla sin la corrección).
+
+Cuando el estado cabe en un `signal` (las justificaciones del destare), se usa un `signal`, no un
+`FormRecord` mutado desde un `effect`.
+
+## D-F30. Sin validadores de «obligatorio» en la revisión
+
+**Fecha:** 2026-11-03 · **Fase:** FB3 · Aplica D-F23
+
+El formulario de revisión no marca campos requeridos: el servidor reclama los ausentes con su mensaje
+literal y su lista en `detalles.campos` (HU-M03-01 CA03), que se pinta sobre cada campo. Solo se
+cuida el formato decimal del peso, que no tiene criterio con mensaje propio. Consecuencia: «Confirmar»
+siempre está habilitado, salvo mientras se envía. Un caso distinto es `PLACA_NO_REGISTRADA`, que
+también trae `detalles.campos: ["placa"]` pero no es un campo ausente: ahí se muestra el mensaje
+literal, no «Campo obligatorio».
+
+## D-F31. La coma decimal se normaliza antes de enviar
+
+**Fecha:** 2026-11-03 · **Fase:** FB3
+
+El teclado numérico de un teléfono en español escribe `40,00`. El validador la acepta y **todo
+valor decimal se normaliza con `normalizarDecimal` justo antes de enviarse** (peso del registro,
+corrección, tara, capacidad). El defecto apareció al probar contra el backend: el servidor
+rechazaba `"40,00"` con «Datos inválidos». Los pesos y las toneladas se muestran siempre con punto
+(`ToneladasPipe`), como el servidor los devuelve.

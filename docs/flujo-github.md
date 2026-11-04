@@ -47,9 +47,14 @@ chore/…  docs/…  fix/…    Cambios fuera de una fase
 
 ## 4. Protección de ramas
 
-`main` y `staging` exigen el check **Formato, lint, pruebas y build** del workflow `Frontend` y
-rechazan el empuje forzado y el borrado. No exigen aprobación de revisor (el repositorio tiene un
-único autor); la revisión humana de la fase es la puerta de supervisión.
+`main` y `staging` exigen pull request y rechazan el empuje forzado y el borrado. No exigen
+aprobación de revisor (el repositorio tiene un único autor; la revisión humana de la fase es la
+puerta de supervisión) y no se aplican al administrador.
+
+**El CI no es un check obligatorio de la rama** porque `frontend.yml` y `docs.yml` se disparan por
+rutas (`frontend/**` y `docs/**`): exigir uno de los dos bloquearía para siempre los PR que no lo
+disparan. La regla se cumple por la plantilla de PR: no se fusiona con un check en rojo. Si se
+quita el filtro de rutas, o se añade un job final que siempre corra, pasa a ser obligatorio.
 
 ## 5. Tablero
 

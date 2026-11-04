@@ -1,0 +1,51 @@
+<app-aviso-error [error]="errorCarga()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (lote(); as lote) {
+  <app-encabezado-pagina [titulo]="'Cerrar ' + lote.nombre" [subtitulo]="lote.codigo" />
+
+  @if (resumen(); as resumen) {
+    <app-resumen-cierre [resumen]="resumen" />
+  }
+
+  @if (cerrable()) {
+    <form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="cerrar()" novalidate>
+      <app-aviso-error class="formulario__ancho" [error]="envio.error()" />
+
+      <mat-form-field>
+        <mat-label>Destino</mat-label>
+        <mat-select formControlName="destino" data-prueba="destino">
+          @for (destino of destinos(); track destino.codigo) {
+            <mat-option [value]="destino.codigo">{{ destino.nombre }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ formulario.controls.destino | errorCampo }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="formulario__ancho">
+        <mat-label>Observación (opcional)</mat-label>
+        <textarea matInput rows="2" formControlName="observacion" data-prueba="observacion"></textarea>
+      </mat-form-field>
+
+      <div class="acciones-formulario formulario__ancho">
+        <a mat-button [routerLink]="['/lotes', lote.id]">Volver al lote</a>
+        <button
+          mat-flat-button
+          color="warn"
+          type="submit"
+          [disabled]="envio.enviando()"
+          data-prueba="confirmar-cierre"
+        >
+          Cerrar lote
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="tarjeta" data-prueba="no-cerrable">
+      Este lote está {{ lote.estado === 'CERRADO' ? 'cerrado' : 'abierto' }} y no se puede cerrar desde aquí.
+      <a [routerLink]="['/lotes', lote.id]">Ver el lote</a>
+    </p>
+  }
+}

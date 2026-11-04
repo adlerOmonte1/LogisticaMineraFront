@@ -247,27 +247,27 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Abrir lote: `mensaje` y el lote en la lista como Abierto | ⬜ |
+| CA01 | AI | Abrir lote: `mensaje` y el lote en la lista como Abierto | ✅ |
 | CA02 | M | Nombre repetido: mensaje literal | ⬜ |
 | CA03 | M | Apertura futura: mensaje literal (el selector de fecha tampoco ofrece futuro) | ⬜ |
-| CA04 | AI | Tras asignar, totales del lote y de cada mineral | ⬜ |
-| CA05 | AI | Ingresos de otro mineral agrupados en «Agregar de otro tipo de mineral» | ⬜ |
+| CA04 | AI | Tras asignar, totales del lote y de cada mineral | ✅ |
+| CA05 | AI | Ingresos de otro mineral agrupados en «Agregar de otro tipo de mineral» | ✅ |
 | CA06 | M | Anulado: mensaje literal | ⬜ |
 | CA07 | M | En proceso: mensaje literal | ⬜ |
 | CA08 | AI | Traslado entre lotes reflejado en ambos | ⬜ |
 | CA09 | M | Ya zarandeado o molido: mensaje literal | ⬜ |
-| CA10 | AI | Iniciar recorrido: `mensaje` y estado En recorrido | ⬜ |
+| CA10 | AI | Iniciar recorrido: `mensaje` y estado En recorrido | ✅ |
 | CA11 | M | Sin ingresos: mensaje literal | ⬜ |
 | CA12 | AI | Tardío antes del secado: señalado como tardío | ⬜ |
 | CA13 | AI | Tardío después del secado: señalado con secado propio y su acción en «Siguiente paso» | ⬜ |
 | CA14 | M | Sin selección: mensaje literal | ⬜ |
-| CA15 | R | Supervisor sin abrir, asignar, retirar ni iniciar | ⬜ |
-| CA16 | AI | Estado, composición con código, fecha y neto, tardíos señalados, total de toneladas | ⬜ |
+| CA15 | R | Supervisor sin abrir, asignar, retirar ni iniciar | ✅ |
+| CA16 | AI | Estado, composición con código, fecha y neto, tardíos señalados, total de toneladas | ✅ |
 | CA17 | AI | «Agregar otro mineral»: su grupo aparece vacío | ⬜ |
 | CA18 | M | Mineral ya en el lote: mensaje literal | ⬜ |
 | CA19 | M | Quitar mineral con ingresos: mensaje literal | ⬜ |
-| CA20 | M | Otro mineral sin autorización: mensaje literal; el campo se pide antes de enviar | ⬜ |
-| CA21 | AI | Ingreso de otro mineral marcado «Otro mineral» con la autorización | ⬜ |
+| CA20 | M | Otro mineral sin autorización: mensaje literal; el campo se pide antes de enviar | ✅ |
+| CA21 | AI | Ingreso de otro mineral marcado «Otro mineral» con la autorización | ✅ |
 | CA22 | AI | Retirar devuelve a cancha y recalcula totales | ⬜ |
 | CA23 | M | Único ingreso en recorrido: mensaje literal | ⬜ |
 
@@ -275,17 +275,17 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | «Siguiente paso» registra y muestra el `mensaje` con el nombre del lote o la parte | ⬜ |
-| CA02 | M | Tras el secado se pide la ruta (`elegir_ruta`); forzado sin ruta, mensaje literal | ⬜ |
+| CA01 | AI | «Siguiente paso» registra y muestra el `mensaje` con el nombre del lote o la parte | ✅ |
+| CA02 | M | Tras el secado se pide la ruta (`elegir_ruta`); forzado sin ruta, mensaje literal | ✅ |
 | CA03 | M | Solo se ofrece la etapa que corresponde; forzada otra, mensaje literal | ⬜ |
 | CA04 | M | Etapa repetida: mensaje literal | ⬜ |
-| CA05 | M | Lote Abierto: no hay «Siguiente paso»; forzado, mensaje literal | ⬜ |
+| CA05 | M | Lote Abierto: no hay «Siguiente paso»; forzado, mensaje literal | ✅ |
 | CA06 | M | Fecha futura: mensaje literal | ⬜ |
 | CA07 | M | Fecha anterior a la etapa previa: mensaje literal | ⬜ |
-| CA08 | M | Fecha anterior al inicio: mensaje literal | ⬜ |
-| CA09 | M | Ruta completa: sin «Siguiente paso» para esa carga | ⬜ |
-| CA10 | M | Horas ≤ 0: mensaje literal; válidas: se muestran las t/h | ⬜ |
-| CA11 | AI | Ensacado con bigbags: peso aproximado por bigbag mostrado como estimación | ⬜ |
+| CA08 | M | Fecha anterior al inicio: mensaje literal | ✅ |
+| CA09 | M | Ruta completa: sin «Siguiente paso» para esa carga | ✅ |
+| CA10 | M | Horas ≤ 0: mensaje literal; válidas: se muestran las t/h | ✅ |
+| CA11 | AI | Ensacado con bigbags: peso aproximado por bigbag mostrado como estimación | ✅ |
 | CA12 | M | Todo ensacado sin «Recalcular»: mensaje literal y la opción visible | ⬜ |
 | CA13 | M | Bigbags sin ensacado: la acción solo aparece con el ensacado | ⬜ |
 | CA14 | AI | Secado propio del tardío con su reparto | ⬜ |
@@ -296,10 +296,10 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Pestaña Trazabilidad: etapas de la ruta con completadas, fecha y responsable | ⬜ |
+| CA01 | AI | Pestaña Trazabilidad: etapas de la ruta con completadas, fecha y responsable | ✅ |
 | CA02 | AI | Sin lote: el `mensaje` correspondiente | ⬜ |
-| CA03 | AI | «Proceso completo» visible | ⬜ |
-| CA04 | AI | «x de y etapas» visible | ⬜ |
+| CA03 | AI | «Proceso completo» visible | ✅ |
+| CA04 | AI | «x de y etapas» visible | ✅ |
 | CA05 | AI | Ingreso anulado señalado | ⬜ |
 | CA06 | AI | Cada parte con su ruta; la proporción sobre la unión | ⬜ |
 | CA07 | AI | Secado recorrido y «ruta por decidir», sin proporción | ⬜ |
@@ -324,13 +324,13 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Cierre: `mensaje` con el destino; lote Cerrado con fecha y responsable | ⬜ |
+| CA01 | AI | Cierre: `mensaje` con el destino; lote Cerrado con fecha y responsable | ✅ |
 | CA02 | M | Con pendientes: mensaje con la lista | ⬜ |
 | CA03 | M | Sin destino: mensaje literal | ⬜ |
 | CA04 | M | Ya cerrado: sin acción; forzada, mensaje literal | ⬜ |
 | CA05 | R | Solo el Administrador ve «Cerrar» y «Cierre de lotes» | ⬜ |
-| CA06 | AI | Confirmación con el resumen y la diferencia **como estimación** | ⬜ |
-| CA07 | M | Lote cerrado: ninguna acción de composición ni de etapa | ⬜ |
+| CA06 | AI | Confirmación con el resumen y la diferencia **como estimación** | ✅ |
+| CA07 | M | Lote cerrado: ninguna acción de composición ni de etapa | ✅ |
 | CA08 | S | Visible en FB4 | ⬜ |
 
 ---
@@ -341,49 +341,49 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Resultados del vehículo en la fecha, del más reciente al más antiguo | ⬜ |
-| CA02 | AI | Placa parcial devuelve todas las que la contienen | ⬜ |
-| CA03 | **I** | Al abrir un resultado: imagen del ticket junto a los datos, ampliable | ⬜ |
-| CA04 | M | Sin resultados: `mensaje` como estado vacío | ⬜ |
+| CA01 | AI | Resultados del vehículo en la fecha, del más reciente al más antiguo | ✅ |
+| CA02 | AI | Placa parcial devuelve todas las que la contienen | ✅ |
+| CA03 | **I** | Al abrir un resultado: imagen del ticket junto a los datos, ampliable | ✅ |
+| CA04 | M | Sin resultados: `mensaje` como estado vacío | ✅ |
 | CA05 | AI | Anulado incluido, señalado y con motivo | ⬜ |
-| CA06 | M | Sin criterios: mensaje literal | ⬜ |
+| CA06 | M | Sin criterios: mensaje literal | ✅ |
 | CA07 | AI | Respaldo no disponible: datos y el mensaje en lugar de la imagen | ⬜ |
 | CA08 | AI | En proceso: señalado, con bruto y neto «pendiente del destare» | ⬜ |
 | CA09 | AI | Sin foto: motivo en lugar de la imagen | ⬜ |
 | CA10 | AI | Con lote: lote, estado y recorrido | ⬜ |
 | CA11 | AI | Sin lote: «espera en cancha» | ⬜ |
-| CA12 | M | Rango inverso: mensaje literal | ⬜ |
+| CA12 | M | Rango inverso: mensaje literal | ✅ |
 
 ### HU-M07-02 · Listado y detalle
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Rango de fechas: paginado y descendente | ⬜ |
+| CA01 | AI | Rango de fechas: paginado y descendente | ✅ |
 | CA02 | AI | Filtros combinados | ⬜ |
-| CA03 | AI | Número de ingresos y toneladas del conjunto, sin anulados ni En proceso | ⬜ |
-| CA04 | AI | Detalle completo: datos, imagen, tres marcas, usuario, estado, tara | ⬜ |
+| CA03 | AI | Número de ingresos y toneladas del conjunto, sin anulados ni En proceso | ✅ |
+| CA04 | AI | Detalle completo: datos, imagen, tres marcas, usuario, estado, tara | ✅ |
 | CA05 | AI | Reconocimiento, validaciones y trazabilidad en su pestaña | ⬜ |
 | CA06 | AI | Bloque ausente indicado con su `mensaje`, no omitido | ⬜ |
 | CA07 | M | Rango inverso: mensaje literal | ⬜ |
-| CA08 | AI | Sin fechas: mes en curso hasta hoy, y los filtros lo muestran | ⬜ |
-| CA09 | AI | Sin foto señalado en la fila | ⬜ |
+| CA08 | AI | Sin fechas: mes en curso hasta hoy, y los filtros lo muestran | ✅ |
+| CA09 | AI | Sin foto señalado en la fila | ✅ |
 | CA10 | AI | Texto libre por placa o código | ⬜ |
-| CA11 | M | Sin resultados: `mensaje` como estado vacío | ⬜ |
-| CA12 | **I** | Pestaña Historial en orden cronológico (FB4) | ⬜ |
-| CA13 | AI | Exportar descarga el CSV del conjunto completo, con el nombre del servidor | ⬜ |
-| CA14 | M | Exportar vacío: mensaje literal (leído del blob) | ⬜ |
+| CA11 | M | Sin resultados: `mensaje` como estado vacío | ✅ |
+| CA12 | **I** | Pestaña Historial en orden cronológico (FB4) | ✅ |
+| CA13 | AI | Exportar descarga el CSV del conjunto completo, con el nombre del servidor | ✅ |
+| CA14 | M | Exportar vacío: mensaje literal (leído del blob) | ✅ |
 | CA15 | R | Supervisor sin «Exportar» | ⬜ |
-| CA16 | AI | Cabecera: código o dígitos finales abren el detalle | ⬜ |
+| CA16 | AI | Cabecera: código o dígitos finales abren el detalle | ✅ |
 | CA17 | AI | Cabecera: otro texto lleva a la consulta con esa placa | ⬜ |
 
 ### HU-M07-03 · Calendario
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Mes en curso con ingresos y toneladas por día, como texto | ⬜ |
-| CA02 | AI | Día con anulados marcado con icono y texto | ⬜ |
-| CA03 | AI | Día con En proceso marcado con icono y texto | ⬜ |
-| CA04 | AI | Lista del día con hora, placa, código, mineral, neto y estado | ⬜ |
+| CA01 | AI | Mes en curso con ingresos y toneladas por día, como texto | ✅ |
+| CA02 | AI | Día con anulados marcado con icono y texto | ✅ |
+| CA03 | AI | Día con En proceso marcado con icono y texto | ✅ |
+| CA04 | AI | Lista del día con hora, placa, código, mineral, neto y estado | ✅ |
 | CA05 | M | Día vacío: `mensaje` | ⬜ |
 | CA06 | AI | Navegar de mes recalcula días y resumen | ⬜ |
 | CA07 | AI | Un ingreso del día abre su detalle | ⬜ |
@@ -393,10 +393,10 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Cuatro cifras del día | ⬜ |
-| CA02 | AI | «Sin contar n en proceso» bajo las toneladas | ⬜ |
+| CA01 | AI | Cuatro cifras del día | ✅ |
+| CA02 | AI | «Sin contar n en proceso» bajo las toneladas | ✅ |
 | CA03 | AI | Sin ingresos: cero y el `mensaje` | ⬜ |
-| CA04 | AI | Barras de 7 días con la cifra legible; un día coincide con el calendario | ⬜ |
+| CA04 | AI | Barras de 7 días con la cifra legible; un día coincide con el calendario | ✅ |
 | CA05 | AI | Un último ingreso abre su detalle | ⬜ |
 | CA06 | AI | Aviso por cada pendiente de destare que lleva a `/ingresos/destares` | ⬜ |
 | CA07 | AI | Administrador: «listo para cerrar» lleva a `/lotes/{id}/cerrar` | ⬜ |
@@ -442,33 +442,33 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | S | Visible en la auditoría | ⬜ |
-| CA02 | S | Antes y después en el detalle del evento | ⬜ |
+| CA01 | S | Visible en la auditoría | ✅ |
+| CA02 | S | Antes y después en el detalle del evento | ✅ |
 | CA03 | S | — | ⬜ |
 | CA04 | S | `ACCESO_RECHAZADO` visible | ⬜ |
 | CA05 | S | `RECONOCER` y `CORREGIR_DATO` visibles | ⬜ |
 | CA06 | S | `EXPORTAR` con periodo o filtros (FB6, FB7) | ⬜ |
-| CA07 | S | Motivo junto al cambio | ⬜ |
+| CA07 | S | Motivo junto al cambio | ✅ |
 
 ### HU-M09-02 · Historial de un ingreso
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Cronológico con autor | ⬜ |
-| CA02 | AI | Antes, después y motivo | ⬜ |
-| CA03 | AI | Eventos del lote incluidos (asignación, recorrido, etapas, cierre) | ⬜ |
-| CA04 | AI | El Supervisor lo ve igual | ⬜ |
-| CA05 | **I** | Sin enlace a la auditoría para quien no es Administrador | ⬜ |
+| CA01 | AI | Cronológico con autor | ✅ |
+| CA02 | AI | Antes, después y motivo | ✅ |
+| CA03 | AI | Eventos del lote incluidos (asignación, recorrido, etapas, cierre) | ✅ |
+| CA04 | AI | El Supervisor lo ve igual | ✅ |
+| CA05 | **I** | Sin enlace a la auditoría para quien no es Administrador | ✅ |
 
 ### HU-M09-03 · Auditoría del sistema
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Del más reciente al más antiguo, con entidad, referencia y autor | ⬜ |
+| CA01 | AI | Del más reciente al más antiguo, con entidad, referencia y autor | ✅ |
 | CA02 | AI | Filtros de usuario, acción y referencia combinados | ⬜ |
-| CA03 | AI | Antes, después y motivo en el detalle | ⬜ |
+| CA03 | AI | Antes, después y motivo en el detalle | ✅ |
 | CA04 | M | Sin resultados: `mensaje` | ⬜ |
-| CA05 | R | Solo el Administrador ve Auditoría | ⬜ |
+| CA05 | R | Solo el Administrador ve Auditoría | ✅ |
 
 ---
 

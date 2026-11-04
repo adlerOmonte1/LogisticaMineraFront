@@ -1,0 +1,51 @@
+<table mat-table [dataSource]="eventos()" class="tabla">
+  <ng-container matColumnDef="fecha">
+    <th mat-header-cell *matHeaderCellDef>Fecha y hora</th>
+    <td mat-cell *matCellDef="let evento" class="monoespaciado" data-prueba="fecha">
+      {{ evento.fecha_hora | fechaLima }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="usuario">
+    <th mat-header-cell *matHeaderCellDef>Usuario</th>
+    <td mat-cell *matCellDef="let evento" data-etiqueta="Usuario" data-prueba="usuario">
+      {{ evento.usuario ?? 'Sin sesión' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="accion">
+    <th mat-header-cell *matHeaderCellDef>Acción</th>
+    <td mat-cell *matCellDef="let evento">
+      <app-insignia-estado [texto]="evento.accion_texto" [tono]="tono(evento)" />
+      @if (operacion(evento); as texto) {
+        <span class="operacion texto-secundario" data-prueba="operacion">{{ texto }}</span>
+      }
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="registro">
+    <th mat-header-cell *matHeaderCellDef>Registro afectado</th>
+    <td mat-cell *matCellDef="let evento" data-etiqueta="Registro" data-prueba="registro">
+      {{ registro(evento) }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="detalle">
+    <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Detalle</span></th>
+    <td mat-cell *matCellDef="let evento" class="celda-acciones">
+      <button
+        mat-stroked-button
+        type="button"
+        data-prueba="ver-detalle"
+        [attr.aria-label]="'Ver el detalle del evento ' + evento.id"
+        (click)="ver.emit(evento)"
+      >
+        <mat-icon>open_in_new</mat-icon>
+        Detalle
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+  <tr mat-row *matRowDef="let evento; columns: columnas" data-prueba="fila-evento"></tr>
+</table>

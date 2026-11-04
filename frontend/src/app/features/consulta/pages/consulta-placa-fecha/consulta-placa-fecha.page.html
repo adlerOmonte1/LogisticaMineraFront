@@ -1,0 +1,83 @@
+<app-encabezado-pagina
+  titulo="Consulta por placa y fecha"
+  subtitulo="Encuentre un ingreso y vea su ticket de respaldo"
+/>
+
+<form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="buscar()" novalidate>
+  <mat-form-field>
+    <mat-label>Placa (completa o parte)</mat-label>
+    <input
+      matInput
+      formControlName="placa"
+      autocomplete="off"
+      autocapitalize="characters"
+      data-prueba="placa"
+    />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Fecha</mat-label>
+    <input matInput type="date" formControlName="fecha" data-prueba="fecha" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Hasta (opcional, para un rango)</mat-label>
+    <input matInput type="date" formControlName="hasta" data-prueba="hasta" />
+  </mat-form-field>
+  <div class="acciones-formulario formulario__ancho">
+    <button mat-button type="button" data-prueba="limpiar" (click)="limpiar()">Limpiar</button>
+    <button mat-flat-button color="primary" type="submit" data-prueba="buscar">
+      <mat-icon>search</mat-icon>
+      Consultar
+    </button>
+  </div>
+</form>
+
+@if (buscado()) {
+  <app-marco-listado
+    [cargando]="listado.cargando()"
+    [vacio]="listado.vacio()"
+    [error]="listado.error()"
+    [total]="listado.total()"
+    [pagina]="listado.pagina()"
+    [mensajeVacio]="listado.datos()?.mensaje ?? 'Sin resultados'"
+    iconoVacio="search_off"
+    (cambioPagina)="listado.irAPagina($event)"
+  >
+    <app-tabla-ingresos
+      [filas]="listado.filas()"
+      [seleccionable]="true"
+      [seleccionada]="elegido()?.id ?? null"
+      (elegir)="elegir($event)"
+    />
+  </app-marco-listado>
+}
+
+@if (elegido(); as fila) {
+  <section class="seleccion" aria-label="Ingreso elegido" data-prueba="seleccion">
+    <div class="seleccion__cabecera">
+      <h2 class="seleccion__titulo">
+        <span class="monoespaciado">{{ fila.codigo }}</span> · {{ fila.placa }}
+      </h2>
+      <a mat-stroked-button [routerLink]="['/consulta/ingresos', fila.id]" data-prueba="detalle-completo">
+        Ver el detalle completo
+      </a>
+      <button mat-button type="button" data-prueba="cerrar-seleccion" (click)="cerrarDetalle()">
+        Cerrar
+      </button>
+    </div>
+    <app-aviso-error [error]="errorDetalle()" />
+    @if (cargandoDetalle()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    @if (detalle(); as detalle) {
+      <div class="seleccion__cuerpo">
+        <app-pestana-ticket
+          [respaldo]="detalle.respaldo"
+          [urlImagen]="ticket.url()"
+          [falloImagen]="ticket.fallo()"
+        />
+        <app-pestana-datos [detalle]="detalle" />
+      </div>
+      <app-pestana-trazabilidad [trazabilidad]="detalle.trazabilidad" />
+    }
+  </section>
+}

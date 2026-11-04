@@ -11,9 +11,6 @@ import type { DatosPantallaPendiente } from './paginas/pantalla-pendiente.page';
 const PENDIENTES: readonly { ruta: string; titulo: string; fase: string; permiso: Permiso }[] = [
   { ruta: 'lotes', titulo: 'Trazabilidad', fase: 'FB5', permiso: 'CONSULTAR' },
   { ruta: 'lotes/cierre', titulo: 'Cierre de lotes', fase: 'FB5', permiso: 'CERRAR_LOTE' },
-  { ruta: 'consulta', titulo: 'Consulta', fase: 'FB6', permiso: 'CONSULTAR' },
-  { ruta: 'consulta/ingresos', titulo: 'Ingresos', fase: 'FB6', permiso: 'CONSULTAR' },
-  { ruta: 'consulta/calendario', titulo: 'Calendario', fase: 'FB6', permiso: 'CONSULTAR' },
   { ruta: 'consolidacion', titulo: 'Consolidación', fase: 'FB7', permiso: 'CONSOLIDAR' },
 ];
 

@@ -13,6 +13,8 @@ import { ConectividadService } from '../../conectividad/conectividad.service';
 import { AutenticacionService, RUTA_CAMBIO_CLAVE } from '../../sesion/autenticacion.service';
 import { SesionService } from '../../sesion/sesion.service';
 import { BarraInferiorComponent } from '../barra-inferior/barra-inferior.component';
+import { BusquedaCabeceraComponent } from '../busqueda-cabecera/busqueda-cabecera.component';
+import { CampanaAvisosComponent } from '../campana-avisos/campana-avisos.component';
 import { FranjaConexionComponent } from '../franja-conexion/franja-conexion.component';
 import { MenuLateralComponent } from '../menu-lateral/menu-lateral.component';
 import { MenuUsuarioComponent } from '../menu-usuario/menu-usuario.component';
@@ -43,6 +45,8 @@ const CONSULTA_ESCRITORIO = '(min-width: 1024px)';
     MenuLateralComponent,
     MenuUsuarioComponent,
     BarraInferiorComponent,
+    BusquedaCabeceraComponent,
+    CampanaAvisosComponent,
     FranjaConexionComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

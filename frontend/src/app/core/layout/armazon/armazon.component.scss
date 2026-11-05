@@ -26,9 +26,14 @@
 }
 
 .armazon__titulo {
+  // Cede espacio a la búsqueda, la campana y el menú del usuario antes de desbordar la cabecera.
+  min-width: 0;
+  overflow: hidden;
   font-size: 1rem;
   font-weight: 600;
   color: var(--label-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .armazon__espaciador {

@@ -23,6 +23,10 @@
       }
       <span class="armazon__titulo">Control de ingreso de mineral</span>
       <span class="armazon__espaciador"></span>
+      @if (mostrarNavegacion()) {
+        <app-busqueda-cabecera />
+        <app-campana-avisos />
+      }
       @if (usuario(); as usuario) {
         <app-menu-usuario
           [usuario]="usuario"

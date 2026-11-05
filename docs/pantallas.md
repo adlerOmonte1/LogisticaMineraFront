@@ -204,6 +204,6 @@ filtrada: es el enlace de la pestaña Historial. Ruta y pestañas: `rutas-admini
 | `linea-eventos` | Pestaña Historial |
 | `cambios-evento` (antes y después por campo) | `linea-eventos` y el diálogo de detalle de la auditoría |
 | `confirmacion` (diálogo con motivo opcional u obligatorio) | Bajas, anulación, reversión, cierre |
-| `selector-periodo` | Calendario y consolidación |
+| `selector-periodo` | Consolidación (el calendario conserva su navegación propia, D-F44) |
 
 Ninguno inyecta servicios. Se crean cuando la segunda pantalla los necesita, no antes.

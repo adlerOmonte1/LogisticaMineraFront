@@ -97,7 +97,8 @@ export class ConsultaPlacaFechaPage {
       const fecha = this.fecha();
       if (placa || fecha) {
         untracked(() => {
-          this.formulario.patchValue({ placa: placa ?? '', fecha: fecha ?? '' });
+          // La placa que llega por la URL se ve como se busca: en mayúsculas y sin espacios.
+          this.formulario.patchValue({ placa: normalizarPlaca(placa ?? ''), fecha: fecha ?? '' });
           this.buscar();
         });
       }

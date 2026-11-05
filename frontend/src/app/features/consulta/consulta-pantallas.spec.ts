@@ -214,6 +214,12 @@ describe('ConsultaPlacaFechaPage (HU-M07-01)', () => {
     expect(raiz.querySelector<HTMLInputElement>('[data-prueba="placa"]')?.value).toBe('ABC');
   });
 
+  it('una placa en minúsculas por la URL se muestra y se busca normalizada', () => {
+    const { raiz } = pagina({ placa: 'b5a' });
+    expect(api.buscar).toHaveBeenCalledOnceWith({ placa: 'B5A', fecha: '', hasta: '' }, 1);
+    expect(raiz.querySelector<HTMLInputElement>('[data-prueba="placa"]')?.value).toBe('B5A');
+  });
+
   it('al elegir un resultado abre el ticket junto a los datos, y el lote con su recorrido (CA03, CA10)', () => {
     const { fixture, raiz } = pagina({ placa: 'V2K' });
     raiz.querySelector<HTMLButtonElement>('[data-prueba="ver-ticket"]')?.click();

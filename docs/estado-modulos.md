@@ -29,7 +29,7 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | FB3 | M03 + M04 + M05 Registro | 🟩 | Técnica pasada | Registro en 3 pasos, sin foto, destare, detalle (4 pestañas), corrección, reversión y anulación. Pendiente: T01 y T02 cronometradas en teléfono real |
 | FB4 | M09 Auditoría | 🟩 | Técnica pasada, con recorrido en vivo | Pestaña Historial del detalle y Auditoría del sistema. Faltan por recorrer los filtros de usuario y de acción y los eventos de acceso rechazado |
 | FB5 | M06 Trazabilidad | 🟩 | Técnica pasada, con recorrido en vivo | Lotes, detalle con el recorrido en tarjetas por etapa, composición, división, bigbags, cierre y pestaña Trazabilidad; rediseñado con la disposición de la maqueta el 2026-11-05 (D-F45), sin recorrido visual posterior. Secado en 2 toques y ruta en 3 comprobados en teléfono **emulado**; falta teléfono real, dividir, tardíos y traslados |
-| FB6 | M07 Consulta | 🟩 | Técnica pasada, con recorrido en vivo | Inicio con avisos, consulta por placa y fecha con el ticket al lado, listado con totales y exportación, calendario y búsqueda de la cabecera. Falta cronometrar T03 en un teléfono real y recorrer lo anotado en la bitácora |
+| FB6 | M07 Consulta | 🟩 | Técnica pasada, con recorrido en vivo | Rediseñado con la disposición de la maqueta el 2026-11-05 (D-F46), sin recorrido visual posterior. Inicio con avisos, consulta por placa y fecha con el ticket al lado, listado con totales y exportación, calendario y búsqueda de la cabecera. Falta cronometrar T03 en un teléfono real y recorrer lo anotado en la bitácora |
 | FB7 | M08 Consolidación | 🟩 | Técnica pasada, con recorrido en vivo | Total mensual por tipo de mineral con avisos de En proceso, anulados excluidos y «al corte», selector de periodo sin futuro y exportación XLSX; pantalla = archivo = calendario (84,80 t en noviembre). Falta cronometrar T05 y T06 en un teléfono real y ver el total cambiar tras una corrección de peso (CA05) |
 | FB8 | Estabilización | ⬜ | — | — |
 | FB9 | Despliegue | ⬜ | — | — |
@@ -66,7 +66,7 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | `linea-eventos`, `cambios-evento` | ✅ | FB4 |
 | `recorrido-etapas` | ✅ | FB5 |
 | `selector-periodo` (con límite opcional, D-F44) | ✅ | FB7 |
-| Piezas visuales de la maqueta, `estilos/_maqueta.scss` (D-F45) | ✅ | FB5 (rediseño) |
+| Piezas visuales de la maqueta: `app-ficha`, `app-aviso-franja`, `app-cifra`, `app-segmentos` y `estilos/_maqueta.scss` (D-F45, D-F46) | ✅ | FB5–FB6 (rediseño) |
 | `tabla-paginada` | ⬜ | Según la fase que la necesite |
 
 ## Infraestructura del proyecto
@@ -81,7 +81,7 @@ qué orden. Esto es el **avance real**, que diverge del plan por definición.
 | Node 20 LTS fijado | ✅ | `.nvmrc` y `engines`; el CI usa Node 20. La máquina local sigue en Node 24 |
 | ESLint y Prettier | ✅ | Límites entre capas con `import/no-restricted-paths` (D-F22) |
 | Pipeline de GitHub Actions | ✅ | `frontend.yml` (formato, lint, pruebas con cobertura, build y presupuesto) y `docs.yml` |
-| Pruebas unitarias | ✅ | 535 pruebas; cobertura 94,0 % de sentencias (mínimo 80 %) |
+| Pruebas unitarias | ✅ | 539 pruebas; cobertura 94,1 % de sentencias (mínimo 80 %) |
 | Bundle inicial | ✅ | 376,6 kB (presupuesto 500 kB, D-F21); el registro, la auditoría, los lotes y la consolidación son chunks diferidos |
 | Esquema OpenAPI del backend completo | ⬜ | D-F09, paso 0.14 |
 

@@ -681,3 +681,51 @@ disposición, con sus mismos nombres de clase para compararlas directo:
   en el cliente. Se conservan los filtros de mineral y fechas, que la maqueta no tiene (HU-M06-01).
 
 Se revisaría si el backend agrega avance y bigbags a `GET lotes/`.
+
+## D-F46. Consulta con la disposición de la maqueta; la tarjeta global se alinea
+
+**Fecha:** 2026-11-05 · **Fase:** FB6 (rediseño) · Aplica D-F45
+
+Se rediseñan inicio, listado, calendario, consulta por placa y detalle del ingreso con la
+disposición de `pInicio`, `pIngresos`, `pCalendario`, `pConsulta` y `pDetalle`:
+
+- **Inicio:** cuatro cifras con su icono y unidad, y debajo «Últimos ingresos» junto al gráfico de
+  7 días (hoy resaltado). Se retiran los accesos por rol: repetían el menú lateral y la maqueta no
+  los tiene.
+- **Calendario:** cifras del mes arriba, cuadrícula con el dorado más intenso según las toneladas
+  (la cifra sigue escrita en cada celda), «hoy» marcado y el día elegido en un panel al lado.
+- **Listado:** botones segmentados por estado (`app-segmentos`) y el resumen del conjunto en la
+  misma tarjeta. **Detalle:** enlace «‹ Ingresos», código grande, fichas de estado, aviso rojo del
+  anulado o naranja del En proceso, pestañas segmentadas y los datos en rejilla.
+- **Componentes compartidos nuevos:** `app-cifra` (reemplaza a `cifra-inicio`) y `app-segmentos`.
+  `app-insignia-ingreso` y `app-marca-sin-respaldo` pasan a pintarse con `app-ficha`, así que el
+  estado del ingreso se ve igual en todas las pantallas.
+- **La tarjeta global `.tarjeta`** pasa de 14 px de radio y 16 px de relleno a 6 px y 20 px, como
+  la `card` de la maqueta. Es un cambio **para todas las pantallas**, deliberado y barato.
+
+**No se copió de la maqueta** (el contrato no lo da o contradice una regla): las «búsquedas
+frecuentes» de la consulta (placas fijas de la maqueta, no hay dato del servidor), el menú de
+acciones por fila y el aviso con un texto fijo de pendientes (los avisos los manda el servidor, en
+la campana). En la consulta por placa se mantiene la tabla de resultados completa sobre el ticket
+y los datos, en lugar de la lista compacta junto a ellos; la pestaña Reconocimiento y la de
+Validación siguen con tabla de Material.
+
+## D-F47. Diálogos con el formato de hoja y de alerta de la maqueta
+
+**Fecha:** 2026-11-05 · **Fase:** FB5–FB6 (rediseño) · Aplica D-F45 y D-F46
+
+Los diálogos eran el contenedor de Material sin tocar: título pequeño, sin borde, pie sin fondo.
+Se alinean con `modal`, `sheet` y `alertBox` de la maqueta:
+
+- **Estilo central, no por diálogo.** `DialogosService` abre todo con `panelClass: 'dialogo-maqueta'`
+  y `estilos/_dialogos.scss` da el borde dorado superior, el radio de 6 px, el título grande, el
+  cuerpo con aire y el pie con fondo propio y filete. En teléfono la hoja sube desde abajo y ocupa
+  el ancho (`:has()` sobre el contenedor global de Material).
+- **`app-cabecera-dialogo`** (en `shared/`): título a la izquierda y botón «Cerrar» a la derecha. El
+  título sigue siendo el `mat-dialog-title`, así que el diálogo queda nombrado. Cerrar equivale a
+  «Cancelar». Lo usan los 13 diálogos de formulario (lotes, etapas, bigbags, división, asignar,
+  usuarios, catálogos, tara, evento de auditoría…).
+- **La confirmación** usa el formato de alerta: icono (aviso naranja si la acción cambia el estado
+  de un registro), título y mensaje centrados y dos botones a lo ancho.
+- Sin cambios de lógica: los diálogos siguen devolviendo lo mismo y el rechazo del servidor sigue
+  mostrándose literal dentro del diálogo.

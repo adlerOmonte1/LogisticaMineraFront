@@ -1,15 +1,17 @@
-import { Type } from '@angular/core';
+import { Type, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { AvisosService } from '@core/consulta/avisos.service';
 import { DialogosService } from '@core/dialogos/dialogos.service';
 import { NotificacionService } from '@core/notificacion/notificacion.service';
 import { TiposMineralApiService } from '@core/catalogo/tipos-mineral-api.service';
 import { SesionService } from '@core/sesion/sesion.service';
 import { ErrorApi } from '@models/error-api.model';
 import { CatalogoRecorrido, Lote, RespuestaLote } from '@models/lote.model';
+import { Aviso } from '@models/consulta.model';
 import { Pagina } from '@models/pagina.model';
 import { Rol } from '@models/rol.model';
 import { RUTAS_PENDIENTES } from '@core/layout/rutas-pendientes';
@@ -86,10 +88,32 @@ describe('LotesPage (HU-M06-01)', () => {
     return montarPagina(LotesPage, rol, [
       { provide: LotesApiService, useValue: api },
       { provide: TiposMineralApiService, useValue: minerales },
+      { provide: AvisosService, useValue: { avisos: avisos } },
     ]);
   };
+  const avisos = signal<readonly Aviso[]>([]);
 
   afterEach(() => localStorage.clear());
+
+  it('el aviso de ingresos sin lote sale con el texto del servidor', () => {
+    avisos.set([
+      {
+        tipo: 'SIN_LOTE',
+        titulo: '2 ingresos esperan en cancha sin lote',
+        detalle: 'ING-1, ING-2',
+        enlace: '/lotes',
+      },
+    ]);
+    const { raiz } = montar('ADMINISTRADOR');
+    expect(textos(raiz, 'aviso-sin-lote')[0]).toContain('2 ingresos esperan en cancha sin lote');
+    avisos.set([]);
+  });
+
+  it('los botones segmentados filtran por estado', () => {
+    const { raiz } = montar('SUPERVISOR');
+    raiz.querySelector<HTMLButtonElement>('[data-prueba="segmento-CERRADO"]')?.click();
+    expect(api.listar.calls.mostRecent().args[0].estado).toBe('CERRADO');
+  });
 
   it('lista los lotes con su estado, mineral e ingresos para cualquier rol', () => {
     const { raiz } = montar('SUPERVISOR');
@@ -126,6 +150,7 @@ describe('LotesPage (HU-M06-01)', () => {
     const { raiz } = montarPagina(LotesPage, 'ADMINISTRADOR', [
       { provide: LotesApiService, useValue: api },
       { provide: TiposMineralApiService, useValue: minerales },
+      { provide: AvisosService, useValue: { avisos: signal([]) } },
     ]);
     expect(raiz.querySelector('[role="status"]')?.textContent).toContain('No hay lotes');
   });
@@ -258,13 +283,12 @@ describe('LoteDetallePage', () => {
     expect(textos(raiz, 'pendientes')[0]).toContain('Falta registrar el secado');
   });
 
-  it('el Administrador compone, divide y cierra un lote en recorrido', () => {
-    expect(acciones(montar('ADMINISTRADOR').raiz)).toEqual([
-      'agregar-mineral',
-      'asignar',
-      'dividir',
-      'cerrar',
-    ]);
+  it('el Administrador compone y divide; «Cerrar lote» aparece con todo ensacado, como en la maqueta', () => {
+    expect(acciones(montar('ADMINISTRADOR').raiz)).toEqual(['agregar-mineral', 'asignar', 'dividir']);
+    const listo = montar('ADMINISTRADOR', crearLote({ siguientes: [], pendientes: [] }));
+    expect(acciones(listo.raiz)).toContain('cerrar');
+    expect(textos(listo.raiz, 'estado')).toEqual(['Listo para cerrar']);
+    expect(hay(listo.raiz, 'aviso-listo')).toBeTrue();
   });
 
   it('el Administrativo compone y divide, pero no cierra (HU-M06-05 CA05)', () => {
@@ -320,8 +344,10 @@ describe('LoteDetallePage', () => {
     for (const accion of ['retirar', 'quitar-mineral', 'siguiente', 'asociar-bigbags']) {
       expect(hay(raiz, accion)).withContext(accion).toBeFalse();
     }
-    expect(textos(raiz, 'destino')).toEqual(['Venta']);
-    expect(textos(raiz, 'cierre')[0]).toContain('admin.prueba');
+    const aviso = textos(raiz, 'aviso-cerrado')[0];
+    expect(aviso).toContain('venta');
+    expect(aviso).toContain('admin.prueba');
+    expect(hay(raiz, 'ver-resumen')).toBeTrue();
   });
 
   it('solo se ofrece lo que dice `siguientes`: sin entradas no hay botones, aunque esté en recorrido', () => {
@@ -335,6 +361,7 @@ describe('LoteDetallePage', () => {
     const conEnsacado = montar(
       'SUPERVISOR',
       crearLote({
+        ruta: 'ZARANDEO_ENSACADO',
         recorrido: [
           {
             id: 1,
@@ -566,11 +593,13 @@ describe('CerrarLotePage (HU-M06-05)', () => {
 
   it('la diferencia entre el ensacado y lo registrado se señala como estimación (CA06)', () => {
     const { raiz } = montar();
-    expect(textos(raiz, 'diferencia')[0]).toContain('≈ 0.30 t');
-    expect(textos(raiz, 'diferencia')[0]).toContain('(estimación)');
-    expect(textos(raiz, 'ensacado')[0]).toContain('(estimación)');
-    expect(textos(raiz, 'registradas')[0]).not.toContain('estimación');
-    expect(textos(raiz, 'rendimiento')[0]).toContain('3.30 t/h en 4.00 h');
+    const cifra = (prueba: string) => textos(raiz, prueba)[0].replace(/\s+/g, ' ');
+    expect(cifra('diferencia')).toContain('≈ +0.30');
+    expect(cifra('ensacado')).toContain('≈ 13.50');
+    expect(cifra('bigbags')).toContain('estimación');
+    expect(cifra('registradas')).not.toContain('≈');
+    expect(raiz.textContent).toContain('Supera lo registrado · estimación');
+    expect(cifra('rendimiento')).toContain('3.30 t/h');
   });
 
   it('lista lo que falta para cerrar, y deja que el servidor decida (CA02)', () => {
@@ -628,14 +657,16 @@ describe('CerrarLotePage (HU-M06-05)', () => {
 describe('CierreLotesPage (HU-M06-05 CA05)', () => {
   it('pide solo los lotes en recorrido y dice cuáles están listos y cuáles tienen pendientes', () => {
     const api = jasmine.createSpyObj<LotesApiService>('LotesApiService', ['listar', 'resumen']);
-    api.listar.and.returnValue(
-      of(
-        pagina([
-          crearLoteFila({ id: 1, nombre: 'A' }),
-          crearLoteFila({ id: 2, nombre: 'B' }),
-          crearLoteFila({ id: 3, nombre: 'C' }),
-        ]),
-      ),
+    api.listar.and.callFake((filtro) =>
+      filtro.estado === 'CERRADO'
+        ? of(pagina([crearLoteFila({ id: 9, nombre: 'Z', estado: 'CERRADO', destino: 'VENTA' })]))
+        : of(
+            pagina([
+              crearLoteFila({ id: 1, nombre: 'A' }),
+              crearLoteFila({ id: 2, nombre: 'B' }),
+              crearLoteFila({ id: 3, nombre: 'C' }),
+            ]),
+          ),
     );
     api.resumen.and.callFake((id: number) =>
       id === 1
@@ -648,11 +679,15 @@ describe('CierreLotesPage (HU-M06-05 CA05)', () => {
       { provide: LotesApiService, useValue: api },
     ]);
 
-    expect(api.listar.calls.first().args[0].estado).toBe('EN_RECORRIDO');
-    expect(textos(raiz, 'estado-cierre').map((t) => t.replace(/\s+/g, ' ').replace(/^[a-z_]+ /, ''))).toEqual(
-      ['Listo para cerrar', '2 pendientes', 'No disponible'],
-    );
-    expect(raiz.querySelectorAll('[data-prueba="cerrar-lote"]').length).toBe(3);
+    expect(api.listar.calls.allArgs().map(([filtro]) => filtro.estado)).toEqual(['EN_RECORRIDO', 'CERRADO']);
+    const estados = (seccion: string) =>
+      [...raiz.querySelectorAll(`[data-prueba="${seccion}"] [data-prueba="estado-cierre"]`)].map((e) =>
+        (e.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      );
+    expect(estados('seccion-listos')).toEqual(['Listo para cerrar']);
+    expect(estados('seccion-proceso')).toEqual(['P1 y 1 más', 'No disponible']);
+    expect(raiz.textContent).toContain('Cerrado · Venta');
+    expect(raiz.querySelectorAll('[data-prueba="cerrar-lote"]').length).toBe(4);
   });
 });
 

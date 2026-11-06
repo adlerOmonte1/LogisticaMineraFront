@@ -1,61 +1,39 @@
-<table mat-table [dataSource]="lotes()" class="tabla">
-  <ng-container matColumnDef="codigo">
-    <th mat-header-cell *matHeaderCellDef>Código</th>
-    <td mat-cell *matCellDef="let lote" class="monoespaciado" data-prueba="codigo">{{ lote.codigo }}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="nombre">
-    <th mat-header-cell *matHeaderCellDef>Nombre</th>
-    <td mat-cell *matCellDef="let lote" data-prueba="nombre">
-      <strong>{{ lote.nombre }}</strong>
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="estado">
-    <th mat-header-cell *matHeaderCellDef>Estado</th>
-    <td mat-cell *matCellDef="let lote">
-      <app-insignia-estado [texto]="estado(lote).texto" [tono]="estado(lote).tono" />
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="mineral">
-    <th mat-header-cell *matHeaderCellDef>Mineral</th>
-    <td mat-cell *matCellDef="let lote" data-etiqueta="Mineral">{{ lote.tipo_mineral_nombre }}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="ingresos">
-    <th mat-header-cell *matHeaderCellDef>Ingresos</th>
-    <td mat-cell *matCellDef="let lote" data-etiqueta="Ingresos">{{ lote.ingresos }}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="toneladas">
-    <th mat-header-cell *matHeaderCellDef>Toneladas</th>
-    <td mat-cell *matCellDef="let lote" class="monoespaciado" data-etiqueta="Toneladas">
-      {{ lote.toneladas | toneladas }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="apertura">
-    <th mat-header-cell *matHeaderCellDef>Apertura</th>
-    <td mat-cell *matCellDef="let lote" data-etiqueta="Apertura">
-      {{ lote.fecha_apertura | fechaLima: 'fecha' }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="ver">
-    <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Abrir</span></th>
-    <td mat-cell *matCellDef="let lote" class="celda-acciones">
-      <a
-        mat-stroked-button
-        [routerLink]="['/lotes', lote.id]"
-        [attr.aria-label]="'Ver el lote ' + lote.nombre"
-        data-prueba="ver-lote"
-      >
-        Ver
-      </a>
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-  <tr mat-row *matRowDef="let lote; columns: columnas" data-prueba="fila-lote"></tr>
-</table>
+<div class="lm-scroll">
+  <table class="lm-tabla">
+    <thead>
+      <tr>
+        <th>Lote</th>
+        <th>Tipo de mineral</th>
+        <th>Apertura</th>
+        <th class="r">Ingresos</th>
+        <th class="r">Toneladas</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (lote of lotes(); track lote.id) {
+        <tr class="click" [routerLink]="['/lotes', lote.id]" data-prueba="fila-lote">
+          <td class="main" data-l="">
+            <a
+              class="fila-enlace"
+              [routerLink]="['/lotes', lote.id]"
+              [attr.aria-label]="'Ver el lote ' + lote.nombre"
+              data-prueba="nombre"
+              >{{ lote.nombre }}</a
+            >
+            <div class="lm-xs lm-faint codigo" data-prueba="codigo">{{ lote.codigo }}</div>
+          </td>
+          <td data-l="Mineral">{{ lote.tipo_mineral_nombre }}</td>
+          <td class="lm-num" data-l="Apertura">{{ lote.fecha_apertura | fechaLima: 'fecha' }}</td>
+          <td class="r" data-l="Ingresos">{{ lote.ingresos }}</td>
+          <td class="r" data-l="Toneladas">{{ lote.toneladas | toneladas: false }}</td>
+          <td data-l="Estado">
+            <app-ficha [color]="ficha(lote).color" [punto]="true" data-prueba="estado">{{
+              ficha(lote).texto
+            }}</app-ficha>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

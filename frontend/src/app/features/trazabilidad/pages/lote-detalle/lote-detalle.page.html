@@ -4,15 +4,27 @@
 }
 
 @if (lote(); as lote) {
-  <app-encabezado-pagina [titulo]="lote.nombre" [subtitulo]="lote.codigo">
+  <app-encabezado-pagina
+    [titulo]="lote.nombre"
+    [subtitulo]="subtitulo()"
+    [volver]="{ texto: 'Lotes de proceso', ruta: '/lotes' }"
+  >
     @if (puedeComponer()) {
+      @if (!listo()) {
+        <button mat-stroked-button type="button" data-prueba="asignar" (click)="asignar()">
+          <mat-icon>add</mat-icon>
+          Agregar ingresos
+        </button>
+      }
       <button mat-stroked-button type="button" data-prueba="agregar-mineral" (click)="agregarMineral()">
         <mat-icon>add</mat-icon>
         Agregar otro mineral
       </button>
-      <button mat-stroked-button type="button" data-prueba="asignar" (click)="asignar()">
-        <mat-icon>playlist_add</mat-icon>
-        Asignar ingresos
+    }
+    @if (puedeDividir()) {
+      <button mat-stroked-button type="button" data-prueba="dividir" (click)="dividir()">
+        <mat-icon>call_split</mat-icon>
+        Dividir lote
       </button>
     }
     @if (puedeIniciar()) {
@@ -27,88 +39,138 @@
         Iniciar recorrido
       </button>
     }
-    @if (puedeDividir()) {
-      <button mat-stroked-button type="button" data-prueba="dividir" (click)="dividir()">
-        <mat-icon>call_split</mat-icon>
-        Dividir
-      </button>
-    }
     @if (puedeCerrar()) {
       <a mat-flat-button color="primary" [routerLink]="['/lotes', lote.id, 'cerrar']" data-prueba="cerrar">
         <mat-icon>task_alt</mat-icon>
         Cerrar lote
       </a>
     }
+    @if (lote.estado === 'CERRADO') {
+      <a mat-stroked-button [routerLink]="['/lotes', lote.id, 'cerrar']" data-prueba="ver-resumen">
+        Ver resumen de cierre
+      </a>
+    }
   </app-encabezado-pagina>
 
-  <div class="pagina">
-    <section class="tarjeta" aria-label="Estado del lote">
-      <dl class="datos">
-        <dt>Estado</dt>
-        <dd>
-          @if (estado(); as estado) {
-            <app-insignia-estado [texto]="estado.texto" [tono]="estado.tono" />
-          }
-        </dd>
-        <dt>Apertura</dt>
-        <dd data-prueba="apertura">{{ lote.fecha_apertura | fechaLima: 'fecha' }}</dd>
-        <dt>Inicio del recorrido</dt>
-        <dd data-prueba="inicio">{{ lote.fecha_inicio_recorrido | fechaLima }}</dd>
-        @if (nombreRuta(lote); as ruta) {
-          <dt>Ruta</dt>
-          <dd data-prueba="ruta">{{ ruta }}</dd>
-        }
-        @if (lote.estado === 'CERRADO') {
-          <dt>Destino</dt>
-          <dd data-prueba="destino">{{ lote.destino_texto }}</dd>
-          <dt>Cierre</dt>
-          <dd data-prueba="cierre">{{ lote.fecha_cierre | fechaLima }} · {{ lote.usuario_cierre }}</dd>
-          @if (lote.observacion_cierre) {
-            <dt>Observación</dt>
-            <dd>{{ lote.observacion_cierre }}</dd>
-          }
-        }
-      </dl>
-    </section>
+  <div class="lm-pila">
+    <div class="lm-fila wrap" data-prueba="fichas">
+      @if (ficha(); as ficha) {
+        <app-ficha [color]="ficha.color" [punto]="true" data-prueba="estado">{{ ficha.texto }}</app-ficha>
+      }
+      @if (flujo(); as flujo) {
+        <app-ficha color="purple" data-prueba="avance">
+          {{ flujo.avance.hechas }} de {{ flujo.avance.total }} etapas
+        </app-ficha>
+      }
+      @if (lote.partes.length > 1) {
+        <app-ficha color="gray">Dividido en {{ lote.partes.length }} partes</app-ficha>
+      }
+    </div>
 
-    @if (lote.estado === 'EN_RECORRIDO' && lote.pendientes.length > 0) {
-      <section class="tarjeta pendientes" aria-label="Pendientes para el cierre" data-prueba="pendientes">
-        <h2 class="titulo">Falta para poder cerrar</h2>
-        <ul>
-          @for (pendiente of lote.pendientes; track pendiente) {
-            <li>{{ pendiente }}</li>
-          }
-        </ul>
-      </section>
+    <div class="lm-card">
+      <div class="lm-grid lm-g4">
+        <div class="lm-kv">
+          <span>Toneladas netas</span>
+          <b class="big lm-num" data-prueba="toneladas">{{ lote.total.toneladas | toneladas }}</b>
+        </div>
+        <div class="lm-kv">
+          <span>Ingresos</span>
+          <b data-prueba="ingresos">
+            {{ lote.total.ingresos }}
+            @if (tardios() > 0) {
+              ({{ tardios() }} {{ tardios() === 1 ? 'tardío' : 'tardíos' }})
+            }
+          </b>
+        </div>
+        <div class="lm-kv">
+          <span>Bigbags producidos</span>
+          <b data-prueba="bigbags-total">{{ totalBigbags() }}</b>
+        </div>
+        <div class="lm-kv">
+          <span>Inicio del recorrido</span>
+          <b data-prueba="inicio">
+            @if (lote.fecha_inicio_recorrido) {
+              {{ lote.fecha_inicio_recorrido | fechaLima }}
+            } @else {
+              Aún abierto
+            }
+          </b>
+        </div>
+      </div>
+    </div>
+
+    @if (lote.estado === 'CERRADO') {
+      <app-aviso-franja color="gray" icono="task_alt" data-prueba="aviso-cerrado">
+        Cerrado con destino {{ lote.destino_texto.toLowerCase() }} el {{ lote.fecha_cierre | fechaLima }} por
+        {{ lote.usuario_cierre }}.
+        @if (lote.observacion_cierre) {
+          Observación: {{ lote.observacion_cierre }}.
+        }
+        El lote está cerrado: no admite más ingresos ni etapas.
+      </app-aviso-franja>
+    } @else if (listo()) {
+      <app-aviso-franja color="green" icono="task_alt" data-prueba="aviso-listo">
+        Todo el mineral está ensacado.
+        @if (puedeCerrar()) {
+          Puede cerrarlo con su destino.
+        } @else {
+          Solo el Administrador puede cerrarlo con su destino.
+        }
+      </app-aviso-franja>
+    } @else if (lote.estado === 'ABIERTO') {
+      <app-aviso-franja color="blue" icono="info" data-prueba="aviso-abierto">
+        Mientras el lote está abierto reúne ingresos. Al iniciar el recorrido empieza el secado; desde
+        entonces el lote admite ingresos tardíos, y un ingreso agregado por error puede retirarse hasta que su
+        mineral pase por zarandeo o molienda.
+      </app-aviso-franja>
+    } @else if (lote.pendientes.length > 0) {
+      <app-aviso-franja color="orange" icono="schedule" data-prueba="pendientes">
+        Falta para poder cerrar:
+        @for (pendiente of lote.pendientes; track pendiente; let ultimo = $last) {
+          {{ pendiente }}{{ ultimo ? '.' : ';' }}
+        }
+      </app-aviso-franja>
     }
 
-    <app-siguiente-paso
-      [siguientes]="lote.siguientes"
-      [etapas]="catalogo()?.etapas ?? []"
-      (registrar)="registrar($event)"
-    />
     @if (rendimiento(); as texto) {
-      <p class="rendimiento" role="status" data-prueba="rendimiento">{{ texto }}</p>
+      <app-aviso-franja color="green" icono="speed" role="status"
+        ><span data-prueba="rendimiento">{{ texto }}</span></app-aviso-franja
+      >
     }
 
+    <div class="lm-fila between">
+      <h2 class="lm-seccion">Recorrido del mineral</h2>
+      @if (listo()) {
+        <app-ficha color="green">Todo el mineral ensacado</app-ficha>
+      }
+    </div>
+    <app-flujo-lote
+      [lote]="lote"
+      [catalogo]="catalogo()"
+      [puedeRegistrar]="puedeRegistrar()"
+      [puedeAsociar]="puedeAsociarBigbags()"
+      (registrar)="registrar($event)"
+      (asociarBigbags)="asociarBigbags()"
+    />
+
+    @if (lote.bigbags.length > 0) {
+      <div class="lm-fila between">
+        <h2 class="lm-seccion">Bigbags</h2>
+        <span class="lm-small lm-muted">{{ totalBigbags() }} en total</span>
+      </div>
+      <app-bigbags-lote [bigbags]="lote.bigbags" [partes]="lote.partes" />
+    }
+
+    <div class="lm-fila between">
+      <h2 class="lm-seccion">Composición del lote</h2>
+      <span class="lm-small lm-muted" data-prueba="resumen-composicion">{{ resumenComposicion() }}</span>
+    </div>
     <app-composicion-lote
       [composicion]="lote.composicion"
       [total]="lote.total"
       [editable]="puedeComponer()"
       (retirar)="retirar($event)"
       (quitarMineral)="quitarMineral($event)"
-    />
-
-    @if (lote.partes.length > 0) {
-      <app-partes-lote [partes]="lote.partes" />
-    }
-
-    <app-recorrido-lote
-      [recorrido]="lote.recorrido"
-      [bigbags]="lote.bigbags"
-      [partes]="lote.partes"
-      [puedeAsociar]="puedeAsociarBigbags()"
-      (asociarBigbags)="asociarBigbags()"
     />
   </div>
 }

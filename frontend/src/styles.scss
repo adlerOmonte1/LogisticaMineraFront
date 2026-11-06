@@ -2,6 +2,7 @@
 // (LogisticaMinera/Mockup/index.html). Los tokens de color viven como variables CSS para lo
 // que Material no cubre: insignias de estado, armazón, avisos.
 @use '@angular/material' as mat;
+@use 'estilos/maqueta';
 
 $paleta-oro: (
   50: #fcf5e8,

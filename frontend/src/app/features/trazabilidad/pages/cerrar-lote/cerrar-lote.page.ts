@@ -11,6 +11,7 @@ import {
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
@@ -26,34 +27,48 @@ import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
 import { EnvioFormulario } from '@shared/formularios/envio-formulario';
 import { ErrorCampoPipe } from '@shared/pipes/error-campo.pipe';
+import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
 import { CatalogoRecorridoApiService } from '../../data-access/catalogo-recorrido-api.service';
 import { LotesApiService } from '../../data-access/lotes-api.service';
 import { ResumenCierreComponent } from '../../ui/resumen-cierre/resumen-cierre.component';
+import { AvisoFranjaComponent } from '@shared/components/aviso-franja/aviso-franja.component';
 
 /**
- * Cerrar un lote con su destino (HU-M06-05), solo el Administrador. La pantalla es la
- * confirmación: muestra el resumen con la diferencia como estimación (CA06) y, al cerrar, pide
- * una confirmación final. Con pendientes o sin destino responde el servidor con su mensaje
+ * Resumen y cierre de un lote con su destino (HU-M06-05), solo el Administrador, con la
+ * disposición de `pAlta` en la maqueta (D-F45): el aviso según su estado, el formulario de
+ * cierre, las cifras con la diferencia como estimación (CA06), los tiempos, el resultado por
+ * parte y el recorrido. Al cerrar pide una confirmación final. Con pendientes o sin destino responde el servidor con su mensaje
  * literal (CA02, CA03); el cliente no los anticipa.
  */
 @Component({
   selector: 'app-cerrar-lote',
   standalone: true,
   imports: [
+    AvisoFranjaComponent,
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressBarModule,
     MatSelectModule,
     AvisoErrorComponent,
     EncabezadoPaginaComponent,
     ErrorCampoPipe,
+    FechaLimaPipe,
     ResumenCierreComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cerrar-lote.page.html',
+  styles: `
+    .sin-margen {
+      margin: 0;
+    }
+    .acciones {
+      justify-content: flex-end;
+    }
+  `,
 })
 export class CerrarLotePage {
   readonly id = input.required<string>();
@@ -74,6 +89,11 @@ export class CerrarLotePage {
   protected readonly formulario = new FormGroup({
     destino: new FormControl<CodigoDestino | null>(null),
     observacion: new FormControl('', { nonNullable: true }),
+  });
+
+  protected readonly subtitulo = computed(() => {
+    const lote = this.lote();
+    return lote ? [lote.codigo, ...lote.composicion.map((g) => g.tipo_mineral.nombre)].join(', ') : '';
   });
 
   /** Un lote ya cerrado no ofrece cerrar otra vez (HU-M06-05 CA04). */

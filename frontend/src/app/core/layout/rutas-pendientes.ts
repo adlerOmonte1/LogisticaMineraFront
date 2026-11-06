@@ -8,9 +8,8 @@ import type { DatosPantallaPendiente } from './paginas/pantalla-pendiente.page';
  * Rutas de fases posteriores (docs/plan-implementacion.md §4). Cada una se reemplaza por su
  * feature al construir la fase; mientras tanto, el menú de cada rol está completo.
  */
-const PENDIENTES: readonly { ruta: string; titulo: string; fase: string; permiso: Permiso }[] = [
-  { ruta: 'consolidacion', titulo: 'Consolidación', fase: 'FB7', permiso: 'CONSOLIDAR' },
-];
+// Desde FB7 todas las pantallas del menú existen; el mecanismo queda para una pantalla nueva.
+const PENDIENTES: readonly { ruta: string; titulo: string; fase: string; permiso: Permiso }[] = [];
 
 export function rutaPendiente(ruta: string, titulo: string, fase: string, permiso: Permiso): Route {
   const datos: DatosPantallaPendiente = { titulo, fase };

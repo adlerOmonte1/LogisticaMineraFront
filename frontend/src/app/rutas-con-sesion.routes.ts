@@ -48,6 +48,12 @@ export const RUTAS_CON_SESION: Routes = [
               import('./features/trazabilidad/trazabilidad.routes').then((m) => m.TRAZABILIDAD_ROUTES),
           },
           {
+            path: 'consolidacion',
+            canActivate: [permisoGuard('CONSOLIDAR')],
+            loadChildren: () =>
+              import('./features/consolidacion/consolidacion.routes').then((m) => m.CONSOLIDACION_ROUTES),
+          },
+          {
             path: 'catalogos',
             canActivate: [permisoGuard('GESTIONAR_CATALOGO')],
             loadChildren: () => import('./features/catalogo/catalogo.routes').then((m) => m.CATALOGO_ROUTES),

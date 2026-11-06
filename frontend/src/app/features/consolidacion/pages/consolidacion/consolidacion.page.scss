@@ -1,0 +1,49 @@
+.periodo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.al-corte,
+.anulados {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.al-corte {
+  color: var(--label-2);
+  font-weight: 600;
+}
+
+.anulados {
+  margin-top: 12px;
+}
+
+.aviso {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radio);
+}
+
+.aviso--proceso {
+  color: var(--orange);
+  background: color-mix(in srgb, var(--orange-b) 12%, transparent);
+}
+
+.aviso__texto,
+.aviso__detalle {
+  margin: 0;
+}
+
+.aviso__detalle {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}

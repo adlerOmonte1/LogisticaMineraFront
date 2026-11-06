@@ -12,6 +12,7 @@ import { CodigoRuta, ParteNueva, RespuestaLote, RutaCatalogo } from '@models/lot
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { DatosDialogoEnvio, DialogoEnvioBase } from '@shared/dialogos/dialogo-envio.base';
 import { sumarFracciones, textoSuma } from '@shared/utils/fraccion';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoDivision extends DatosDialogoEnvio<ParteNueva[], RespuestaLote> {
   rutas: readonly RutaCatalogo[];
@@ -43,6 +44,7 @@ function nuevaParte(): FormGroup<{
   selector: 'app-dialogo-division',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     ReactiveFormsModule,
     MatButtonModule,
     MatDialogModule,
@@ -54,7 +56,7 @@ function nuevaParte(): FormGroup<{
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
       <mat-dialog-content>
         <app-aviso-error [error]="envio.error()" />

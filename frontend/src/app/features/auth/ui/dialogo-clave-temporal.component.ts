@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { ClaveTemporal } from '@models/usuario.model';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 /**
  * Muestra la contraseña temporal **una sola vez** (HU-M01-02 CA08). Al cerrar el diálogo no
@@ -13,10 +14,10 @@ import { ClaveTemporal } from '@models/usuario.model';
 @Component({
   selector: 'app-dialogo-clave-temporal',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [CabeceraDialogoComponent, MatDialogModule, MatButtonModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>Contraseña temporal de {{ datos.username }}</h2>
+    <app-cabecera-dialogo>Contraseña temporal de {{ datos.username }}</app-cabecera-dialogo>
     <mat-dialog-content>
       <p>Entréguela a la persona; deberá cambiarla al iniciar sesión. No volverá a mostrarse.</p>
       <p class="clave monoespaciado" data-prueba="clave-temporal">{{ datos.clave_temporal }}</p>

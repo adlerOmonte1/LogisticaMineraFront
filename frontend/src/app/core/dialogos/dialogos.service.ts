@@ -21,6 +21,7 @@ export class DialogosService {
       .open<C, D, R>(componente, {
         data: datos,
         width: ANCHO_DIALOGO,
+        panelClass: 'dialogo-maqueta',
         maxWidth: '96vw',
         autoFocus: 'first-tabbable',
         injector: this.injector,

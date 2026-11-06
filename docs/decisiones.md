@@ -614,3 +614,28 @@ Dos defectos del cliente que solo aparecieron al usar el backend real:
   tal cual, quedaba antes del paso anterior si se registraba en el mismo minuto (23:03:00 frente a
   23:03:41) y el servidor la rechazaba. Ahora la fecha **solo viaja si el usuario la cambió**; si no,
   la asigna el servidor, como en el resto del sistema (D-01). Corrige lo dicho en D-F36.
+
+---
+
+# Decisiones de la construcción de FB7 (2026-11-04)
+
+## D-F44. `selector-periodo` limita el futuro; el calendario conserva su navegación
+
+**Fecha:** 2026-11-04 · **Fase:** FB7 · Aplica HU-M08-01 CA04 · Precisa `pantallas.md` (componentes compartidos)
+
+`pantallas.md` preveía `shared/components/selector-periodo` para el calendario y la consolidación.
+Al construirlo, el calendario (FB6) ya tenía su propia navegación de mes, que **sí** permite ir a
+meses futuros (un mes sin llegadas es un estado válido de la consulta), mientras que la
+consolidación **no** debe ofrecerlos (CA04). Se decide:
+
+- `selector-periodo` es presentacional, con `limite` opcional: con él, la flecha «siguiente» se
+  deshabilita en el límite, la lista de meses del año límite se corta en el mes límite y la de años
+  termina en el año límite. Lo usa la consolidación con el mes en curso de Lima (D-F17).
+- El calendario **no** se migra: cambiar una pantalla ya recorrida contra el backend no aporta y
+  mezclaría FB6 en el commit de FB7.
+- El periodo va en la URL (`?anio=&mes=`), así que un mes se puede enlazar. Un periodo futuro
+  forzado así **no se corrige en el cliente**: se envía y el servidor responde «No se puede
+  consolidar un periodo futuro», que se muestra literal. Un valor que no es un mes válido cae en el
+  mes en curso.
+- El cliente no suma ni redondea: la tabla y el total son los del servidor, con las mismas columnas
+  y en el mismo orden que el XLSX, para comparar fila por fila (HU-M08-02 CA03).

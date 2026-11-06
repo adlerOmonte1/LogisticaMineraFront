@@ -684,7 +684,7 @@ describe('rutas de consulta', () => {
     expect(Object.keys(rutas)).toContain('ingresos/:id');
   });
 
-  it('solo Consolidación sigue pendiente: Consulta, Ingresos y Calendario ya no lo son', () => {
-    expect(RUTAS_PENDIENTES.map((r) => r.path)).toEqual(['consolidacion']);
+  it('ya no queda ninguna pantalla pendiente: Consulta, Ingresos, Calendario y Consolidación existen', () => {
+    expect(RUTAS_PENDIENTES.map((r) => r.path)).toEqual([]);
   });
 });

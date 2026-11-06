@@ -1,0 +1,63 @@
+<app-encabezado-pagina titulo="Consolidación" subtitulo="Total acumulado del mes por tipo de mineral">
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    data-prueba="exportar"
+    [disabled]="exportando()"
+    (click)="exportar()"
+  >
+    <mat-icon>download</mat-icon>
+    Exportar XLSX
+  </button>
+</app-encabezado-pagina>
+
+<section class="tarjeta periodo">
+  <app-selector-periodo [periodo]="periodo()" [limite]="limite" (cambio)="cambiarPeriodo($event)" />
+  @if (datos()?.al_corte; as corte) {
+    <p class="al-corte" data-prueba="al-corte">
+      <mat-icon aria-hidden="true">schedule</mat-icon>
+      {{ corte }}
+    </p>
+  }
+</section>
+
+<app-aviso-error [error]="error()" />
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (datos(); as consolidado) {
+  @if (consolidado.en_proceso_mensaje; as aviso) {
+    <div class="aviso aviso--proceso" role="status" data-prueba="en-proceso">
+      <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+      <div>
+        <p class="aviso__texto">{{ aviso }}</p>
+        @if (consolidado.en_proceso.codigos.length > 0) {
+          <p class="aviso__detalle monoespaciado" data-prueba="en-proceso-codigos">
+            {{ consolidado.en_proceso.codigos.join(', ') }}
+          </p>
+        }
+      </div>
+    </div>
+  }
+
+  <section class="tarjeta tarjeta--plana">
+    @if (consolidado.mensaje; as mensaje) {
+      <app-estado-vacio icono="bar_chart" [mensaje]="mensaje" />
+    } @else {
+      <app-tabla-consolidado [consolidado]="consolidado" />
+    }
+  </section>
+
+  <p class="anulados texto-secundario" data-prueba="anulados">
+    <mat-icon aria-hidden="true">block</mat-icon>
+    @if (consolidado.anulados_excluidos === 0) {
+      Ningún ingreso anulado en el periodo.
+    } @else {
+      {{ consolidado.anulados_excluidos }}
+      {{ consolidado.anulados_excluidos === 1 ? 'ingreso anulado excluido' : 'ingresos anulados excluidos' }}
+      del total.
+    }
+  </p>
+}

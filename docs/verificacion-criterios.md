@@ -325,8 +325,8 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
 | CA01 | AI | Cierre: `mensaje` con el destino; lote Cerrado con fecha y responsable | ✅ |
-| CA02 | M | Con pendientes: mensaje con la lista | ⬜ |
-| CA03 | M | Sin destino: mensaje literal | ⬜ |
+| CA02 | M | Con pendientes: mensaje con la lista | ✅ |
+| CA03 | M | Sin destino: mensaje literal | ✅ |
 | CA04 | M | Ya cerrado: sin acción; forzada, mensaje literal | ⬜ |
 | CA05 | R | Solo el Administrador ve «Cerrar» y «Cierre de lotes» | ⬜ |
 | CA06 | AI | Confirmación con el resumen y la diferencia **como estimación** | ✅ |
@@ -372,9 +372,9 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA12 | **I** | Pestaña Historial en orden cronológico (FB4) | ✅ |
 | CA13 | AI | Exportar descarga el CSV del conjunto completo, con el nombre del servidor | ✅ |
 | CA14 | M | Exportar vacío: mensaje literal (leído del blob) | ✅ |
-| CA15 | R | Supervisor sin «Exportar» | ⬜ |
+| CA15 | R | Supervisor sin «Exportar» | ✅ |
 | CA16 | AI | Cabecera: código o dígitos finales abren el detalle | ✅ |
-| CA17 | AI | Cabecera: otro texto lleva a la consulta con esa placa | ⬜ |
+| CA17 | AI | Cabecera: otro texto lleva a la consulta con esa placa | ✅ |
 
 ### HU-M07-03 · Calendario
 
@@ -384,10 +384,10 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA02 | AI | Día con anulados marcado con icono y texto | ✅ |
 | CA03 | AI | Día con En proceso marcado con icono y texto | ✅ |
 | CA04 | AI | Lista del día con hora, placa, código, mineral, neto y estado | ✅ |
-| CA05 | M | Día vacío: `mensaje` | ⬜ |
-| CA06 | AI | Navegar de mes recalcula días y resumen | ⬜ |
+| CA05 | M | Día vacío: `mensaje` | ✅ |
+| CA06 | AI | Navegar de mes recalcula días y resumen | ✅ |
 | CA07 | AI | Un ingreso del día abre su detalle | ⬜ |
-| CA08 | AI | Total del mes = consolidado del mes (FB7) | ⬜ |
+| CA08 | AI | Total del mes = consolidado del mes (FB7) | ✅ |
 
 ### HU-M07-04 · Inicio y avisos
 
@@ -400,10 +400,10 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA05 | AI | Un último ingreso abre su detalle | ⬜ |
 | CA06 | AI | Aviso por cada pendiente de destare que lleva a `/ingresos/destares` | ⬜ |
 | CA07 | AI | Administrador: «listo para cerrar» lleva a `/lotes/{id}/cerrar` | ⬜ |
-| CA08 | AI | Supervisor sin avisos de cierre ni de ingresos sin lote | ⬜ |
+| CA08 | AI | Supervisor sin avisos de cierre ni de ingresos sin lote | ✅ |
 | CA09 | M | Nada pendiente: `mensaje` | ⬜ |
 | CA10 | AI | Tras el destare, el aviso desaparece al reabrir | ⬜ |
-| CA11 | AI | Cifra sin permiso: sin enlace | ⬜ |
+| CA11 | AI | Cifra sin permiso: sin enlace | ✅ |
 
 ---
 
@@ -413,25 +413,25 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | Toneladas por cada tipo de mineral del periodo | ⬜ |
-| CA02 | AI | Anulados fuera; `anulados_excluidos` visible | ⬜ |
-| CA03 | M | Mes vacío: `mensaje` | ⬜ |
-| CA04 | M | Futuro: el selector no lo ofrece; forzado, mensaje literal | ⬜ |
+| CA01 | AI | Toneladas por cada tipo de mineral del periodo | ✅ |
+| CA02 | AI | Anulados fuera; `anulados_excluidos` visible | ✅ |
+| CA03 | M | Mes vacío: `mensaje` | ✅ |
+| CA04 | M | Futuro: el selector no lo ofrece; forzado, mensaje literal | ✅ |
 | CA05 | AI | Tras corregir un peso (FB3), el total cambia | ⬜ |
-| CA06 | R | Supervisor sin Consolidación | ⬜ |
-| CA07 | AI | `en_proceso_mensaje` visible | ⬜ |
+| CA06 | R | Supervisor sin Consolidación | ✅ |
+| CA07 | AI | `en_proceso_mensaje` visible | ✅ |
 | CA08 | S | — | ⬜ |
-| CA09 | AI | `al_corte` visible en el mes en curso | ⬜ |
+| CA09 | AI | `al_corte` visible en el mes en curso | ✅ |
 | CA10 | S | — | ⬜ |
 
 ### HU-M08-02 · Exportación
 
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
-| CA01 | AI | XLSX con total e ingresos por mineral | ⬜ |
-| CA02 | M | Mes vacío: mensaje literal (leído del blob) | ⬜ |
-| CA03 | AI | Archivo = pantalla, fila por fila | ⬜ |
-| CA04 | R | Supervisor sin exportar | ⬜ |
+| CA01 | AI | XLSX con total e ingresos por mineral | ✅ |
+| CA02 | M | Mes vacío: mensaje literal (leído del blob) | ✅ |
+| CA03 | AI | Archivo = pantalla, fila por fila | ✅ |
+| CA04 | R | Supervisor sin exportar | ✅ |
 | CA05 | S | Visible en FB4 | ⬜ |
 
 ---
@@ -465,9 +465,9 @@ llena al cerrar cada puerta; un criterio **S** sin observación indirecta se mar
 | CA | Tipo | Qué se revisa en la interfaz | Estado |
 |---|---|---|---|
 | CA01 | AI | Del más reciente al más antiguo, con entidad, referencia y autor | ✅ |
-| CA02 | AI | Filtros de usuario, acción y referencia combinados | ⬜ |
+| CA02 | AI | Filtros de usuario, acción y referencia combinados | ✅ |
 | CA03 | AI | Antes, después y motivo en el detalle | ✅ |
-| CA04 | M | Sin resultados: `mensaje` | ⬜ |
+| CA04 | M | Sin resultados: `mensaje` | ✅ |
 | CA05 | R | Solo el Administrador ve Auditoría | ✅ |
 
 ---

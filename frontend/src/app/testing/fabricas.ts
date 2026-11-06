@@ -1,3 +1,4 @@
+import { Consolidado } from '@models/consolidacion.model';
 import { Aviso, CalendarioMes, FilaIngreso, InicioDia, ResultadoConsulta } from '@models/consulta.model';
 import { Evento } from '@models/evento.model';
 import { Lote, LoteFila, ResumenLote } from '@models/lote.model';
@@ -516,6 +517,40 @@ export function crearAviso(cambios: Partial<Aviso> = {}): Aviso {
     detalle: 'Vehículo ABC-123, peso bruto 32.40 t',
     enlace: '/ingresos/destares',
     ingreso: 331,
+    ...cambios,
+  };
+}
+
+/** Noviembre de 2026 con dos minerales, un En proceso y un anulado (el mes en curso de los datos). */
+export function crearConsolidado(cambios: Partial<Consolidado> = {}): Consolidado {
+  return {
+    anio: 2026,
+    mes: 11,
+    tipos_mineral: [
+      {
+        tipo_mineral: 1,
+        codigo: 'MOA',
+        nombre: 'Mineral óxido Pingüino',
+        ingresos: 3,
+        toneladas: '49.20',
+        participacion: '58.02',
+      },
+      {
+        tipo_mineral: 2,
+        codigo: 'MOB',
+        nombre: 'Mineral óxido tipo B',
+        ingresos: 2,
+        toneladas: '35.60',
+        participacion: '41.98',
+      },
+    ],
+    total_toneladas: '84.80',
+    total_ingresos: 5,
+    en_proceso: { cantidad: 1, codigos: ['ING-2026-00005'] },
+    anulados_excluidos: 1,
+    mensaje: null,
+    en_proceso_mensaje: 'Hay 1 ingresos en proceso en el periodo, pendientes del destare',
+    al_corte: 'Total al corte de hoy, 04/11/2026',
     ...cambios,
   };
 }

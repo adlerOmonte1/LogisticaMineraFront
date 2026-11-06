@@ -1,107 +1,105 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 
-import { LoteFila, ResumenLote } from '@models/lote.model';
-import { InsigniaEstadoComponent } from '@shared/components/insignia-estado/insignia-estado.component';
+import { ETIQUETA_DESTINO, LoteFila, ResumenLote } from '@models/lote.model';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
+import { FichaComponent } from '@shared/components/ficha/ficha.component';
 
-type EstadoCierre = 'calculando' | 'no-disponible' | 'listo' | 'pendientes';
+export type ModoCierre = 'listos' | 'proceso' | 'cerrados';
 
 /**
- * Lotes en recorrido con su estado de cierre: «Listo» o cuántos pendientes tiene, según el
- * resumen que calcula el servidor (HU-M06-05). Mientras el resumen de un lote no llega —o falló—
- * se indica sin suponer nada. Presentacional.
+ * Una de las tres tablas de «Cierre de lotes» de la maqueta (`pAltas`): lote con su código y
+ * mineral, toneladas registradas, bigbags y el estado —«Listo para cerrar», lo primero que falta
+ * según el servidor, o el destino del lote cerrado—. La fila abre el resumen de cierre
+ * (HU-M06-05). Presentacional.
  */
 @Component({
   selector: 'app-tabla-cierre',
   standalone: true,
-  imports: [MatButtonModule, MatTableModule, RouterLink, InsigniaEstadoComponent, ToneladasPipe],
+  imports: [FichaComponent, RouterLink, ToneladasPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    :host {
-      display: block;
-      overflow-x: auto;
-    }
-  `,
   template: `
-    <table mat-table [dataSource]="lotes()" class="tabla">
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef>Lote</th>
-        <td mat-cell *matCellDef="let lote" data-prueba="nombre">
-          <strong>{{ lote.nombre }}</strong>
-          <span class="texto-secundario monoespaciado"> {{ lote.codigo }}</span>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="mineral">
-        <th mat-header-cell *matHeaderCellDef>Mineral</th>
-        <td mat-cell *matCellDef="let lote" data-etiqueta="Mineral">{{ lote.tipo_mineral_nombre }}</td>
-      </ng-container>
-      <ng-container matColumnDef="toneladas">
-        <th mat-header-cell *matHeaderCellDef>Toneladas</th>
-        <td mat-cell *matCellDef="let lote" class="monoespaciado" data-etiqueta="Toneladas">
-          {{ lote.toneladas | toneladas }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="cierre">
-        <th mat-header-cell *matHeaderCellDef>Estado del cierre</th>
-        <td mat-cell *matCellDef="let lote" data-prueba="estado-cierre">
-          @switch (estado(lote)) {
-            @case ('calculando') {
-              <span class="texto-secundario">Calculando…</span>
-            }
-            @case ('no-disponible') {
-              <span class="texto-secundario">No disponible</span>
-            }
-            @case ('listo') {
-              <app-insignia-estado texto="Listo para cerrar" tono="exito" />
-            }
-            @default {
-              <app-insignia-estado [texto]="textoPendientes(lote)" tono="aviso" />
-            }
+    <div class="lm-scroll">
+      <table class="lm-tabla">
+        <thead>
+          <tr>
+            <th>Lote</th>
+            <th class="r">Toneladas registradas</th>
+            <th class="r">Bigbags</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (lote of lotes(); track lote.id) {
+            <tr class="click" [routerLink]="['/lotes', lote.id, 'cerrar']" data-prueba="fila-cierre">
+              <td class="main" data-l="">
+                <a
+                  class="fila-enlace"
+                  [routerLink]="['/lotes', lote.id, 'cerrar']"
+                  [attr.aria-label]="'Resumen de cierre de ' + lote.nombre"
+                  data-prueba="cerrar-lote"
+                  >{{ lote.nombre }}</a
+                >
+                <div class="lm-xs lm-faint detalle" data-prueba="nombre">
+                  {{ lote.codigo }}, {{ lote.tipo_mineral_nombre }}
+                </div>
+              </td>
+              <td class="r" data-l="Registrado">{{ lote.toneladas | toneladas }}</td>
+              <td class="r" data-l="Bigbags">{{ bigbags(lote) }}</td>
+              <td data-l="Estado" class="estado" data-prueba="estado-cierre">
+                @switch (modo()) {
+                  @case ('listos') {
+                    <app-ficha color="green" [punto]="true">Listo para cerrar</app-ficha>
+                  }
+                  @case ('cerrados') {
+                    <app-ficha color="gray" [punto]="true">Cerrado · {{ destino(lote) }}</app-ficha>
+                  }
+                  @default {
+                    <span class="lm-small lm-muted">{{ pendiente(lote) }}</span>
+                  }
+                }
+              </td>
+            </tr>
           }
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Cerrar</span></th>
-        <td mat-cell *matCellDef="let lote" class="celda-acciones">
-          <a
-            mat-flat-button
-            color="primary"
-            [routerLink]="['/lotes', lote.id, 'cerrar']"
-            [attr.aria-label]="'Cerrar el lote ' + lote.nombre"
-            data-prueba="cerrar-lote"
-          >
-            Cerrar
-          </a>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-      <tr mat-row *matRowDef="let lote; columns: columnas" data-prueba="fila-cierre"></tr>
-    </table>
+        </tbody>
+      </table>
+    </div>
+  `,
+  styles: `
+    .detalle {
+      font-weight: 400;
+    }
+    .estado {
+      white-space: normal;
+    }
   `,
 })
 export class TablaCierreComponent {
   readonly lotes = input.required<readonly LoteFila[]>();
   /** Resumen por id de lote: sin clave, todavía no llegó; `null`, no se pudo leer. */
-  readonly resumenes = input.required<Readonly<Record<number, ResumenLote | null>>>();
+  readonly resumenes = input<Readonly<Record<number, ResumenLote | null>>>({});
+  readonly modo = input<ModoCierre>('proceso');
 
-  protected readonly columnas = ['nombre', 'mineral', 'toneladas', 'cierre', 'acciones'];
-
-  protected estado(lote: LoteFila): EstadoCierre {
+  protected bigbags(lote: LoteFila): string {
     const resumen = this.resumenes()[lote.id];
-    if (resumen === undefined) {
-      return 'calculando';
-    }
-    if (resumen === null) {
-      return 'no-disponible';
-    }
-    return resumen.pendientes.length === 0 ? 'listo' : 'pendientes';
+    return resumen && resumen.bigbags > 0 ? String(resumen.bigbags) : '—';
   }
 
-  protected textoPendientes(lote: LoteFila): string {
-    const n = this.resumenes()[lote.id]?.pendientes.length ?? 0;
-    return `${n} ${n === 1 ? 'pendiente' : 'pendientes'}`;
+  protected destino(lote: LoteFila): string {
+    return lote.destino ? ETIQUETA_DESTINO[lote.destino] : 'sin destino';
+  }
+
+  /** «Falta el secado del lote y 2 más», con el texto del servidor. */
+  protected pendiente(lote: LoteFila): string {
+    const resumen = this.resumenes()[lote.id];
+    if (resumen === undefined) {
+      return 'Calculando…';
+    }
+    if (resumen === null) {
+      return 'No disponible';
+    }
+    const [primero, ...resto] = resumen.pendientes;
+    const texto = primero ? primero.charAt(0).toUpperCase() + primero.slice(1) : '';
+    return resto.length > 0 ? `${texto} y ${resto.length} más` : texto;
   }
 }

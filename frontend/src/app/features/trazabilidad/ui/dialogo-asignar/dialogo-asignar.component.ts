@@ -12,6 +12,7 @@ import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.
 import { DatosDialogoEnvio, DialogoEnvioBase } from '@shared/dialogos/dialogo-envio.base';
 import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoAsignar extends DatosDialogoEnvio<CuerpoAsignar, RespuestaLote> {
   disponibles: DisponiblesLote;
@@ -27,6 +28,7 @@ export interface DatosDialogoAsignar extends DatosDialogoEnvio<CuerpoAsignar, Re
   selector: 'app-dialogo-asignar',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     NgTemplateOutlet,
     ReactiveFormsModule,
     MatButtonModule,
@@ -40,7 +42,7 @@ export interface DatosDialogoAsignar extends DatosDialogoEnvio<CuerpoAsignar, Re
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
       <mat-dialog-content>
         <app-aviso-error [error]="envio.error()" />

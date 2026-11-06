@@ -7,6 +7,7 @@ import {
   FormularioUsuarioComponent,
   ValorFormularioUsuario,
 } from './formulario-usuario/formulario-usuario.component';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoUsuario extends DatosDialogoEnvio<ValorFormularioUsuario, UsuarioDetalle> {
   usuario: UsuarioDetalle | null;
@@ -15,10 +16,10 @@ export interface DatosDialogoUsuario extends DatosDialogoEnvio<ValorFormularioUs
 @Component({
   selector: 'app-dialogo-usuario',
   standalone: true,
-  imports: [MatDialogModule, FormularioUsuarioComponent],
+  imports: [CabeceraDialogoComponent, MatDialogModule, FormularioUsuarioComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <mat-dialog-content>
       <app-formulario-usuario
         [usuario]="datos.usuario"

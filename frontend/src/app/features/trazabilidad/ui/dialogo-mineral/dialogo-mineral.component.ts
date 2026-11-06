@@ -9,6 +9,7 @@ import { RespuestaLote } from '@models/lote.model';
 import { TipoMineral } from '@models/tipo-mineral.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { DatosDialogoEnvio, DialogoEnvioBase } from '@shared/dialogos/dialogo-envio.base';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoMineral extends DatosDialogoEnvio<number | null, RespuestaLote> {
   minerales: readonly TipoMineral[];
@@ -22,6 +23,7 @@ export interface DatosDialogoMineral extends DatosDialogoEnvio<number | null, Re
   selector: 'app-dialogo-mineral',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     ReactiveFormsModule,
     MatButtonModule,
     MatDialogModule,
@@ -31,7 +33,7 @@ export interface DatosDialogoMineral extends DatosDialogoEnvio<number | null, Re
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
       <mat-dialog-content>
         <app-aviso-error [error]="envio.error()" />

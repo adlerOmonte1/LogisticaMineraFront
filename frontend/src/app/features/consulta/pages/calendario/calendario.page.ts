@@ -2,11 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { RouterLink } from '@angular/router';
 
 import { comoErrorApi } from '@core/errores/error-inesperado';
 import { CalendarioMes, DiaCalendario } from '@models/consulta.model';
 import { ErrorApi } from '@models/error-api.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
+import { CifraComponent } from '@shared/components/cifra/cifra.component';
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
 import { EstadoVacioComponent } from '@shared/components/estado-vacio/estado-vacio.component';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
@@ -15,6 +17,13 @@ import { ConsultaApiService } from '../../data-access/consulta-api.service';
 import { TablaIngresosComponent } from '../../ui/tabla-ingresos/tabla-ingresos.component';
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] as const;
+
+const FORMATO_DIA = new Intl.DateTimeFormat('es-PE', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'UTC',
+});
 
 const FORMATO_MES = new Intl.DateTimeFormat('es-PE', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
@@ -33,7 +42,8 @@ export function celdasPrevias(anio: number, mes: number): number {
 }
 
 /**
- * Calendario de llegadas (HU-M07-03): cada día con sus ingresos y toneladas **como texto**, y los
+ * Calendario de llegadas (HU-M07-03, disposición de `pCalendario`, D-F46): las cifras del mes, la
+ * cuadrícula con el color más intenso según las toneladas, y el día elegido al lado. Cada día con sus ingresos y toneladas **como texto**, y los
  * días con anulados o con ingresos En proceso marcados con icono y palabra, no solo con color
  * (RNF-M07-11). Al elegir un día se lista con hora, placa, código, mineral, neto y estado; un
  * día sin llegadas muestra el mensaje del servidor.
@@ -45,7 +55,9 @@ export function celdasPrevias(anio: number, mes: number): number {
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    RouterLink,
     AvisoErrorComponent,
+    CifraComponent,
     EncabezadoPaginaComponent,
     EstadoVacioComponent,
     TablaIngresosComponent,
@@ -71,6 +83,12 @@ export class CalendarioPage implements OnInit {
   );
   protected readonly previas = computed(() => Array.from({ length: celdasPrevias(this.anio(), this.mes()) }));
   protected readonly numeroDeDia = numeroDeDia;
+  /** El día de hoy en la zona de la planta, para señalarlo en la cuadrícula (D-F17). */
+  protected readonly hoy = signal(separarFechaYHoraLima(new Date().toISOString()).fecha);
+  /** El mayor del mes: solo escala el color de cada día, no se usa para ningún total. */
+  private readonly mayorDelMes = computed(() =>
+    Math.max(0, ...(this.datos()?.dias ?? []).map((d) => Number(d.toneladas))),
+  );
 
   ngOnInit(): void {
     this.irAlMesActual();
@@ -95,6 +113,20 @@ export class CalendarioPage implements OnInit {
   protected elegirDia(dia: DiaCalendario): void {
     this.diaElegido.set(numeroDeDia(dia.fecha));
     this.cargar();
+  }
+
+  /** Más toneladas, más intenso el dorado del día (la cifra sigue escrita en la celda). */
+  protected fondo(dia: DiaCalendario): string | null {
+    const mayor = this.mayorDelMes();
+    const valor = Number(dia.toneladas);
+    return mayor > 0 && valor > 0
+      ? `color-mix(in srgb, var(--gold) ${Math.round((valor / mayor) * 45)}%, var(--surface))`
+      : null;
+  }
+
+  protected tituloDia(fecha: string): string {
+    const texto = FORMATO_DIA.format(new Date(`${fecha}T12:00:00Z`));
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
   }
 
   /** «3 ingresos, 39,60 t, con anulados» para quien lee la cuadrícula con un lector de pantalla. */

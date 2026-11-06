@@ -1,4 +1,7 @@
-<app-encabezado-pagina titulo="Trazabilidad" subtitulo="Lotes de proceso y su recorrido por las etapas">
+<app-encabezado-pagina
+  titulo="Lotes de proceso"
+  subtitulo="Agrupe los ingresos que se procesan juntos y siga su recorrido: secado, zarandeo y, según el caso, molienda y ensacado"
+>
   <a
     *appSiPuede="'COMPONER_LOTE'"
     mat-flat-button
@@ -11,55 +14,65 @@
   </a>
 </app-encabezado-pagina>
 
-<app-marco-listado
-  [cargando]="listado.cargando()"
-  [vacio]="listado.vacio()"
-  [error]="listado.error()"
-  [total]="listado.total()"
-  [pagina]="listado.pagina()"
-  mensajeVacio="No hay lotes con estos filtros"
-  iconoVacio="account_tree"
-  (cambioPagina)="listado.irAPagina($event)"
->
-  <ng-container filtros>
-    <mat-form-field>
-      <mat-label>Estado</mat-label>
-      <mat-select [ngModel]="listado.filtro().estado" (ngModelChange)="filtrarPorEstado($event)">
-        <mat-option [value]="null">Todos</mat-option>
-        @for (estado of estados; track estado) {
-          <mat-option [value]="estado">{{ etiquetaEstado[estado] }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Mineral</mat-label>
-      <mat-select [ngModel]="listado.filtro().tipo_mineral" (ngModelChange)="filtrarPorMineral($event)">
-        <mat-option [value]="null">Todos</mat-option>
-        @for (mineral of minerales(); track mineral.id) {
-          <mat-option [value]="mineral.id">{{ mineral.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Apertura desde</mat-label>
-      <input
-        matInput
-        type="date"
-        [ngModel]="listado.filtro().desde"
-        (ngModelChange)="filtrarPorFechas({ desde: $event ?? '' })"
-        data-prueba="desde"
-      />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Apertura hasta</mat-label>
-      <input
-        matInput
-        type="date"
-        [ngModel]="listado.filtro().hasta"
-        (ngModelChange)="filtrarPorFechas({ hasta: $event ?? '' })"
-        data-prueba="hasta"
-      />
-    </mat-form-field>
-  </ng-container>
-  <app-tabla-lotes [lotes]="listado.filas()" />
-</app-marco-listado>
+<div class="lm-pila">
+  @if (sinLote(); as aviso) {
+    <app-aviso-franja color="blue" icono="info" data-prueba="aviso-sin-lote">
+      <b>{{ aviso.titulo }}</b>
+      @if (aviso.detalle) {
+        · {{ aviso.detalle }}
+      }
+    </app-aviso-franja>
+  }
+
+  <app-marco-listado
+    [cargando]="listado.cargando()"
+    [vacio]="listado.vacio()"
+    [error]="listado.error()"
+    [total]="listado.total()"
+    [pagina]="listado.pagina()"
+    mensajeVacio="No hay lotes en esta vista"
+    iconoVacio="inventory_2"
+    (cambioPagina)="listado.irAPagina($event)"
+  >
+    <ng-container filtros>
+      <div class="filtro-estado">
+        <app-segmentos
+          etiqueta="Estado del lote"
+          [opciones]="segmentos"
+          [valor]="listado.filtro().estado"
+          (cambio)="filtrarPorEstado($event)"
+        />
+      </div>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Mineral</mat-label>
+        <mat-select [ngModel]="listado.filtro().tipo_mineral" (ngModelChange)="filtrarPorMineral($event)">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (mineral of minerales(); track mineral.id) {
+            <mat-option [value]="mineral.id">{{ mineral.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Apertura desde</mat-label>
+        <input
+          matInput
+          type="date"
+          [ngModel]="listado.filtro().desde"
+          (ngModelChange)="filtrarPorFechas({ desde: $event ?? '' })"
+          data-prueba="desde"
+        />
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Apertura hasta</mat-label>
+        <input
+          matInput
+          type="date"
+          [ngModel]="listado.filtro().hasta"
+          (ngModelChange)="filtrarPorFechas({ hasta: $event ?? '' })"
+          data-prueba="hasta"
+        />
+      </mat-form-field>
+    </ng-container>
+    <app-tabla-lotes [lotes]="listado.filas()" />
+  </app-marco-listado>
+</div>

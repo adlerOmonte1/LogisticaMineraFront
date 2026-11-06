@@ -639,3 +639,93 @@ consolidación **no** debe ofrecerlos (CA04). Se decide:
   mes en curso.
 - El cliente no suma ni redondea: la tabla y el total son los del servidor, con las mismas columnas
   y en el mismo orden que el XLSX, para comparar fila por fila (HU-M08-02 CA03).
+
+---
+
+# Rediseño de Trazabilidad con la maqueta (2026-11-05)
+
+## D-F45. Las pantallas de Trazabilidad siguen la disposición de la maqueta
+
+**Fecha:** 2026-11-05 · **Fase:** FB5 (rediseño) · Aplica D-F18 · Reemplaza la presentación de FB5
+
+Las pantallas de lotes quedaron como listas de datos (`dl`, listas sueltas, un bloque «Siguiente
+paso» aparte del recorrido) y en la revisión no se entendía en qué etapa estaba cada parte. La
+maqueta (`pLotes`, `pLote`, `pAltas`, `pAlta`) lo resuelve con un flujo visual. Se adopta su
+disposición, con sus mismos nombres de clase para compararlas directo:
+
+- **Componentes, no clases sueltas.** Las piezas con identidad son componentes con estilos
+  encapsulados: `app-ficha` (la `pill` de la maqueta) y `app-aviso-franja` (el `banner`) en
+  `shared/`, y `app-tarjeta-etapa` y `app-flujo-lote` en Trazabilidad; la cifra (`kpi`), la línea
+  de tiempo y los segmentos viven en el componente que los usa. En `src/estilos/_maqueta.scss`
+  quedan solo los tokens que faltaban (`--purple`, `--ink`, `--font-d`…, sin colores fijos en los
+  componentes) y utilidades de disposición con prefijo `lm-` (`lm-card`, `lm-kv`, `lm-tabla`,
+  `lm-grid`…), para no chocar con Material ni con librerías.
+- **Detalle del lote:** fichas de estado y avance, cifras del lote, un aviso según el estado y
+  «Recorrido del mineral»: etapa común, división y una columna por parte, con una tarjeta por etapa
+  (completada, siguiente o pendiente). El botón de registrar vive **en la tarjeta** de la etapa
+  que sigue; los tardíos con secado propio van aparte. Reemplaza `siguiente-paso`, `partes-lote` y
+  `recorrido-lote`.
+- **El cliente no decide qué etapa sigue** (RNF-M06-07): `construirFlujo` solo acomoda
+  `recorrido` (hecho) y `siguientes` (lo que sigue) en las tarjetas de la ruta del catálogo. Un
+  `siguientes` que no encaja en ninguna tarjeta se ofrece igual en «Otros pasos pendientes», para
+  no perder una acción.
+- **«Listo para cerrar»** es un lote en recorrido sin `pendientes` del servidor. «Cerrar lote»
+  aparece en el detalle solo entonces, como en la maqueta; el resumen de cierre sigue permitiendo
+  intentarlo con pendientes y el servidor responde con su mensaje (HU-M06-05 CA02).
+- **Cierre de lotes** en tres secciones (listos, en proceso con lo primero que falta, cerrados con
+  su destino); el resumen de un lote con cuatro cifras, tiempos, resultado por parte, recorrido en
+  línea de tiempo e ingresos.
+- **Lo que la maqueta tiene y el contrato no:** el avance de la lista de lotes, sus bigbags y el
+  filtro «Listos para cerrar» (la lista `GET lotes/` no los trae); los códigos de bigbag; y el
+  rendimiento t/h por etapa (solo llega al registrar la molienda y en el resumen). No se inventan
+  en el cliente. Se conservan los filtros de mineral y fechas, que la maqueta no tiene (HU-M06-01).
+
+Se revisaría si el backend agrega avance y bigbags a `GET lotes/`.
+
+## D-F46. Consulta con la disposición de la maqueta; la tarjeta global se alinea
+
+**Fecha:** 2026-11-05 · **Fase:** FB6 (rediseño) · Aplica D-F45
+
+Se rediseñan inicio, listado, calendario, consulta por placa y detalle del ingreso con la
+disposición de `pInicio`, `pIngresos`, `pCalendario`, `pConsulta` y `pDetalle`:
+
+- **Inicio:** cuatro cifras con su icono y unidad, y debajo «Últimos ingresos» junto al gráfico de
+  7 días (hoy resaltado). Se retiran los accesos por rol: repetían el menú lateral y la maqueta no
+  los tiene.
+- **Calendario:** cifras del mes arriba, cuadrícula con el dorado más intenso según las toneladas
+  (la cifra sigue escrita en cada celda), «hoy» marcado y el día elegido en un panel al lado.
+- **Listado:** botones segmentados por estado (`app-segmentos`) y el resumen del conjunto en la
+  misma tarjeta. **Detalle:** enlace «‹ Ingresos», código grande, fichas de estado, aviso rojo del
+  anulado o naranja del En proceso, pestañas segmentadas y los datos en rejilla.
+- **Componentes compartidos nuevos:** `app-cifra` (reemplaza a `cifra-inicio`) y `app-segmentos`.
+  `app-insignia-ingreso` y `app-marca-sin-respaldo` pasan a pintarse con `app-ficha`, así que el
+  estado del ingreso se ve igual en todas las pantallas.
+- **La tarjeta global `.tarjeta`** pasa de 14 px de radio y 16 px de relleno a 6 px y 20 px, como
+  la `card` de la maqueta. Es un cambio **para todas las pantallas**, deliberado y barato.
+
+**No se copió de la maqueta** (el contrato no lo da o contradice una regla): las «búsquedas
+frecuentes» de la consulta (placas fijas de la maqueta, no hay dato del servidor), el menú de
+acciones por fila y el aviso con un texto fijo de pendientes (los avisos los manda el servidor, en
+la campana). En la consulta por placa se mantiene la tabla de resultados completa sobre el ticket
+y los datos, en lugar de la lista compacta junto a ellos; la pestaña Reconocimiento y la de
+Validación siguen con tabla de Material.
+
+## D-F47. Diálogos con el formato de hoja y de alerta de la maqueta
+
+**Fecha:** 2026-11-05 · **Fase:** FB5–FB6 (rediseño) · Aplica D-F45 y D-F46
+
+Los diálogos eran el contenedor de Material sin tocar: título pequeño, sin borde, pie sin fondo.
+Se alinean con `modal`, `sheet` y `alertBox` de la maqueta:
+
+- **Estilo central, no por diálogo.** `DialogosService` abre todo con `panelClass: 'dialogo-maqueta'`
+  y `estilos/_dialogos.scss` da el borde dorado superior, el radio de 6 px, el título grande, el
+  cuerpo con aire y el pie con fondo propio y filete. En teléfono la hoja sube desde abajo y ocupa
+  el ancho (`:has()` sobre el contenedor global de Material).
+- **`app-cabecera-dialogo`** (en `shared/`): título a la izquierda y botón «Cerrar» a la derecha. El
+  título sigue siendo el `mat-dialog-title`, así que el diálogo queda nombrado. Cerrar equivale a
+  «Cancelar». Lo usan los 13 diálogos de formulario (lotes, etapas, bigbags, división, asignar,
+  usuarios, catálogos, tara, evento de auditoría…).
+- **La confirmación** usa el formato de alerta: icono (aviso naranja si la acción cambia el estado
+  de un registro), título y mensaje centrados y dos botones a lo ancho.
+- Sin cambios de lógica: los diálogos siguen devolviendo lo mismo y el rechazo del servidor sigue
+  mostrándose literal dentro del diálogo.

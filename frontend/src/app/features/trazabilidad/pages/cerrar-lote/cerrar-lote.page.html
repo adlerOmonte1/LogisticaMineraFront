@@ -4,48 +4,83 @@
 }
 
 @if (lote(); as lote) {
-  <app-encabezado-pagina [titulo]="'Cerrar ' + lote.nombre" [subtitulo]="lote.codigo" />
+  <app-encabezado-pagina
+    [titulo]="'Resumen de ' + lote.nombre"
+    [subtitulo]="subtitulo()"
+    [volver]="{ texto: 'Cierre de lotes', ruta: '/lotes/cierre' }"
+  >
+    <a mat-stroked-button [routerLink]="['/lotes', lote.id]" data-prueba="ver-lote">Ver lote</a>
+  </app-encabezado-pagina>
 
-  @if (resumen(); as resumen) {
-    <app-resumen-cierre [resumen]="resumen" />
-  }
+  <div class="lm-pila">
+    @if (lote.estado === 'CERRADO') {
+      <app-aviso-franja color="green" icono="task_alt" data-prueba="no-cerrable">
+        Cerrado con destino {{ lote.destino_texto.toLowerCase() }} el {{ lote.fecha_cierre | fechaLima }} por
+        {{ lote.usuario_cierre }}.
+        @if (lote.observacion_cierre) {
+          Observación: {{ lote.observacion_cierre }}.
+        }
+        El lote quedó cerrado: no admite más ingresos ni etapas.
+      </app-aviso-franja>
+    } @else if (lote.estado === 'ABIERTO') {
+      <app-aviso-franja color="orange" icono="schedule" data-prueba="no-cerrable"
+        >El lote sigue abierto: inicie su recorrido antes de pensar en cerrarlo.</app-aviso-franja
+      >
+    } @else if (resumen()?.pendientes?.length) {
+      <app-aviso-franja color="orange" icono="schedule" data-prueba="pendientes">
+        Todavía no se puede cerrar el lote. Pendiente:
+        @for (pendiente of resumen()?.pendientes; track pendiente; let ultimo = $last) {
+          {{ pendiente }}{{ ultimo ? '.' : ';' }}
+        }
+      </app-aviso-franja>
+    } @else {
+      <app-aviso-franja color="blue" icono="info" data-prueba="listo"
+        >Todo el mineral está ensacado. Revise el resumen y ciérrelo con su destino.</app-aviso-franja
+      >
+    }
 
-  @if (cerrable()) {
-    <form class="tarjeta formulario" [formGroup]="formulario" (ngSubmit)="cerrar()" novalidate>
-      <app-aviso-error class="formulario__ancho" [error]="envio.error()" />
+    @if (cerrable()) {
+      <form
+        class="lm-card"
+        [formGroup]="formulario"
+        (ngSubmit)="cerrar()"
+        novalidate
+        data-prueba="formulario-cierre"
+      >
+        <h2 class="lm-seccion sin-margen">Cerrar con destino</h2>
+        <app-aviso-error [error]="envio.error()" />
+        <div class="formulario">
+          <mat-form-field>
+            <mat-label>Destino</mat-label>
+            <mat-select formControlName="destino" data-prueba="destino">
+              @for (destino of destinos(); track destino.codigo) {
+                <mat-option [value]="destino.codigo">{{ destino.nombre }}</mat-option>
+              }
+            </mat-select>
+            <mat-error>{{ formulario.controls.destino | errorCampo }}</mat-error>
+          </mat-form-field>
+          <mat-form-field class="formulario__ancho">
+            <mat-label>Observación (opcional)</mat-label>
+            <textarea matInput rows="2" formControlName="observacion" data-prueba="observacion"></textarea>
+          </mat-form-field>
+        </div>
+        <div class="lm-fila acciones">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="envio.enviando()"
+            data-prueba="confirmar-cierre"
+          >
+            <mat-icon>task_alt</mat-icon>
+            Cerrar lote
+          </button>
+        </div>
+      </form>
+    }
 
-      <mat-form-field>
-        <mat-label>Destino</mat-label>
-        <mat-select formControlName="destino" data-prueba="destino">
-          @for (destino of destinos(); track destino.codigo) {
-            <mat-option [value]="destino.codigo">{{ destino.nombre }}</mat-option>
-          }
-        </mat-select>
-        <mat-error>{{ formulario.controls.destino | errorCampo }}</mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="formulario__ancho">
-        <mat-label>Observación (opcional)</mat-label>
-        <textarea matInput rows="2" formControlName="observacion" data-prueba="observacion"></textarea>
-      </mat-form-field>
-
-      <div class="acciones-formulario formulario__ancho">
-        <a mat-button [routerLink]="['/lotes', lote.id]">Volver al lote</a>
-        <button
-          mat-flat-button
-          color="warn"
-          type="submit"
-          [disabled]="envio.enviando()"
-          data-prueba="confirmar-cierre"
-        >
-          Cerrar lote
-        </button>
-      </div>
-    </form>
-  } @else {
-    <p class="tarjeta" data-prueba="no-cerrable">
-      Este lote está {{ lote.estado === 'CERRADO' ? 'cerrado' : 'abierto' }} y no se puede cerrar desde aquí.
-      <a [routerLink]="['/lotes', lote.id]">Ver el lote</a>
-    </p>
-  }
+    @if (resumen(); as resumen) {
+      <app-resumen-cierre [resumen]="resumen" [lote]="lote" />
+    }
+  </div>
 }

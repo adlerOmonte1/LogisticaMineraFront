@@ -36,9 +36,9 @@ describe('IndicadorConfianzaComponent', () => {
 describe('Insignias del ingreso', () => {
   it('cada estado lleva su texto y su tono, no solo color', () => {
     const esperado: Record<EstadoIngreso, [string, string]> = {
-      REGISTRADO: ['Registrado', 'insignia--exito'],
-      EN_PROCESO: ['En proceso', 'insignia--aviso'],
-      ANULADO: ['Anulado', 'insignia--error'],
+      REGISTRADO: ['Registrado', 'ficha--green'],
+      EN_PROCESO: ['En proceso', 'ficha--orange'],
+      ANULADO: ['Anulado', 'ficha--red'],
     };
     for (const [estado, [texto, clase]] of Object.entries(esperado)) {
       const fixture = TestBed.createComponent(InsigniaIngresoComponent);
@@ -47,7 +47,6 @@ describe('Insignias del ingreso', () => {
       const raiz: HTMLElement = fixture.nativeElement;
       expect(raiz.textContent).toContain(texto);
       expect(raiz.querySelector(`.${clase}`)).not.toBeNull();
-      expect(raiz.querySelector('mat-icon')).not.toBeNull();
     }
   });
 
@@ -57,7 +56,7 @@ describe('Insignias del ingreso', () => {
     fixture.detectChanges();
     const raiz: HTMLElement = fixture.nativeElement;
     expect(raiz.textContent).toContain('Sin respaldo fotográfico');
-    expect(raiz.querySelector('app-insignia-estado')?.getAttribute('title')).toBe('Sin cámara');
+    expect(raiz.querySelector('app-ficha')?.getAttribute('title')).toBe('Sin cámara');
   });
 });
 

@@ -11,6 +11,7 @@ import { CuerpoBigbags, ParteLote, RespuestaBigbags } from '@models/lote.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { DatosDialogoEnvio, DialogoEnvioBase } from '@shared/dialogos/dialogo-envio.base';
 import { normalizarDecimal } from '@shared/formularios/validadores';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoBigbags extends DatosDialogoEnvio<CuerpoBigbags, RespuestaBigbags> {
   partes: readonly ParteLote[];
@@ -25,6 +26,7 @@ export interface DatosDialogoBigbags extends DatosDialogoEnvio<CuerpoBigbags, Re
   selector: 'app-dialogo-bigbags',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -36,7 +38,7 @@ export interface DatosDialogoBigbags extends DatosDialogoEnvio<CuerpoBigbags, Re
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
       <mat-dialog-content>
         <app-aviso-error [error]="envio.error()" />

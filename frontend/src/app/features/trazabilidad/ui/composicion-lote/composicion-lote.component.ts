@@ -1,129 +1,157 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
 
 import { ComposicionMineral, IngresoDeComposicion, Lote } from '@models/lote.model';
-import { InsigniaEstadoComponent } from '@shared/components/insignia-estado/insignia-estado.component';
 import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
+import { FichaComponent } from '@shared/components/ficha/ficha.component';
 
 /**
- * Composición del lote por tipo de mineral: cada ingreso con su código, fecha y peso neto, los
- * tardíos y el «Otro mineral» señalados con texto, y los totales (HU-M06-01 CA04, CA12, CA13,
- * CA16, CA17, CA21). Con `editable`, cada ingreso se puede retirar y cada mineral quitar;
- * quitar un mineral con ingresos lo rechaza el servidor con su mensaje (CA19). Presentacional.
+ * «Composición del lote», como la tabla de la maqueta: una fila de grupo por tipo de mineral con
+ * su subtotal, sus ingresos con fichas de texto (tardío, secado propio, otro mineral, anulado, en
+ * proceso) y el total del lote al pie (HU-M06-01 CA04, CA12, CA13, CA16, CA17, CA21). Con
+ * `editable`, cada ingreso se puede retirar y cada mineral quitar; lo que no procede lo rechaza el
+ * servidor con su mensaje (CA19). Cada código abre el detalle del ingreso. Presentacional.
  */
 @Component({
   selector: 'app-composicion-lote',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, FechaLimaPipe, InsigniaEstadoComponent, ToneladasPipe],
+  imports: [FichaComponent, MatButtonModule, RouterLink, FechaLimaPipe, ToneladasPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="tarjeta" aria-labelledby="titulo-composicion">
-      <h2 id="titulo-composicion" class="titulo">Composición</h2>
-      @for (grupo of composicion(); track grupo.tipo_mineral.id) {
-        <div class="grupo" data-prueba="grupo-mineral">
-          <div class="grupo__cabecera">
-            <h3 class="grupo__nombre" data-prueba="mineral">{{ grupo.tipo_mineral.nombre }}</h3>
-            @if (grupo.otro_mineral) {
-              <app-insignia-estado texto="Otro mineral" tono="aviso" />
-            }
-            <span class="texto-secundario" data-prueba="resumen-mineral">
-              {{ grupo.cantidad }} {{ grupo.cantidad === 1 ? 'ingreso' : 'ingresos' }} ·
-              {{ grupo.toneladas | toneladas }}
-            </span>
-            @if (editable()) {
-              <button
-                mat-button
-                type="button"
-                class="grupo__quitar"
-                data-prueba="quitar-mineral"
-                [attr.aria-label]="'Quitar el mineral ' + grupo.tipo_mineral.nombre"
-                (click)="quitarMineral.emit(grupo)"
-              >
-                <mat-icon>remove_circle_outline</mat-icon>
-                Quitar mineral
-              </button>
-            }
-          </div>
-          @if (grupo.autorizacion) {
-            <p class="texto-secundario" data-prueba="autorizacion">Autorización: {{ grupo.autorizacion }}</p>
-          }
-          @if (grupo.ingresos.length === 0) {
-            <p class="texto-secundario" data-prueba="grupo-vacio">Sin ingresos todavía</p>
-          } @else {
-            <ul class="ingresos">
-              @for (ingreso of grupo.ingresos; track ingreso.id) {
-                <li class="ingreso" data-prueba="ingreso">
-                  <span class="monoespaciado" data-prueba="codigo">{{ ingreso.codigo }}</span>
-                  <span class="texto-secundario">{{ ingreso.fecha_hora_pesaje | fechaLima }}</span>
-                  <span class="monoespaciado">{{ ingreso.peso_neto_tn | toneladas }}</span>
-                  @if (ingreso.secado_propio) {
-                    <app-insignia-estado texto="Tardío · secado propio" tono="aviso" />
-                  } @else if (ingreso.tardio) {
-                    <app-insignia-estado texto="Tardío" tono="aviso" />
+    <div class="lm-card lm-card--plana">
+      <div class="lm-scroll">
+        <table class="lm-tabla">
+          <thead>
+            <tr>
+              <th>Ingreso</th>
+              <th>Fecha del pesaje</th>
+              <th class="r">Peso neto</th>
+              @if (editable()) {
+                <th><span class="cdk-visually-hidden">Acciones</span></th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (grupo of composicion(); track grupo.tipo_mineral.id) {
+              <tr class="grp" data-prueba="grupo-mineral">
+                <td colspan="2" data-l="">
+                  <b data-prueba="mineral">{{ grupo.tipo_mineral.nombre }}</b>
+                  <span class="lm-xs lm-muted" data-prueba="resumen-mineral">
+                    {{ grupo.cantidad }} {{ grupo.cantidad === 1 ? 'ingreso' : 'ingresos' }}
+                  </span>
+                  @if (grupo.otro_mineral) {
+                    <app-ficha color="purple">Otro mineral</app-ficha>
                   }
-                  @if (editable()) {
+                  @if (grupo.autorizacion) {
+                    <div class="lm-xs lm-muted" data-prueba="autorizacion">
+                      Autorización: {{ grupo.autorizacion }}
+                    </div>
+                  }
+                </td>
+                <td class="r" data-l="Subtotal">
+                  <b>{{ grupo.toneladas | toneladas }}</b>
+                </td>
+                @if (editable()) {
+                  <td class="act">
                     <button
                       mat-button
                       type="button"
-                      data-prueba="retirar"
-                      [attr.aria-label]="'Retirar el ingreso ' + ingreso.codigo"
-                      (click)="retirar.emit(ingreso)"
+                      class="peligro"
+                      data-prueba="quitar-mineral"
+                      [attr.aria-label]="'Quitar el mineral ' + grupo.tipo_mineral.nombre"
+                      (click)="quitarMineral.emit(grupo)"
                     >
-                      Retirar
+                      Quitar
                     </button>
+                  </td>
+                }
+              </tr>
+              @for (ingreso of grupo.ingresos; track ingreso.id) {
+                <tr [class.dim]="ingreso.estado === 'ANULADO'" data-prueba="ingreso">
+                  <td class="main" data-l="Ingreso">
+                    <a
+                      class="enlace-ingreso"
+                      [routerLink]="['/consulta/ingresos', ingreso.id]"
+                      data-prueba="codigo"
+                      >{{ ingreso.codigo }}</a
+                    >
+                    @if (ingreso.secado_propio) {
+                      <app-ficha color="orange">Tardío · secado propio</app-ficha>
+                    } @else if (ingreso.tardio) {
+                      <app-ficha color="orange">Tardío</app-ficha>
+                    }
+                    @if (ingreso.otro_mineral) {
+                      <app-ficha color="purple">Otro mineral</app-ficha>
+                    }
+                    @if (ingreso.estado === 'ANULADO') {
+                      <app-ficha color="red">Anulado</app-ficha>
+                    } @else if (ingreso.estado === 'EN_PROCESO') {
+                      <app-ficha color="orange">En proceso</app-ficha>
+                    }
+                  </td>
+                  <td class="lm-num" data-l="Fecha">{{ ingreso.fecha_hora_pesaje | fechaLima }}</td>
+                  <td class="r" data-l="Peso neto">{{ ingreso.peso_neto_tn | toneladas }}</td>
+                  @if (editable()) {
+                    <td class="act">
+                      <button
+                        mat-button
+                        type="button"
+                        class="peligro"
+                        data-prueba="retirar"
+                        [attr.aria-label]="'Retirar el ingreso ' + ingreso.codigo"
+                        (click)="retirar.emit(ingreso)"
+                      >
+                        Retirar
+                      </button>
+                    </td>
                   }
-                </li>
+                </tr>
+              } @empty {
+                <tr>
+                  <td
+                    [attr.colspan]="editable() ? 4 : 3"
+                    class="lm-small lm-muted"
+                    data-l=""
+                    data-prueba="grupo-vacio"
+                  >
+                    Sin ingresos de este mineral todavía.
+                  </td>
+                </tr>
               }
-            </ul>
-          }
-        </div>
-      }
-      <p class="total" data-prueba="total">
-        <strong>Total:</strong> {{ total().ingresos }}
-        {{ total().ingresos === 1 ? 'ingreso registrado' : 'ingresos registrados' }} ·
-        <span class="monoespaciado">{{ total().toneladas | toneladas }}</span>
-      </p>
-    </section>
+            }
+          </tbody>
+          <tfoot>
+            <tr data-prueba="total">
+              <td colspan="2" data-l="">
+                Total del lote · {{ total().ingresos }}
+                {{ total().ingresos === 1 ? 'ingreso registrado' : 'ingresos registrados' }}
+              </td>
+              <td class="r" data-l="Total">{{ total().toneladas | toneladas }}</td>
+              @if (editable()) {
+                <td></td>
+              }
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   `,
   styles: `
-    .titulo {
-      margin: 0 0 12px;
-      font-size: 1.1rem;
+    app-ficha {
+      margin-left: 6px;
     }
-    .grupo {
-      padding: 8px 0 12px;
-      border-bottom: 1px solid var(--sep);
+    .enlace-ingreso {
+      color: inherit;
+      text-decoration: none;
+      &:hover {
+        color: var(--link);
+        text-decoration: underline;
+      }
     }
-    .grupo__cabecera {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px 12px;
-    }
-    .grupo__nombre {
-      margin: 0;
-      font-size: 1rem;
-    }
-    .grupo__quitar {
-      margin-left: auto;
-    }
-    .ingresos {
-      display: grid;
-      gap: 4px;
-      margin: 8px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-    .ingreso {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 4px 12px;
-    }
-    .total {
-      margin: 12px 0 0;
+    .peligro {
+      color: var(--red);
     }
   `,
 })

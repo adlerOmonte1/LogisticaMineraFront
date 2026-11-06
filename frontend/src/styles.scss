@@ -2,6 +2,8 @@
 // (LogisticaMinera/Mockup/index.html). Los tokens de color viven como variables CSS para lo
 // que Material no cubre: insignias de estado, armazón, avisos.
 @use '@angular/material' as mat;
+@use 'estilos/maqueta';
+@use 'estilos/dialogos';
 
 $paleta-oro: (
   50: #fcf5e8,
@@ -149,8 +151,8 @@ a {
 .tarjeta {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radio);
-  padding: 16px;
+  border-radius: 6px;
+  padding: 20px;
 }
 
 .tarjeta--plana {

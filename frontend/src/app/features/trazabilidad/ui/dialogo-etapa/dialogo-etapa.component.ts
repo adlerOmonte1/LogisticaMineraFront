@@ -22,6 +22,7 @@ import { DatosDialogoEnvio, DialogoEnvioBase } from '@shared/dialogos/dialogo-en
 import { normalizarDecimal } from '@shared/formularios/validadores';
 import { aIsoLima, separarFechaYHoraLima } from '@shared/utils/fecha-hora';
 import { sumarFracciones, textoSuma } from '@shared/utils/fraccion';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 /** Lo que el usuario llenó para registrar un paso; la página lo convierte en la llamada. */
 export interface ValorEtapa {
@@ -53,6 +54,7 @@ export interface DatosDialogoEtapa extends DatosDialogoEnvio<ValorEtapa, Respues
   selector: 'app-dialogo-etapa',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -64,7 +66,7 @@ export interface DatosDialogoEtapa extends DatosDialogoEnvio<ValorEtapa, Respues
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <p class="carga texto-secundario" data-prueba="carga">{{ datos.siguiente.carga }}</p>
     <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
       <mat-dialog-content>

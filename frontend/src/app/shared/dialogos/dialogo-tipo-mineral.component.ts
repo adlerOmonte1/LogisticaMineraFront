@@ -7,6 +7,7 @@ import {
   ValorTipoMineral,
 } from '../components/formulario-tipo-mineral/formulario-tipo-mineral.component';
 import { DatosDialogoEnvio, DialogoEnvioBase } from './dialogo-envio.base';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoTipoMineral extends DatosDialogoEnvio<ValorTipoMineral, TipoMineral> {
   tipoMineral: TipoMineral | null;
@@ -19,10 +20,10 @@ export interface DatosDialogoTipoMineral extends DatosDialogoEnvio<ValorTipoMine
 @Component({
   selector: 'app-dialogo-tipo-mineral',
   standalone: true,
-  imports: [MatDialogModule, FormularioTipoMineralComponent],
+  imports: [CabeceraDialogoComponent, MatDialogModule, FormularioTipoMineralComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <mat-dialog-content>
       <app-formulario-tipo-mineral
         [tipoMineral]="datos.tipoMineral"

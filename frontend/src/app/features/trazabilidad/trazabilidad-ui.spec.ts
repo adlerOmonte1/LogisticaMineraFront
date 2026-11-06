@@ -11,20 +11,21 @@ import {
   EtapaCatalogo,
   Lote,
   ParteLote,
+  PasoRecorrido,
   RutaCatalogo,
   SiguientePaso,
 } from '@models/lote.model';
 import { estabilizar } from '../../testing/estabilizar';
 import { crearLote } from '../../testing/fabricas';
+import { BigbagsLoteComponent } from './ui/bigbags-lote/bigbags-lote.component';
 import { ComposicionLoteComponent } from './ui/composicion-lote/composicion-lote.component';
 import { DialogoAsignarComponent } from './ui/dialogo-asignar/dialogo-asignar.component';
 import { DialogoBigbagsComponent } from './ui/dialogo-bigbags/dialogo-bigbags.component';
 import { DialogoDivisionComponent } from './ui/dialogo-division/dialogo-division.component';
 import { DialogoEtapaComponent } from './ui/dialogo-etapa/dialogo-etapa.component';
 import { DialogoMineralComponent } from './ui/dialogo-mineral/dialogo-mineral.component';
-import { PartesLoteComponent } from './ui/partes-lote/partes-lote.component';
-import { RecorridoLoteComponent } from './ui/recorrido-lote/recorrido-lote.component';
-import { SiguientePasoComponent } from './ui/siguiente-paso/siguiente-paso.component';
+import { construirFlujo } from './ui/flujo-lote/flujo-lote';
+import { FlujoLoteComponent } from './ui/flujo-lote/flujo-lote.component';
 
 const ETAPAS: EtapaCatalogo[] = [
   { codigo: 'SECADO', nombre: 'Secado', orden: 1 },
@@ -77,37 +78,237 @@ function textos(raiz: HTMLElement, prueba: string): string[] {
   return [...raiz.querySelectorAll(`[data-prueba="${prueba}"]`)].map((e) => e.textContent?.trim() ?? '');
 }
 
-describe('SiguientePasoComponent (RNF-M06-07)', () => {
-  it('ofrece un botón por cada carga que trae `siguientes`, y nada más', () => {
-    const { raiz } = montar(SiguientePasoComponent, {
-      siguientes: [paso(), paso({ carga: 'Parte A', parte: 1, etapa: 'ZARANDEO' })],
-      etapas: ETAPAS,
+const CATALOGO = { etapas: ETAPAS, rutas: RUTAS, destinos: [] };
+
+function pasoRecorrido(cambios: Partial<PasoRecorrido> = {}): PasoRecorrido {
+  return {
+    id: 1,
+    etapa: 'SECADO',
+    etapa_texto: 'Secado',
+    carga: 'Lote prueba',
+    parte: null,
+    ingreso_tardio: null,
+    fecha_hora: '2026-11-03T09:00:00-05:00',
+    usuario: 'sup.prueba',
+    horas_molienda: null,
+    observacion: '',
+    ...cambios,
+  };
+}
+
+const BIGBAG = {
+  id: 1,
+  parte: null,
+  cantidad: 9,
+  peso_aproximado_tn: '1.47',
+  recalculado: false,
+  es_estimacion: true,
+  fecha_hora: '2026-11-03T10:00:00-05:00',
+};
+
+describe('construirFlujo (RNF-M06-07)', () => {
+  it('la tarjeta siguiente es la que nombra `siguientes`; el cliente no la deduce', () => {
+    const flujo = construirFlujo(crearLote(), CATALOGO);
+    expect(flujo.secado.estado).toBe('next');
+    expect(flujo.secado.siguiente).toEqual(paso());
+    expect(flujo.lineas.length).toBe(1);
+    expect(flujo.lineas[0].etapas).toBeNull();
+    expect(flujo.sueltos).toEqual([]);
+  });
+
+  it('un lote abierto espera el inicio del recorrido', () => {
+    const flujo = construirFlujo(crearLote({ estado: 'ABIERTO', siguientes: [] }), CATALOGO);
+    expect(flujo.secado.estado).toBe('wait');
+  });
+
+  it('tras el secado, «Ruta por definir» lleva el paso que pide elegirla (HU-M06-02 CA02)', () => {
+    const elegir = paso({ etapa: null, elegir_ruta: true });
+    const flujo = construirFlujo(crearLote({ recorrido: [pasoRecorrido()], siguientes: [elegir] }), CATALOGO);
+    expect(flujo.secado.estado).toBe('ok');
+    expect(flujo.lineas[0].elegirRuta).toEqual(elegir);
+  });
+
+  it('dividido: una columna por parte con las etapas de su ruta y el avance', () => {
+    const flujo = construirFlujo(
+      crearLote({
+        partes: [
+          parte(),
+          parte({ id: 2, nombre: 'Parte B', ruta: 'MOLIENDA_ENSACADO', ruta_texto: 'Molido' }),
+        ],
+        recorrido: [
+          pasoRecorrido(),
+          pasoRecorrido({ id: 2, etapa: 'ZARANDEO', etapa_texto: 'Zarandeo', parte: 1, carga: 'Parte A' }),
+        ],
+        siguientes: [
+          paso({ carga: 'Parte A', parte: 1, etapa: 'ENSACADO' }),
+          paso({ carga: 'Parte B', parte: 2, etapa: 'MOLIENDA' }),
+        ],
+      }),
+      CATALOGO,
+    );
+    expect(flujo.dividido).toBeTrue();
+    expect(flujo.lineas.map((l) => l.etapas?.map((t) => `${t.etapa}:${t.estado}`))).toEqual([
+      ['ZARANDEO:ok', 'ENSACADO:next'],
+      ['MOLIENDA:next', 'ENSACADO:pend'],
+    ]);
+    expect(flujo.avance).toEqual({ hechas: 2, total: 5 });
+  });
+
+  it('un tardío con secado propio va aparte con su propio paso (HU-M06-01 CA13)', () => {
+    const base = crearLote();
+    const tardio = {
+      ...base.composicion[0].ingresos[0],
+      id: 9,
+      codigo: 'ING-T',
+      tardio: true,
+      secado_propio: true,
+    };
+    const secadoPropio = paso({ carga: 'ING-T', ingreso: 9 });
+    const flujo = construirFlujo(
+      crearLote({
+        composicion: [{ ...base.composicion[0], ingresos: [...base.composicion[0].ingresos, tardio] }],
+        recorrido: [pasoRecorrido()],
+        siguientes: [secadoPropio],
+      }),
+      CATALOGO,
+    );
+    expect(flujo.complementos.length).toBe(1);
+    expect(flujo.complementos[0].secado.siguiente).toEqual(secadoPropio);
+    expect(flujo.secado.estado).toBe('ok');
+  });
+
+  it('un `siguientes` que no encaja en ninguna tarjeta se ofrece igual', () => {
+    const raro = paso({ carga: 'Otra', parte: 99, etapa: 'MOLIENDA' });
+    const flujo = construirFlujo(crearLote({ siguientes: [paso(), raro] }), CATALOGO);
+    expect(flujo.sueltos).toEqual([raro]);
+  });
+
+  it('el lote cerrado cuenta todas las etapas como hechas', () => {
+    const flujo = construirFlujo(crearLote({ estado: 'CERRADO', siguientes: [] }), CATALOGO);
+    expect(flujo.avance.hechas).toBe(flujo.avance.total);
+  });
+});
+
+describe('FlujoLoteComponent (HU-M06-02)', () => {
+  it('dibuja la etapa común con el botón del `siguientes` del servidor, y lo emite', () => {
+    const { fixture, raiz } = montar(FlujoLoteComponent, {
+      lote: crearLote(),
+      catalogo: CATALOGO,
+      puedeRegistrar: true,
     });
-    const botones = textos(raiz, 'siguiente').map((texto) => texto.replace(/^arrow_forward\s*/, ''));
-    expect(botones).toEqual(['Registrar secado', 'Registrar zarandeo']);
-    expect(textos(raiz, 'carga')).toEqual(['Lote prueba', 'Parte A']);
-  });
-
-  it('tras el secado pide la ruta en lugar de una etapa (HU-M06-02 CA02)', () => {
-    const { raiz } = montar(SiguientePasoComponent, {
-      siguientes: [paso({ etapa: null, elegir_ruta: true })],
-      etapas: ETAPAS,
-    });
-    expect(textos(raiz, 'siguiente')[0]).toContain('Elegir la ruta');
-  });
-
-  it('con la ruta completa no dibuja nada (CA09)', () => {
-    const { raiz } = montar(SiguientePasoComponent, { siguientes: [], etapas: ETAPAS });
-    expect(raiz.querySelector('[data-prueba="siguiente"]')).toBeNull();
-    expect(raiz.querySelector('section')).toBeNull();
-  });
-
-  it('al pulsar emite la carga elegida', () => {
-    const { fixture, raiz } = montar(SiguientePasoComponent, { siguientes: [paso()], etapas: ETAPAS });
     const emitidos: SiguientePaso[] = [];
     fixture.componentInstance.registrar.subscribe((p) => emitidos.push(p));
+    expect(textos(raiz, 'siguiente')).toEqual(['Registrar secado']);
     raiz.querySelector<HTMLButtonElement>('[data-prueba="siguiente"]')?.click();
     expect(emitidos).toEqual([paso()]);
+  });
+
+  it('sin permiso para registrar no ofrece botones, pero dice cuál sigue', () => {
+    const { raiz } = montar(FlujoLoteComponent, { lote: crearLote(), catalogo: CATALOGO });
+    expect(raiz.querySelector('[data-prueba="siguiente"]')).toBeNull();
+    expect(textos(raiz, 'etapa-estado')).toContain('Siguiente etapa');
+  });
+
+  it('«Ruta por definir» ofrece registrar el siguiente paso (CA02)', () => {
+    const elegir = paso({ etapa: null, elegir_ruta: true });
+    const { raiz } = montar(FlujoLoteComponent, {
+      lote: crearLote({ recorrido: [pasoRecorrido()], siguientes: [elegir] }),
+      catalogo: CATALOGO,
+      puedeRegistrar: true,
+    });
+    expect(raiz.querySelector('[data-prueba="ruta-por-definir"]')).not.toBeNull();
+    expect(textos(raiz, 'siguiente')).toEqual(['Registrar siguiente paso']);
+  });
+
+  it('una etapa hecha dice quién y cuándo, y las horas de molienda', () => {
+    const { raiz } = montar(FlujoLoteComponent, {
+      lote: crearLote({
+        ruta: 'MOLIENDA_ENSACADO',
+        recorrido: [
+          pasoRecorrido(),
+          pasoRecorrido({ id: 2, etapa: 'MOLIENDA', etapa_texto: 'Molienda', horas_molienda: '4.00' }),
+        ],
+        siguientes: [paso({ etapa: 'ENSACADO' })],
+      }),
+      catalogo: CATALOGO,
+      puedeRegistrar: true,
+    });
+    expect(textos(raiz, 'etapa-nombre')).toEqual(['Secado', 'Molienda', 'Ensacado']);
+    expect(textos(raiz, 'etapa-registro')[0]).toContain('sup.prueba');
+    expect(textos(raiz, 'horas')).toEqual(['4 h de molienda']);
+    expect(textos(raiz, 'siguiente')).toEqual(['Registrar ensacado']);
+  });
+
+  it('dividido: «Dividido en 2 partes» y una columna por parte', () => {
+    const { raiz } = montar(FlujoLoteComponent, {
+      lote: crearLote({
+        partes: [parte(), parte({ id: 2, nombre: 'Parte B' })],
+        recorrido: [pasoRecorrido()],
+        siguientes: [],
+      }),
+      catalogo: CATALOGO,
+    });
+    expect(textos(raiz, 'dividido')).toEqual(['Dividido en 2 partes']);
+    expect(textos(raiz, 'linea-nombre')).toEqual(['Parte A', 'Parte B']);
+    expect(textos(raiz, 'linea-detalle')[0]).toBe('Zaranda, 1/2 del lote, ≈ 6.60 t');
+  });
+
+  it('con el ensacado, los bigbags son estimación y «Asociar» solo aparece si se puede (CA11, CA13)', () => {
+    const lote = crearLote({
+      ruta: 'ZARANDEO_ENSACADO',
+      recorrido: [
+        pasoRecorrido(),
+        pasoRecorrido({ id: 2, etapa: 'ZARANDEO', etapa_texto: 'Zarandeo' }),
+        pasoRecorrido({ id: 3, etapa: 'ENSACADO', etapa_texto: 'Ensacado' }),
+      ],
+      bigbags: [BIGBAG],
+      siguientes: [],
+      pendientes: [],
+    });
+    const lectura = montar(FlujoLoteComponent, { lote, catalogo: CATALOGO });
+    const resumen = textos(lectura.raiz, 'resumen-bigbags')[0];
+    expect(resumen).toContain('9 bigbags');
+    expect(resumen).toContain('≈ 13.23 t');
+    expect(resumen).toContain('(estimación)');
+    expect(lectura.raiz.querySelector('[data-prueba="asociar-bigbags"]')).toBeNull();
+    const gestion = montar(FlujoLoteComponent, { lote, catalogo: CATALOGO, puedeAsociar: true });
+    expect(gestion.raiz.querySelector('[data-prueba="asociar-bigbags"]')).not.toBeNull();
+  });
+
+  it('el tardío con secado propio tiene su tarjeta y su botón', () => {
+    const base = crearLote();
+    const tardio = {
+      ...base.composicion[0].ingresos[0],
+      id: 9,
+      codigo: 'ING-T',
+      tardio: true,
+      secado_propio: true,
+    };
+    const { raiz } = montar(FlujoLoteComponent, {
+      lote: crearLote({
+        composicion: [{ ...base.composicion[0], ingresos: [...base.composicion[0].ingresos, tardio] }],
+        recorrido: [pasoRecorrido()],
+        siguientes: [paso({ carga: 'ING-T', ingreso: 9 })],
+      }),
+      catalogo: CATALOGO,
+      puedeRegistrar: true,
+    });
+    expect(raiz.querySelectorAll('[data-prueba="complemento"]').length).toBe(1);
+    expect(textos(raiz, 'siguiente')).toEqual(['Registrar secado propio']);
+  });
+});
+
+describe('BigbagsLoteComponent (HU-M06-02 CA11)', () => {
+  it('cada registro con su parte, peso por bigbag y total, siempre aproximados', () => {
+    const { raiz } = montar(BigbagsLoteComponent, {
+      bigbags: [{ ...BIGBAG, parte: 1, cantidad: 2, peso_aproximado_tn: '2.72', recalculado: true }],
+      partes: [parte()],
+    });
+    const fila = textos(raiz, 'bigbags')[0];
+    expect(fila).toContain('Parte A');
+    expect(fila).toContain('Recalculado');
+    expect(fila).toContain('≈ 5.44 t');
+    expect(textos(raiz, 'peso-bigbag')[0]).toBe('≈ 2.72 t');
   });
 });
 
@@ -159,7 +360,12 @@ describe('ComposicionLoteComponent (HU-M06-01 CA04, CA12, CA13, CA16, CA17, CA21
   it('un mineral agregado sin ingresos aparece con su grupo vacío (CA17)', () => {
     const { raiz } = montar(ComposicionLoteComponent, { composicion: composicion(), total });
     expect(raiz.querySelectorAll('[data-prueba="grupo-mineral"]').length).toBe(2);
-    expect(textos(raiz, 'grupo-vacio')).toEqual(['Sin ingresos todavía']);
+    expect(textos(raiz, 'grupo-vacio')).toEqual(['Sin ingresos de este mineral todavía.']);
+  });
+
+  it('cada código lleva al detalle del ingreso', () => {
+    const { raiz } = montar(ComposicionLoteComponent, { composicion: composicion(), total });
+    expect(raiz.querySelector('[data-prueba="codigo"]')?.getAttribute('href')).toBe('/consulta/ingresos/1');
   });
 
   it('solo ofrece retirar y quitar cuando es editable, y emite lo elegido', () => {
@@ -180,81 +386,6 @@ describe('ComposicionLoteComponent (HU-M06-01 CA04, CA12, CA13, CA16, CA17, CA21
     raiz.querySelectorAll<HTMLButtonElement>('[data-prueba="quitar-mineral"]')[1].click();
     expect(retirados).toEqual([1]);
     expect(quitados).toEqual([2]);
-  });
-});
-
-describe('PartesLoteComponent (HU-M06-04 CA08)', () => {
-  it('las toneladas de cada parte se señalan como estimación', () => {
-    const { raiz } = montar(PartesLoteComponent, { partes: [parte(), parte({ id: 2, nombre: 'Parte B' })] });
-    expect(raiz.querySelectorAll('[data-prueba="parte"]').length).toBe(2);
-    const toneladas = textos(raiz, 'toneladas')[0];
-    expect(toneladas).toContain('≈');
-    expect(toneladas).toContain('6.60 t');
-    expect(toneladas).toContain('(estimación)');
-    expect(textos(raiz, 'fraccion')[0]).toBe('Fracción 1/2');
-    expect(textos(raiz, 'ruta')[0]).toBe('Zaranda');
-  });
-});
-
-describe('RecorridoLoteComponent', () => {
-  const pasos = [
-    {
-      id: 1,
-      etapa: 'MOLIENDA' as const,
-      etapa_texto: 'Molienda',
-      carga: 'Lote prueba',
-      parte: null,
-      ingreso_tardio: null,
-      fecha_hora: '2026-11-03T09:00:00-05:00',
-      usuario: 'sup.prueba',
-      horas_molienda: '4.00',
-      observacion: '',
-    },
-  ];
-  const bigbags = [
-    {
-      id: 1,
-      parte: null,
-      cantidad: 9,
-      peso_aproximado_tn: '1.47',
-      recalculado: false,
-      es_estimacion: true,
-      fecha_hora: '2026-11-03T10:00:00-05:00',
-    },
-  ];
-
-  it('muestra quién registró cada paso, cuándo y las horas de molienda', () => {
-    const { raiz } = montar(RecorridoLoteComponent, { recorrido: pasos, bigbags: [] });
-    expect(textos(raiz, 'etapa')).toEqual(['Molienda']);
-    expect(textos(raiz, 'usuario')).toEqual(['sup.prueba']);
-    expect(textos(raiz, 'horas')).toEqual(['4.00 h de molienda']);
-  });
-
-  it('el peso de cada bigbag es una estimación (CA11)', () => {
-    const { raiz } = montar(RecorridoLoteComponent, { recorrido: pasos, bigbags });
-    expect(textos(raiz, 'peso-bigbag')[0]).toContain('≈ 1.47 t c/u');
-    expect(textos(raiz, 'peso-bigbag')[0]).toContain('(estimación)');
-  });
-
-  it('sin pasos ni bigbags lo dice', () => {
-    const { raiz } = montar(RecorridoLoteComponent, { recorrido: [], bigbags: [] });
-    expect(raiz.querySelector('[data-prueba="sin-pasos"]')).not.toBeNull();
-    expect(raiz.querySelector('[data-prueba="sin-bigbags"]')).not.toBeNull();
-  });
-
-  it('«Asociar bigbags» solo se ofrece cuando se puede (CA13)', () => {
-    expect(
-      montar(RecorridoLoteComponent, { recorrido: pasos, bigbags: [] }).raiz.querySelector(
-        '[data-prueba="asociar-bigbags"]',
-      ),
-    ).toBeNull();
-    expect(
-      montar(RecorridoLoteComponent, {
-        recorrido: pasos,
-        bigbags: [],
-        puedeAsociar: true,
-      }).raiz.querySelector('[data-prueba="asociar-bigbags"]'),
-    ).not.toBeNull();
   });
 });
 

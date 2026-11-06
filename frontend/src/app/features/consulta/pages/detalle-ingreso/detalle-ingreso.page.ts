@@ -10,7 +10,6 @@ import {
   untracked,
 } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { comoErrorApi } from '@core/errores/error-inesperado';
@@ -50,7 +49,6 @@ const PESTANAS: readonly { ruta: Pestana; etiqueta: string }[] = [
     RouterLink,
     RouterLinkActive,
     MatProgressBarModule,
-    MatTabsModule,
     AvisoErrorComponent,
     CabeceraIngresoComponent,
     PestanaDatosComponent,
@@ -62,6 +60,40 @@ const PESTANAS: readonly { ruta: Pestana; etiqueta: string }[] = [
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './detalle-ingreso.page.html',
+  styles: `
+    .pestanas {
+      display: flex;
+      max-width: 100%;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      border: 1px solid var(--stroke);
+      border-radius: 4px;
+      background: var(--surface);
+      scrollbar-width: none;
+      width: max-content;
+      a {
+        padding: 7px 15px;
+        border-right: 1px solid var(--stroke);
+        color: var(--label-2);
+        font-size: 13.5px;
+        font-weight: 500;
+        text-decoration: none;
+        white-space: nowrap;
+        &:last-child {
+          border-right: 0;
+        }
+        &:hover {
+          background: var(--hover);
+          color: var(--label);
+        }
+        &.on {
+          background: var(--ink);
+          color: #fff;
+          font-weight: 600;
+        }
+      }
+    }
+  `,
 })
 export class DetalleIngresoPage {
   readonly id = input.required<string>();

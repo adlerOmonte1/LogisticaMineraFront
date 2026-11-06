@@ -12,6 +12,7 @@ import { aplicarErrorEnFormulario } from '@shared/formularios/errores-formulario
 import { decimalPositivo, normalizarDecimal } from '@shared/formularios/validadores';
 import { ErrorCampoPipe } from '@shared/pipes/error-campo.pipe';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoTara extends DatosDialogoEnvio<CambioTara, Vehiculo> {
   vehiculo: Vehiculo;
@@ -26,6 +27,7 @@ export interface DatosDialogoTara extends DatosDialogoEnvio<CambioTara, Vehiculo
   selector: 'app-dialogo-tara',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -37,7 +39,7 @@ export interface DatosDialogoTara extends DatosDialogoEnvio<CambioTara, Vehiculo
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()" novalidate>
       <mat-dialog-content>
         <app-aviso-error [error]="envio.error()" />

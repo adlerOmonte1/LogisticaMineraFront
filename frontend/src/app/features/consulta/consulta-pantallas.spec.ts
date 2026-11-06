@@ -12,6 +12,7 @@ import { SesionService } from '@core/sesion/sesion.service';
 import { FilaIngreso, InicioDia } from '@models/consulta.model';
 import { ErrorApi } from '@models/error-api.model';
 import { Rol } from '@models/rol.model';
+import { CifraComponent } from '@shared/components/cifra/cifra.component';
 import { estabilizar } from '../../testing/estabilizar';
 import {
   crearCalendario,
@@ -29,7 +30,6 @@ import { ConsultaPlacaFechaPage } from './pages/consulta-placa-fecha/consulta-pl
 import { InicioPage } from './pages/inicio/inicio.page';
 import { ListadoIngresosPage } from './pages/listado-ingresos/listado-ingresos.page';
 import { BarrasSemanaComponent } from './ui/barras-semana/barras-semana.component';
-import { CifraInicioComponent } from './ui/cifra-inicio/cifra-inicio.component';
 import { TablaIngresosComponent } from './ui/tabla-ingresos/tabla-ingresos.component';
 
 function textos(raiz: HTMLElement, prueba: string): string[] {
@@ -475,11 +475,15 @@ describe('CalendarioPage (HU-M07-03)', () => {
 
   it('el resumen del mes dice ingresos, toneladas, días con llegadas y los En proceso', () => {
     const { raiz } = pagina();
-    const resumen = textos(raiz, 'resumen-mes')[0];
-    expect(resumen).toContain('3 ingresos');
-    expect(resumen).toContain('22.20 t');
-    expect(resumen).toContain('2 días con llegadas');
-    expect(resumen).toContain('1 en proceso');
+    const cifras = textos(raiz, 'cifra-valor');
+    expect(textos(raiz, 'cifra-etiqueta')).toEqual([
+      'Ingresos del mes',
+      'Toneladas netas',
+      'Días con llegadas',
+      'En proceso',
+    ]);
+    expect(cifras).toEqual(['3', '22.20 t', '2', '1']);
+    expect(textos(raiz, 'cifra-detalle')[2]).toBe('de 30 días');
   });
 
   it('navegar de mes recalcula los días y el resumen; enero retrocede a diciembre del año anterior (CA06)', () => {
@@ -534,7 +538,8 @@ describe('CalendarioPage (HU-M07-03)', () => {
     estabilizar(fixture);
     raiz.querySelector<HTMLButtonElement>('[data-prueba="mes-anterior"]')?.click();
     estabilizar(fixture);
-    expect(hay(raiz, 'del-dia')).toBeFalse();
+    expect(raiz.querySelector('[data-prueba="del-dia"]')?.textContent).toContain('Toque un día');
+    expect(hay(raiz, 'fila-ingreso')).toBeFalse();
   });
 
   it('la semana empieza en lunes: noviembre de 2026 empieza en domingo, con seis celdas antes', () => {
@@ -558,11 +563,11 @@ describe('InicioPage (HU-M07-04)', () => {
     const { raiz } = pagina();
     expect(textos(raiz, 'cifra-etiqueta')).toEqual([
       'Ingresos de hoy',
-      'Toneladas de hoy',
+      'Toneladas netas de hoy',
       'Pendientes de destare',
       'Lotes en proceso',
     ]);
-    expect(textos(raiz, 'cifra-valor')).toEqual(['2', '13.20 t', '1', '3']);
+    expect(textos(raiz, 'cifra-valor')).toEqual(['2 ingresos', '13.20 t', '1 ingreso', '3 lotes']);
   });
 
   it('bajo las toneladas dice «Sin contar n en proceso» y el último ingreso del día (CA02)', () => {
@@ -586,7 +591,7 @@ describe('InicioPage (HU-M07-04)', () => {
         ultimos_ingresos: [],
       }),
     );
-    expect(textos(raiz, 'cifra-valor')[0]).toBe('0');
+    expect(textos(raiz, 'cifra-valor')[0]).toBe('0 ingresos');
     expect(textos(raiz, 'cifra-detalle')[0]).toBe('Aún no hay ingresos hoy');
     expect(hay(raiz, 'sin-ultimos')).toBeTrue();
   });
@@ -601,7 +606,9 @@ describe('InicioPage (HU-M07-04)', () => {
     );
     expect(enlaces).toEqual(['/consulta/calendario', '/ingresos/destares', '/lotes']);
     expect(raiz.querySelectorAll('[data-prueba="cifra-sin-enlace"]').length).toBe(1);
-    expect(raiz.querySelector('[data-prueba="cifra-sin-enlace"]')?.textContent).toContain('Toneladas de hoy');
+    expect(raiz.querySelector('[data-prueba="cifra-sin-enlace"]')?.textContent).toContain(
+      'Toneladas netas de hoy',
+    );
   });
 
   it('muestra los últimos ingresos y cada uno abre su detalle (CA05)', () => {
@@ -667,10 +674,10 @@ describe('piezas del inicio', () => {
     expect(vacia.raiz.querySelector<HTMLElement>('.barras__barra')?.style.height).toBe('0%');
   });
 
-  it('CifraInicioComponent: con enlace es un vínculo; sin él, un dato', () => {
-    const con = montar(CifraInicioComponent, [], { etiqueta: 'X', valor: '1', enlace: '/lotes' });
+  it('CifraComponent: con enlace es un vínculo; sin él, un dato', () => {
+    const con = montar(CifraComponent, [], { etiqueta: 'X', valor: '1', enlace: '/lotes' });
     expect(con.raiz.querySelector('a')?.getAttribute('href')).toBe('/lotes');
-    const sin = montar(CifraInicioComponent, [], { etiqueta: 'X', valor: '1' });
+    const sin = montar(CifraComponent, [], { etiqueta: 'X', valor: '1' });
     expect(sin.raiz.querySelector('a')).toBeNull();
   });
 });

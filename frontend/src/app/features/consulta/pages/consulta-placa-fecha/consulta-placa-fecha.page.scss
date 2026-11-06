@@ -1,3 +1,4 @@
+// Los criterios de búsqueda en una tarjeta con la disposición de la maqueta (`pConsulta`, D-F46).
 .formulario {
   margin-bottom: 16px;
 }
@@ -16,9 +17,14 @@
 }
 
 .seleccion__titulo {
+  display: flex;
   flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
   margin: 0;
-  font-size: 1.2rem;
+  font: 600 19px/1.25 var(--font-d);
+  letter-spacing: 0.01em;
 }
 
 // Ticket junto a los datos desde tableta (HU-M07-01 CA03); apilados en teléfono.

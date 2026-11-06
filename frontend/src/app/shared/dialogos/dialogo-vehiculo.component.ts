@@ -5,6 +5,7 @@ import { Transportista } from '@models/transportista.model';
 import { NuevoVehiculo, Vehiculo } from '@models/vehiculo.model';
 import { FormularioVehiculoComponent } from '../components/formulario-vehiculo/formulario-vehiculo.component';
 import { DatosDialogoEnvio, DialogoEnvioBase } from './dialogo-envio.base';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 export interface DatosDialogoVehiculo extends DatosDialogoEnvio<NuevoVehiculo, Vehiculo> {
   vehiculo: Vehiculo | null;
@@ -21,10 +22,10 @@ export interface DatosDialogoVehiculo extends DatosDialogoEnvio<NuevoVehiculo, V
 @Component({
   selector: 'app-dialogo-vehiculo',
   standalone: true,
-  imports: [MatDialogModule, FormularioVehiculoComponent],
+  imports: [CabeceraDialogoComponent, MatDialogModule, FormularioVehiculoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ titulo }}</h2>
+    <app-cabecera-dialogo>{{ titulo }}</app-cabecera-dialogo>
     <mat-dialog-content>
       <app-formulario-vehiculo
         [vehiculo]="datos.vehiculo"

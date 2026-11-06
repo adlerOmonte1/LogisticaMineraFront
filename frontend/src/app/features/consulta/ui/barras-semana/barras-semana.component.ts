@@ -32,7 +32,7 @@ const ALTURA_MINIMA = 4;
   template: `
     <ol class="barras" aria-label="Toneladas de los últimos siete días">
       @for (barra of barras(); track $index) {
-        <li class="barras__dia" data-prueba="barra">
+        <li class="barras__dia" [class.barras__dia--hoy]="$last" data-prueba="barra">
           <span class="barras__valor" data-prueba="barra-valor">{{ barra.toneladas | toneladas }}</span>
           <span class="barras__area">
             <span class="barras__barra" [style.height.%]="barra.altura"></span>
@@ -44,20 +44,28 @@ const ALTURA_MINIMA = 4;
   `,
   styles: `
     .barras {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 8px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 190px;
       margin: 0;
-      padding: 0;
+      padding: 8px 0 0;
       list-style: none;
+      border-bottom: 1px solid var(--border);
     }
     .barras__dia {
-      display: grid;
-      justify-items: center;
-      gap: 4px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      min-width: 0;
+      height: 100%;
     }
     .barras__valor {
-      font-size: 0.7rem;
+      font: 600 13px var(--font-d);
+      color: var(--label-2);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
@@ -65,18 +73,32 @@ const ALTURA_MINIMA = 4;
       display: flex;
       align-items: flex-end;
       width: 100%;
-      height: 96px;
-      border-bottom: 1px solid var(--border);
+      max-width: 46px;
+      height: 120px;
     }
     .barras__barra {
       width: 100%;
-      border-radius: 4px 4px 0 0;
+      min-height: 0;
+      border-radius: 2px 2px 0 0;
+      background: color-mix(in srgb, var(--gold) 45%, transparent);
+    }
+    .barras__dia--hoy .barras__barra {
       background: var(--gold);
     }
     .barras__etiqueta {
-      color: var(--label-2);
-      font-size: 0.75rem;
+      padding-bottom: 6px;
+      color: var(--label-3);
+      font-size: 12px;
       text-transform: capitalize;
+      white-space: nowrap;
+    }
+    @media (max-width: 767px) {
+      .barras {
+        gap: 6px;
+      }
+      .barras__valor {
+        font-size: 11px;
+      }
     }
   `,
 })

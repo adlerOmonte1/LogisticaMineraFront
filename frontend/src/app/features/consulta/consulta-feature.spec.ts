@@ -50,7 +50,7 @@ describe('CabeceraIngresoComponent (acciones por rol)', () => {
     estabilizar(fixture);
     return [...(fixture.nativeElement as HTMLElement).querySelectorAll('[data-prueba]')]
       .map((e) => e.getAttribute('data-prueba') ?? '')
-      .filter((nombre) => nombre !== 'codigo');
+      .filter((nombre) => !['codigo', 'volver'].includes(nombre) && !nombre.startsWith('aviso-'));
   }
 
   it('el Administrador corrige y anula; revierte solo si hay una corrección vigente', () => {

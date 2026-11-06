@@ -1,47 +1,63 @@
 <header class="cabecera">
-  <div class="cabecera__titulo">
-    <h1 class="monoespaciado" data-prueba="codigo">{{ detalle().codigo }}</h1>
+  <a class="cabecera__volver" routerLink="/consulta/ingresos" data-prueba="volver">
+    <mat-icon>chevron_left</mat-icon>Ingresos
+  </a>
+  <div class="cabecera__fila">
+    <div>
+      <h1 class="cabecera__codigo" data-prueba="codigo">{{ detalle().codigo }}</h1>
+      <p class="cabecera__subtitulo">
+        {{ detalle().fecha_hora_pesaje | fechaLima }}, {{ detalle().placa }},
+        {{ detalle().tipo_mineral_nombre }}
+      </p>
+    </div>
+    @if (!anulado()) {
+      <div class="cabecera__acciones">
+        <a
+          *appSiPuede="'CORREGIR_INGRESO'"
+          mat-stroked-button
+          [routerLink]="['/ingresos', detalle().id, 'corregir']"
+          data-prueba="corregir"
+        >
+          <mat-icon>edit</mat-icon>
+          Corregir
+        </a>
+        @if (puedeRevertir()) {
+          <a
+            *appSiPuede="'CORREGIR_INGRESO'"
+            mat-stroked-button
+            [routerLink]="['/ingresos', detalle().id, 'revertir']"
+            data-prueba="revertir"
+          >
+            <mat-icon>undo</mat-icon>
+            Revertir corrección
+          </a>
+        }
+        <a
+          *appSiPuede="'ANULAR_INGRESO'"
+          mat-stroked-button
+          color="warn"
+          [routerLink]="['/ingresos', detalle().id, 'anular']"
+          data-prueba="anular"
+        >
+          <mat-icon>block</mat-icon>
+          Anular
+        </a>
+      </div>
+    }
+  </div>
+  <div class="cabecera__fichas">
     <app-insignia-ingreso [estado]="detalle().estado" />
     @if (detalle().sin_respaldo_fotografico) {
       <app-marca-sin-respaldo [motivo]="detalle().motivo_sin_respaldo_texto" />
     }
   </div>
-  <p class="texto-secundario cabecera__subtitulo">
-    <span class="monoespaciado">{{ detalle().placa }}</span> · {{ detalle().tipo_mineral_nombre }}
-  </p>
-
-  @if (!anulado()) {
-    <div class="cabecera__acciones">
-      <a
-        *appSiPuede="'CORREGIR_INGRESO'"
-        mat-stroked-button
-        [routerLink]="['/ingresos', detalle().id, 'corregir']"
-        data-prueba="corregir"
-      >
-        <mat-icon>edit</mat-icon>
-        Corregir
-      </a>
-      @if (puedeRevertir()) {
-        <a
-          *appSiPuede="'CORREGIR_INGRESO'"
-          mat-stroked-button
-          [routerLink]="['/ingresos', detalle().id, 'revertir']"
-          data-prueba="revertir"
-        >
-          <mat-icon>undo</mat-icon>
-          Revertir corrección
-        </a>
-      }
-      <a
-        *appSiPuede="'ANULAR_INGRESO'"
-        mat-stroked-button
-        color="warn"
-        [routerLink]="['/ingresos', detalle().id, 'anular']"
-        data-prueba="anular"
-      >
-        <mat-icon>block</mat-icon>
-        Anular
-      </a>
-    </div>
+  @if (anulado()) {
+    <app-aviso-franja color="red" icono="cancel" data-prueba="aviso-anulado">
+      Anulado por {{ detalle().anulado_por }}. Motivo: {{ detalle().motivo_anulacion }}
+    </app-aviso-franja>
+  } @else if (detalle().estado === 'EN_PROCESO') {
+    <app-aviso-franja color="orange" icono="hourglass_top" data-prueba="aviso-en-proceso">
+      Este ingreso está En proceso: su peso neto se calcula al registrar el destare del vehículo.
+    </app-aviso-franja>
   }
 </header>

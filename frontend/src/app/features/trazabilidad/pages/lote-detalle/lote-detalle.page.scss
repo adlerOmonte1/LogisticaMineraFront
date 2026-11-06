@@ -1,34 +1,4 @@
-.pagina {
-  display: grid;
-  gap: 16px;
-}
-
-.datos {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 6px 16px;
-  margin: 0;
-
-  dt {
-    color: var(--label-3);
-  }
-
-  dd {
-    margin: 0;
-  }
-}
-
-.titulo {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-}
-
-.pendientes ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.rendimiento {
-  margin: 0;
-  color: var(--label-2);
+// La página usa las piezas globales de la maqueta (`estilos/_maqueta.scss`).
+:host {
+  display: block;
 }

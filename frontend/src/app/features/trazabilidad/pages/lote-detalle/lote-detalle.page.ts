@@ -32,11 +32,12 @@ import {
 } from '@models/lote.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
-import { InsigniaEstadoComponent } from '@shared/components/insignia-estado/insignia-estado.component';
 import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
-import { PresentacionEstado, presentarEstadoLote } from '@shared/utils/presentacion-lote';
+import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
+import { FichaEstado, fichaEstadoLote } from '@shared/utils/presentacion-lote';
 import { CatalogoRecorridoApiService } from '../../data-access/catalogo-recorrido-api.service';
 import { LotesApiService } from '../../data-access/lotes-api.service';
+import { BigbagsLoteComponent } from '../../ui/bigbags-lote/bigbags-lote.component';
 import { ComposicionLoteComponent } from '../../ui/composicion-lote/composicion-lote.component';
 import {
   DatosDialogoAsignar,
@@ -55,37 +56,42 @@ import {
   DatosDialogoMineral,
   DialogoMineralComponent,
 } from '../../ui/dialogo-mineral/dialogo-mineral.component';
-import { PartesLoteComponent } from '../../ui/partes-lote/partes-lote.component';
-import { RecorridoLoteComponent } from '../../ui/recorrido-lote/recorrido-lote.component';
-import { SiguientePasoComponent } from '../../ui/siguiente-paso/siguiente-paso.component';
+import { construirFlujo } from '../../ui/flujo-lote/flujo-lote';
+import { FlujoLoteComponent } from '../../ui/flujo-lote/flujo-lote.component';
+import { FichaComponent } from '@shared/components/ficha/ficha.component';
+import { AvisoFranjaComponent } from '@shared/components/aviso-franja/aviso-franja.component';
+
+const fechaLima = new FechaLimaPipe();
 
 function esRespuestaEtapa(respuesta: RespuestaLote): respuesta is RespuestaEtapa {
   return 'paso' in respuesta;
 }
 
 /**
- * Detalle de un lote: estado, composición con sus tardíos, partes, recorrido, bigbags y el
- * «Siguiente paso». Es la pantalla del Supervisor en planta: registrar una etapa son dos o tres
- * toques (RNF-M06-06). Lo que se ofrece registrar lo dice `siguientes` (RNF-M06-07); las
- * acciones de composición son de gestión y desaparecen con el lote cerrado (HU-M06-05 CA07). Lo
- * que el servidor rechaza se muestra con su mensaje literal.
+ * Detalle de un lote con la disposición de la maqueta (`pLote`, D-F45): fichas de estado y
+ * avance, cifras del lote, el aviso que corresponde a su estado, «Recorrido del mineral» con una
+ * tarjeta por etapa, bigbags y composición. Es la pantalla del Supervisor en planta: registrar
+ * una etapa son dos o tres toques desde su tarjeta (RNF-M06-06). Lo que se ofrece registrar lo
+ * dice `siguientes` (RNF-M06-07); las acciones de composición son de gestión y desaparecen con el
+ * lote cerrado (HU-M06-05 CA07). Lo que el servidor rechaza se muestra con su mensaje literal.
  */
 @Component({
   selector: 'app-lote-detalle',
   standalone: true,
   imports: [
+    AvisoFranjaComponent,
+    FichaComponent,
     RouterLink,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
     AvisoErrorComponent,
     EncabezadoPaginaComponent,
-    InsigniaEstadoComponent,
     FechaLimaPipe,
+    ToneladasPipe,
+    BigbagsLoteComponent,
     ComposicionLoteComponent,
-    PartesLoteComponent,
-    RecorridoLoteComponent,
-    SiguientePasoComponent,
+    FlujoLoteComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './lote-detalle.page.html',
@@ -108,9 +114,46 @@ export class LoteDetallePage {
   /** Rendimiento de la última molienda registrada, tal como lo calculó el servidor. */
   protected readonly rendimiento = signal<string | null>(null);
 
-  protected readonly estado = computed<PresentacionEstado | null>(() => {
+  /** En recorrido y sin pendientes según el servidor: todo el mineral ensacado. */
+  protected readonly listo = computed(() => {
     const lote = this.lote();
-    return lote ? presentarEstadoLote(lote.estado) : null;
+    return lote?.estado === 'EN_RECORRIDO' && lote.pendientes.length === 0;
+  });
+  protected readonly ficha = computed<FichaEstado | null>(() => {
+    const lote = this.lote();
+    return lote ? fichaEstadoLote(lote.estado, this.listo()) : null;
+  });
+  protected readonly flujo = computed(() => {
+    const lote = this.lote();
+    return lote ? construirFlujo(lote, this.catalogo()) : null;
+  });
+  protected readonly subtitulo = computed(() => {
+    const lote = this.lote();
+    if (!lote) {
+      return '';
+    }
+    const minerales = lote.composicion.map((g) => g.tipo_mineral.nombre).join(' y ');
+    return [lote.codigo, minerales, `abierto el ${fechaLima.transform(lote.fecha_apertura, 'fecha')}`]
+      .filter(Boolean)
+      .join(', ');
+  });
+  protected readonly tardios = computed(
+    () =>
+      this.lote()
+        ?.composicion.flatMap((g) => g.ingresos)
+        .filter((i) => i.tardio).length ?? 0,
+  );
+  protected readonly totalBigbags = computed(
+    () => this.lote()?.bigbags.reduce((suma, b) => suma + b.cantidad, 0) ?? 0,
+  );
+  protected readonly resumenComposicion = computed(() => {
+    const lote = this.lote();
+    if (!lote) {
+      return '';
+    }
+    const n = lote.total.ingresos;
+    const tipos = lote.composicion.length;
+    return `${n} ${n === 1 ? 'ingreso' : 'ingresos'}${tipos > 1 ? ` de ${tipos} tipos de mineral` : ''}`;
   });
 
   private readonly noCerrado = computed(() => this.lote()?.estado !== 'CERRADO');
@@ -123,8 +166,10 @@ export class LoteDetallePage {
     const lote = this.lote();
     return this.puedeComponer() && lote?.estado === 'EN_RECORRIDO' && lote.partes.length === 0;
   });
-  protected readonly puedeCerrar = computed(
-    () => this.lote()?.estado === 'EN_RECORRIDO' && this.autorizacion.puede('CERRAR_LOTE'),
+  /** Como en la maqueta, «Cerrar lote» aparece con todo el mineral ensacado (HU-M06-05). */
+  protected readonly puedeCerrar = computed(() => this.listo() && this.autorizacion.puede('CERRAR_LOTE'));
+  protected readonly puedeRegistrar = computed(
+    () => this.noCerrado() && this.autorizacion.puede('REGISTRAR_ETAPA'),
   );
   /** Los bigbags se asocian al ensacado: la acción aparece cuando ya hay uno (HU-M06-02 CA13). */
   protected readonly puedeAsociarBigbags = computed(
@@ -140,11 +185,6 @@ export class LoteDetallePage {
       const id = Number(this.id());
       untracked(() => this.cargar(id));
     });
-  }
-
-  protected nombreRuta(lote: Lote): string {
-    const ruta = this.catalogo()?.rutas.find((r) => r.codigo === lote.ruta);
-    return ruta?.nombre ?? '';
   }
 
   /* Composición (gestión) */

@@ -8,6 +8,7 @@ import { CambiosEventoComponent } from '@shared/components/cambios-evento/cambio
 import { InsigniaEstadoComponent } from '@shared/components/insignia-estado/insignia-estado.component';
 import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
 import { textoRegistro, tonoDeAccion } from '@shared/utils/presentacion-evento';
+import { CabeceraDialogoComponent } from '@shared/components/cabecera-dialogo/cabecera-dialogo.component';
 
 /**
  * Un evento completo: quién, cuándo, desde dónde, el motivo y, por campo, el antes y el después
@@ -18,6 +19,7 @@ import { textoRegistro, tonoDeAccion } from '@shared/utils/presentacion-evento';
   selector: 'app-dialogo-evento',
   standalone: true,
   imports: [
+    CabeceraDialogoComponent,
     MatButtonModule,
     MatDialogModule,
     RouterLink,
@@ -27,7 +29,7 @@ import { textoRegistro, tonoDeAccion } from '@shared/utils/presentacion-evento';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>Evento {{ evento.id }}</h2>
+    <app-cabecera-dialogo>Evento {{ evento.id }}</app-cabecera-dialogo>
     <mat-dialog-content>
       <dl class="datos">
         <dt>Fecha y hora</dt>

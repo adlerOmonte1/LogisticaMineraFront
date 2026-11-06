@@ -69,17 +69,95 @@ Fuentes del backend que se leen a menudo (ruta relativa desde la raíz de este r
 Sin PWA ni service worker (D-F07), sin librería de gráficos (D-F04), sin NgRx (D-F01), sin SSR
 (D-F05).
 
-## Puesta en marcha
+## Cómo ejecutar el proyecto
+
+El frontend no funciona solo: cada pantalla pide sus datos al backend. Se levantan los dos, el
+backend primero.
+
+### 1. Requisitos
+
+| Herramienta | Versión | Para qué |
+|---|---|---|
+| Git | cualquiera reciente | Clonar los dos repositorios |
+| Docker Desktop (con Docker Compose) | cualquiera reciente | Backend y PostgreSQL |
+| Node.js | **20 LTS** (fijado en `frontend/.nvmrc`) | Angular 17 |
+| Chrome o Edge | actual | Usar el sistema y correr las pruebas |
+
+Con `nvm` (o `nvm-windows`): `nvm install 20` y `nvm use 20`. Con Node 22 o superior el proyecto
+compila, pero `npm install` avisa `EBADENGINE` y Angular 17 no está probado ahí.
+
+### 2. Clonar los dos repositorios, lado a lado
 
 ```bash
-cd frontend
-npm install
-npm start          # http://localhost:4200 con proxy hacia el backend en :8000
+git clone https://github.com/adlerOmonte1/LogisticaMinera.git
+git clone https://github.com/adlerOmonte1/LogisticaMineraFront.git
 ```
 
-El backend se levanta desde su repositorio con Docker Compose y los datos de prueba
-(`cargar_datos_prueba`): ver [`docs/entorno.md`](docs/entorno.md) §3. El CLI se invoca con
-`npx ng <comando>`, para que la versión quede fijada en `package.json`.
+Lado a lado, las rutas `../LogisticaMinera/…` de esta documentación funcionan tal cual.
+
+### 3. Levantar el backend (desde `LogisticaMinera/`)
+
+Con Docker Desktop **abierto**:
+
+```bash
+docker compose up -d --build
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py cargar_datos_prueba
+```
+
+- `migrate` solo hace falta la primera vez y cuando el backend trae migraciones nuevas.
+- `cargar_datos_prueba` crea, o devuelve a su estado inicial, una cuenta por rol (Administrador,
+  Administrativo y Supervisor), el catálogo y datos de ejemplo. Solo corre con `DEBUG` activo.
+- **Credenciales de prueba:** en `LogisticaMinera/postman/entornos/local.postman_environment.json`
+  (`usuario_admin`, `usuario_administrativo`, `usuario_supervisor` y sus `clave_…`). No se copian a
+  este repositorio.
+
+Comprobar que respondió: `http://localhost:8000/api/v1/docs/` abre el Swagger de la API.
+
+### 4. Levantar el frontend (desde `LogisticaMineraFront/frontend/`)
+
+```bash
+npm install        # solo la primera vez o cuando cambia package-lock.json
+npm start
+```
+
+Abrir **`http://localhost:4200`** e iniciar sesión con una de las cuentas de prueba. El menú cambia
+según el rol.
+
+`npm start` usa `proxy.conf.json`: todo lo que va a `/api` lo reenvía a `http://localhost:8000`, así
+que el navegador ve un solo origen y no hace falta configurar CORS en desarrollo.
+
+### 5. Apagar y volver a empezar
+
+```bash
+# en frontend/: Ctrl + C detiene npm start
+docker compose stop        # en LogisticaMinera/: detiene el backend sin perder datos
+docker compose up -d       # la siguiente vez basta con esto (sin --build ni migrate)
+```
+
+Para repetir una revisión con los datos de prueba desde cero (en `LogisticaMinera/`):
+
+```bash
+docker compose exec backend python manage.py flush --no-input
+docker compose exec backend python manage.py cargar_datos_prueba
+```
+
+### 6. Problemas frecuentes
+
+| Síntoma | Causa | Qué hacer |
+|---|---|---|
+| `failed to connect to the docker API` | Docker Desktop cerrado | Abrir Docker Desktop y esperar a que diga «running» |
+| El inicio de sesión falla con un error del servidor y la terminal de `npm start` muestra `ECONNREFUSED` | Backend apagado | Paso 3; comprobar `http://localhost:8000/api/v1/docs/` |
+| «Credenciales inválidas» con las cuentas de prueba | Base sin datos de prueba, o datos de otra revisión | `cargar_datos_prueba` de nuevo |
+| `npm start` se queda preguntando por *analytics* | Primera ejecución del CLI de Angular | Responder `N`; o definir antes `NG_CLI_ANALYTICS=false` (PowerShell: `$env:NG_CLI_ANALYTICS='false'`) |
+| `Port 4200 is already in use` | Otro `npm start` abierto | Cerrarlo, o `npx ng serve --port 4300` |
+| Aviso `EBADENGINE` en `npm install` | Node distinto de 20 | Cambiar a Node 20 (paso 1) |
+
+Para usarlo desde un teléfono en la misma red, y otros ajustes del backend útiles para revisar
+(sesión que expira, motor de reconocimiento caído): [`docs/entorno.md`](docs/entorno.md) §3.3 y §4.
+
+El CLI se invoca siempre con `npx ng <comando>` dentro de `frontend/`, para que la versión sea la de
+`package.json`.
 
 ## Módulos y features
 

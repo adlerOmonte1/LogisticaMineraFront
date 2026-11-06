@@ -1,6 +1,6 @@
 @if (detalle(); as d) {
   <section class="tarjeta">
-    <h2 class="seccion">Ticket de balanza</h2>
+    <h2 class="seccion">Datos del ingreso</h2>
     <dl class="datos">
       <div>
         <dt>Placa</dt>
@@ -24,62 +24,66 @@
         <dt>Tara aplicada</dt>
         <dd class="monoespaciado">{{ d.tara_tn ? (d.tara_tn | toneladas) : 'Pendiente del destare' }}</dd>
       </div>
-      <div>
+      <div class="datos__neto">
         <dt>Peso neto</dt>
         <dd class="monoespaciado" data-prueba="peso-neto">
           {{ d.peso_neto_tn ? (d.peso_neto_tn | toneladas) : 'Pendiente del destare' }}
         </dd>
       </div>
-    </dl>
-  </section>
-
-  <section class="tarjeta">
-    <h2 class="seccion">Marcas de tiempo</h2>
-    <p class="texto-secundario nota">
-      El pesaje lo indica quien registra; el inicio y el fin del registro los asigna el sistema y nadie los
-      edita.
-    </p>
-    <dl class="datos">
-      <div>
-        <dt>Fecha y hora del pesaje</dt>
-        <dd data-prueba="pesaje">{{ d.fecha_hora_pesaje | fechaLima }}</dd>
-      </div>
-      <div>
-        <dt>Inicio del registro</dt>
-        <dd data-prueba="inicio">{{ d.hora_inicio_registro | fechaLima }}</dd>
-      </div>
-      <div>
-        <dt>Fin del registro</dt>
-        <dd data-prueba="fin">{{ d.hora_fin_registro | fechaLima }}</dd>
-      </div>
-    </dl>
-  </section>
-
-  <section class="tarjeta">
-    <h2 class="seccion">Registro</h2>
-    <dl class="datos">
       <div>
         <dt>Registrado por</dt>
         <dd>{{ d.registrado_por }}</dd>
       </div>
-      @if (d.sin_respaldo_fotografico) {
+      <div>
+        <dt>Fecha y hora del pesaje</dt>
+        <dd data-prueba="pesaje">{{ d.fecha_hora_pesaje | fechaLima }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <div class="pareja">
+    <section class="tarjeta">
+      <h2 class="seccion">Marcas de tiempo del servidor</h2>
+      <dl class="datos datos--compactos">
+        <div>
+          <dt>Inicio del registro</dt>
+          <dd data-prueba="inicio">{{ d.hora_inicio_registro | fechaLima }}</dd>
+        </div>
+        <div>
+          <dt>Fin del registro</dt>
+          <dd data-prueba="fin">{{ d.hora_fin_registro | fechaLima }}</dd>
+        </div>
+      </dl>
+      <p class="texto-secundario nota">
+        El pesaje lo indica quien registra; el inicio y el fin del registro los asigna el sistema y nadie los
+        edita.
+      </p>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="seccion">Respaldo y anulación</h2>
+      <dl class="datos datos--compactos">
         <div class="datos__ancho">
           <dt>Respaldo fotográfico</dt>
           <dd>
-            <app-marca-sin-respaldo />
-            <span data-prueba="motivo-sin-foto">{{ d.motivo_sin_respaldo_texto }}</span>
+            @if (d.sin_respaldo_fotografico) {
+              <app-marca-sin-respaldo />
+              <span data-prueba="motivo-sin-foto">{{ d.motivo_sin_respaldo_texto }}</span>
+            } @else {
+              Con fotografía del ticket
+            }
           </dd>
         </div>
-      }
-      @if (d.estado === 'ANULADO') {
-        <div class="datos__ancho datos__anulacion" data-prueba="anulacion">
-          <dt>Anulado</dt>
-          <dd>
-            <strong>{{ d.motivo_anulacion }}</strong>
-            <span class="texto-secundario"> · por {{ d.anulado_por }}</span>
-          </dd>
-        </div>
-      }
-    </dl>
-  </section>
+        @if (d.estado === 'ANULADO') {
+          <div class="datos__ancho datos__anulacion" data-prueba="anulacion">
+            <dt>Anulado</dt>
+            <dd>
+              <strong>{{ d.motivo_anulacion }}</strong>
+              <span class="texto-secundario"> · por {{ d.anulado_por }}</span>
+            </dd>
+          </div>
+        }
+      </dl>
+    </section>
+  </div>
 }

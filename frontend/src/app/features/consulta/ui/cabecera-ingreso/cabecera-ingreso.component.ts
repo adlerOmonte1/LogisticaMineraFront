@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 
 import { SiPuedeDirective } from '@core/autorizacion/si-puede.directive';
 import { DetalleIngreso } from '@models/detalle-ingreso.model';
+import { AvisoFranjaComponent } from '@shared/components/aviso-franja/aviso-franja.component';
+import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
 import { InsigniaIngresoComponent } from '@shared/components/insignia-ingreso/insignia-ingreso.component';
 import { MarcaSinRespaldoComponent } from '@shared/components/marca-sin-respaldo/marca-sin-respaldo.component';
 
@@ -18,6 +20,8 @@ import { MarcaSinRespaldoComponent } from '@shared/components/marca-sin-respaldo
   standalone: true,
   imports: [
     RouterLink,
+    AvisoFranjaComponent,
+    FechaLimaPipe,
     MatButtonModule,
     MatIconModule,
     SiPuedeDirective,

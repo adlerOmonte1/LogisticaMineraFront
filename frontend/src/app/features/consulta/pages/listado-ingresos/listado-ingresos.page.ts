@@ -16,6 +16,7 @@ import { ETIQUETA_ESTADO_INGRESO, EstadoIngreso } from '@models/ingreso.model';
 import { TipoMineral } from '@models/tipo-mineral.model';
 import { ETIQUETA_TITULARIDAD, Titularidad } from '@models/vehiculo.model';
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
+import { OpcionSegmento, SegmentosComponent } from '@shared/components/segmentos/segmentos.component';
 import { MarcoListadoComponent } from '@shared/components/marco-listado/marco-listado.component';
 import { crearListadoPaginado } from '@shared/listados/listado-paginado';
 import { FechaLimaPipe } from '@shared/pipes/fecha-lima.pipe';
@@ -51,12 +52,26 @@ const FILTRO_INICIAL: FiltroListado = {
     SiPuedeDirective,
     EncabezadoPaginaComponent,
     MarcoListadoComponent,
+    SegmentosComponent,
     TablaIngresosComponent,
     FechaLimaPipe,
     ToneladasPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './listado-ingresos.page.html',
+  styles: `
+    .filtro-estado {
+      flex: 0 0 100%;
+    }
+    .resumen {
+      display: grid;
+      gap: 2px;
+      padding: 14px 20px 8px;
+      p {
+        margin: 0;
+      }
+    }
+  `,
 })
 export class ListadoIngresosPage implements OnInit {
   private readonly api = inject(ConsultaApiService);
@@ -65,7 +80,13 @@ export class ListadoIngresosPage implements OnInit {
   private readonly notificacion = inject(NotificacionService);
 
   protected readonly titularidades = Object.entries(ETIQUETA_TITULARIDAD) as [Titularidad, string][];
-  protected readonly estados = Object.entries(ETIQUETA_ESTADO_INGRESO) as [EstadoIngreso, string][];
+  protected readonly segmentos: OpcionSegmento<EstadoIngreso | null>[] = [
+    { valor: null, texto: 'Todos' },
+    ...(Object.entries(ETIQUETA_ESTADO_INGRESO) as [EstadoIngreso, string][]).map(([valor, texto]) => ({
+      valor,
+      texto,
+    })),
+  ];
   protected readonly minerales = signal<TipoMineral[]>([]);
   /** Última respuesta completa: de ella salen los totales y el rango que aplicó el servidor. */
   protected readonly resultado = signal<ResultadoConsulta | null>(null);

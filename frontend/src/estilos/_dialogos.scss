@@ -1,0 +1,58 @@
+// Diálogos como el `modal` de la maqueta (`sheet` y `alertBox`, D-F47): borde dorado arriba, título
+// grande, cuerpo con aire y pie con fondo propio. En teléfono, la hoja sube desde abajo.
+// Solo afecta a los abiertos con `DialogosService` (`panelClass: 'dialogo-maqueta'`).
+
+.cdk-overlay-dark-backdrop {
+  background: rgba(20, 18, 16, 0.45);
+}
+
+.dialogo-maqueta {
+  --mdc-dialog-container-shape: 6px;
+  --mdc-dialog-subhead-font: var(--font-d);
+  --mdc-dialog-subhead-size: 22px;
+  --mdc-dialog-subhead-weight: 700;
+  --mdc-dialog-subhead-line-height: 1.2;
+  --mdc-dialog-subhead-tracking: 0.005em;
+
+  .mat-mdc-dialog-surface {
+    border-top: 3px solid var(--gold);
+    box-shadow:
+      0 14px 36px rgba(28, 26, 23, 0.2),
+      0 2px 6px rgba(28, 26, 23, 0.08);
+  }
+
+  .mat-mdc-dialog-title::before {
+    display: none;
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 6px 24px 22px !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    gap: 8px;
+    padding: 14px 20px !important;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 767px) {
+  .cdk-global-overlay-wrapper:has(.dialogo-maqueta) {
+    align-items: flex-end;
+  }
+
+  .dialogo-maqueta {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    .mat-mdc-dialog-surface {
+      max-height: 92vh;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .mat-mdc-dialog-actions {
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+  }
+}

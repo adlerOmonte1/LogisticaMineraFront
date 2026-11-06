@@ -26,7 +26,15 @@
   (cambioPagina)="listado.irAPagina($event)"
 >
   <ng-container filtros>
-    <mat-form-field>
+    <div class="filtro-estado">
+      <app-segmentos
+        etiqueta="Estado del ingreso"
+        [opciones]="segmentos"
+        [valor]="listado.filtro().estado"
+        (cambio)="filtrar({ estado: $event })"
+      />
+    </div>
+    <mat-form-field subscriptSizing="dynamic">
       <mat-label>Desde</mat-label>
       <input
         matInput
@@ -36,7 +44,7 @@
         data-prueba="desde"
       />
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field subscriptSizing="dynamic">
       <mat-label>Hasta</mat-label>
       <input
         matInput
@@ -46,7 +54,7 @@
         data-prueba="hasta"
       />
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field subscriptSizing="dynamic">
       <mat-label>Mineral</mat-label>
       <mat-select
         [ngModel]="listado.filtro().tipo_mineral"
@@ -58,7 +66,7 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field subscriptSizing="dynamic">
       <mat-label>Vehículo</mat-label>
       <mat-select [ngModel]="listado.filtro().titularidad" (ngModelChange)="filtrar({ titularidad: $event })">
         <mat-option [value]="null">Todos</mat-option>
@@ -67,16 +75,7 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field>
-      <mat-label>Estado</mat-label>
-      <mat-select [ngModel]="listado.filtro().estado" (ngModelChange)="filtrar({ estado: $event })">
-        <mat-option [value]="null">Todos</mat-option>
-        @for (opcion of estados; track opcion[0]) {
-          <mat-option [value]="opcion[0]">{{ opcion[1] }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field>
+    <mat-form-field subscriptSizing="dynamic">
       <mat-label>Placa o código</mat-label>
       <input
         matInput
@@ -91,7 +90,7 @@
 
   @if (resultado(); as resultado) {
     <div class="resumen" data-prueba="resumen">
-      <p class="resumen__rango" data-prueba="rango">
+      <p class="resumen__rango lm-small lm-muted" data-prueba="rango">
         Del {{ resultado.filtros.fecha_desde | fechaLima: 'fecha' }} al
         {{ resultado.filtros.fecha_hasta | fechaLima: 'fecha' }}
       </p>

@@ -6,19 +6,19 @@
 @if (detalle(); as detalle) {
   <app-cabecera-ingreso [detalle]="detalle" />
 
-  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Secciones del ingreso">
+  <nav class="pestanas" aria-label="Secciones del ingreso">
     @for (item of pestanas; track item.ruta) {
       <a
-        mat-tab-link
         [routerLink]="['/consulta/ingresos', detalle.id, item.ruta]"
-        [active]="pestanaActiva() === item.ruta"
+        [class.on]="pestanaActiva() === item.ruta"
+        [attr.aria-current]="pestanaActiva() === item.ruta ? 'page' : null"
         [attr.data-prueba]="'pestana-' + item.ruta"
       >
         {{ item.etiqueta }}
       </a>
     }
   </nav>
-  <mat-tab-nav-panel #panel class="panel">
+  <div class="panel">
     @switch (pestanaActiva()) {
       @case ('datos') {
         <app-pestana-datos [detalle]="detalle" />
@@ -43,5 +43,5 @@
         <app-pestana-historial [eventos]="detalle.historial" [codigo]="detalle.codigo" />
       }
     }
-  </mat-tab-nav-panel>
+  </div>
 }

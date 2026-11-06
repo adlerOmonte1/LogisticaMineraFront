@@ -9,22 +9,24 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AutorizacionService } from '@core/autorizacion/autorizacion.service';
 import { comoErrorApi } from '@core/errores/error-inesperado';
-import { ACCION_PRINCIPAL, NAVEGACION, filtrarPorPermiso } from '@core/layout/navegacion';
+import { ACCION_PRINCIPAL } from '@core/layout/navegacion';
 import { SesionService } from '@core/sesion/sesion.service';
 import { InicioDia } from '@models/consulta.model';
 import { ErrorApi } from '@models/error-api.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
+import { CifraComponent } from '@shared/components/cifra/cifra.component';
+import { FichaComponent } from '@shared/components/ficha/ficha.component';
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
 import { ToneladasPipe } from '@shared/pipes/toneladas.pipe';
 import { EtiquetaRolPipe } from '@shared/pipes/etiqueta-rol.pipe';
 import { ConsultaApiService } from '../../data-access/consulta-api.service';
 import { BarrasSemanaComponent } from '../../ui/barras-semana/barras-semana.component';
-import { CifraInicioComponent } from '../../ui/cifra-inicio/cifra-inicio.component';
 import { TablaIngresosComponent } from '../../ui/tabla-ingresos/tabla-ingresos.component';
 
 /**
- * Pantalla de entrada de cada rol (HU-M01-01 CA01, HU-M07-04): el saludo, la consulta rápida por
- * placa, las cuatro cifras del día, los últimos cinco ingresos y las toneladas de la semana.
+ * Pantalla de entrada de cada rol (HU-M01-01 CA01, HU-M07-04), con la disposición de la maqueta
+ * (`pInicio`, D-F46): el saludo, la consulta rápida por placa, las cuatro cifras del día, y los
+ * últimos cinco ingresos junto a las toneladas de la semana.
  * Cada cifra trae del servidor su enlace, o ninguno si el rol no tiene esa pantalla (CA11). Los
  * avisos de pendientes están en la campana de la cabecera.
  */
@@ -41,7 +43,8 @@ import { TablaIngresosComponent } from '../../ui/tabla-ingresos/tabla-ingresos.c
     MatProgressBarModule,
     AvisoErrorComponent,
     BarrasSemanaComponent,
-    CifraInicioComponent,
+    CifraComponent,
+    FichaComponent,
     EncabezadoPaginaComponent,
     EtiquetaRolPipe,
     TablaIngresosComponent,
@@ -63,11 +66,6 @@ export class InicioPage implements OnInit {
 
   protected readonly formulario = new FormGroup({ placa: new FormControl('', { nonNullable: true }) });
 
-  protected readonly accesos = computed(() =>
-    filtrarPorPermiso(NAVEGACION, (permiso) => this.autorizacion.puede(permiso)).filter(
-      (item) => item.ruta !== '/inicio',
-    ),
-  );
   protected readonly accionPrincipal = computed(() =>
     this.autorizacion.puede(ACCION_PRINCIPAL.permiso) ? ACCION_PRINCIPAL : null,
   );

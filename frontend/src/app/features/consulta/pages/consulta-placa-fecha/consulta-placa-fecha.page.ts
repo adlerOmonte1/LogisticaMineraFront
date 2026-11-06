@@ -22,6 +22,7 @@ import { DetalleIngreso } from '@models/detalle-ingreso.model';
 import { ErrorApi } from '@models/error-api.model';
 import { AvisoErrorComponent } from '@shared/components/aviso-error/aviso-error.component';
 import { EncabezadoPaginaComponent } from '@shared/components/encabezado-pagina/encabezado-pagina.component';
+import { InsigniaIngresoComponent } from '@shared/components/insignia-ingreso/insignia-ingreso.component';
 import { MarcoListadoComponent } from '@shared/components/marco-listado/marco-listado.component';
 import { crearListadoPaginado } from '@shared/listados/listado-paginado';
 import { normalizarPlaca } from '@shared/utils/placa';
@@ -55,6 +56,7 @@ const BUSQUEDA_VACIA: FiltroBusqueda = { placa: '', fecha: '', hasta: '' };
     MatProgressBarModule,
     AvisoErrorComponent,
     EncabezadoPaginaComponent,
+    InsigniaIngresoComponent,
     MarcoListadoComponent,
     PestanaDatosComponent,
     PestanaTicketComponent,

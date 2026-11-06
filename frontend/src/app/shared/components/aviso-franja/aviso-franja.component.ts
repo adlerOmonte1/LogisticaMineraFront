@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostBinding, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
-export type ColorAviso = 'green' | 'orange' | 'blue' | 'gray';
+export type ColorAviso = 'green' | 'orange' | 'red' | 'blue' | 'gray';
 
 /**
  * Aviso en franja de la maqueta (`banner`): icono, texto proyectado y un borde de color a la
@@ -38,6 +38,10 @@ export type ColorAviso = 'green' | 'orange' | 'blue' | 'gray';
     :host(.aviso--orange) {
       background: color-mix(in srgb, var(--orange-b) 10%, var(--surface));
       color: var(--orange);
+    }
+    :host(.aviso--red) {
+      background: color-mix(in srgb, var(--red) 8%, var(--surface));
+      color: var(--red);
     }
     :host(.aviso--green) {
       background: color-mix(in srgb, var(--green) 9%, var(--surface));

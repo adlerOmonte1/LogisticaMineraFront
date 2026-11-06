@@ -1,33 +1,52 @@
 :host {
   display: grid;
-  gap: 12px;
+  gap: 16px;
 }
 
 .seccion {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 12px;
+  font: 600 19px/1.25 var(--font-d);
+  letter-spacing: 0.01em;
 }
 
 .nota {
-  margin: 0 0 8px;
+  margin: 12px 0 0;
   font-size: 0.85rem;
+}
+
+.pareja {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .datos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
   margin: 0;
 
   dt {
-    font-size: 0.75rem;
+    margin-bottom: 3px;
+    font-size: 12.5px;
+    font-weight: 500;
     color: var(--label-3);
   }
 
   dd {
     margin: 0;
+    font-size: 15px;
     font-weight: 600;
+    overflow-wrap: anywhere;
   }
+}
+
+.datos--compactos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.datos__neto dd {
+  font: 700 24px/1.1 var(--font-d);
 }
 
 .datos__ancho {
@@ -36,4 +55,14 @@
 
 .datos__anulacion dd {
   color: var(--red);
+}
+
+@media (max-width: 900px) {
+  .datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pareja {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
